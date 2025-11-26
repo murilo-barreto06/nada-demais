@@ -1,0 +1,209 @@
+/* ======== ESTILOS GERAIS ======== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Tema claro */
+body.light {
+    background: #f2f2f2;
+    color: #222;
+}
+
+/* Tema escuro */
+body.dark {
+    background: #181818;
+    color: #eee;
+}
+
+header {
+    width: 100%;
+    background: #555;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.nav-buttons a {
+    background: #cfcfcf;
+    padding: 8px 15px;
+    margin-left: 10px;
+    text-decoration: none;
+    color: black;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.nav-buttons a:hover {
+    background: #ffffff;
+}
+
+/* ======== HOME ======== */
+.home-container {
+    width: 70%;
+    margin: 80px auto;
+    background: #bdbdbd;
+    padding: 80px;
+    border-radius: 25px;
+    text-align: center;
+}
+
+.home-container h2 {
+    font-size: 48px;
+}
+
+.big-button {
+    margin-top: 60px;
+    background: #444;
+    color: white;
+    padding: 35px 70px;
+    font-size: 40px;
+    border-radius: 25px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.big-button:hover {
+    background: #000;
+}
+
+/* ======== CARROSSEL ======== */
+.carousel-container {
+    margin: 40px auto;
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carousel {
+    display: flex;
+    gap: 30px;
+}
+
+.card {
+    width: 270px;
+    background: #555;
+    padding-bottom: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: white;
+    transition: .2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card-title {
+    font-size: 20px;
+    text-align: center;
+    padding: 15px;
+    font-weight: bold;
+}
+
+.card-desc {
+    text-align: center;
+    padding: 10px;
+}
+
+.card-img {
+    height: 150px;
+    background: linear-gradient(#dff3ff, #9bd56a);
+    border-radius: 5px;
+    margin: 15px;
+}
+
+.arrow {
+    font-size: 40px;
+    background: #ccc;
+    width: 60px;
+    height: 60px;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* ======== MODELO (DETALHES) ======== */
+.model-box {
+    width: 90%;
+    margin: 40px auto;
+    background: #c4c4c4;
+    padding: 40px;
+    border-radius: 25px;
+}
+
+.model-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.big-img {
+    width: 100%;
+    height: 250px;
+    background: linear-gradient(#dff3ff, #9bd56a);
+    border-radius: 15px;
+    margin-top: 20px;
+}
+
+.buy-section {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.buy-btn {
+    background: #444;
+    padding: 20px 40px;
+    font-size: 28px;
+    border-radius: 20px;
+    color: white;
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+}
+
+.buy-btn:hover {
+    background: #000;
+}
+
+/* ======== CONFIGURAÇÕES ======== */
+#settingsPanel {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100%;
+    background: #444;
+    color: white;
+    padding: 20px;
+    transition: 0.4s;
+}
+
+#settingsPanel.open {
+    right: 0;
+}
+
+.settings-btn {
+    margin-top: 20px;
+    display: block;
+    padding: 10px;
+    background: #666;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.settings-btn:hover {
+    background: #777;
+}

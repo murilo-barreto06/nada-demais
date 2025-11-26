@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Store</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+
+<header>
+    <h1 onclick="location.href='index.html'">AI Store</h1>
+
+    <div class="nav-buttons">
+        <a href="index.html">Home</a>
+        <a href="store.html">Anuncie</a>
+        <a href="#" onclick="openSettings()">Configurações</a>
+    </div>
+</header>
+
+<div class="home-container">
+    <h2>AI Store</h2>
+
+    <a href="store.html" class="big-button">Compre uma IA</a>
+</div>
+
+<div id="settingsPanel">
+    <h2>Configurações</h2>
+    <div class="settings-btn" onclick="toggleTheme()">Alternar Tema</div>
+    <div class="settings-btn" onclick="closeSettings()">Fechar</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

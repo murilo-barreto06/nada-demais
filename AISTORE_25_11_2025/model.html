@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalhes da IA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+
+<header>
+    <h1 onclick="location.href='index.html'">AI Store</h1>
+
+    <div class="nav-buttons">
+        <a href="index.html">Home</a>
+        <a href="store.html">Voltar</a>
+        <a href="#" onclick="openSettings()">Configurações</a>
+    </div>
+</header>
+
+<div class="model-box">
+    <div class="model-header">
+        <div class="card-img" style="width: 70px; height: 70px;"></div>
+        <h2>Nome da empresa ou criador</h2>
+    </div>
+
+    <div class="big-img"></div>
+
+    <p style="margin-top:20px; font-size:22px;">
+        • Descrição completa da IA<br>
+        • Mais detalhes importantes<br>
+        • Explicações técnicas<br>
+        • Funcionalidades<br>
+        • Benefícios<br>
+    </p>
+
+    <div class="buy-section">
+        <h1>R$ 59,90</h1>
+        <a class="buy-btn" href="#">Adquirir agora</a>
+    </div>
+</div>
+
+<div id="settingsPanel">
+    <h2>Configurações</h2>
+    <div class="settings-btn" onclick="toggleTheme()">Alternar Tema</div>
+    <div class="settings-btn" onclick="closeSettings()">Fechar</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
