@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Store — Loja</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="light">
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html" class="active">Loja</a>
+      <a href="login.html">Entrar</a>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="store-hero">
+      <h1>Modelos disponíveis</h1>
+      <p>Clique em um bloco para ver detalhes. Se o anunciante enviou imagem, ela aparecerá no topo.</p>
+      <button class="home-btn" onclick="goHome()">Home</button>
+    </section>
+
+    <section class="carousel-section large">
+       <div class="carousel-wrapper">
+            <button class="carousel-btn left" onclick="prevSlide()">‹</button>
+
+            <div class="carousel" id="carouselContainer">
+                <!-- items adicionados dinamicamente -->
+            </div>
+
+            <button class="carousel-btn right" onclick="nextSlide()">›</button>
+        </div>
+    </section>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <h3>Configurações</h3>
+    <div class="settings-row">
+      <label>Tema</label>
+      <button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row">
+      <label>Conta</label>
+      <a href="login.html" class="small-btn">Entrar / Cadastrar</a>
+    </div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer>
+    <p>AI Store — protótipo • © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

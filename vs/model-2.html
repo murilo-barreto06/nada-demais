@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Modelo IA</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+  </header>
+
+  <main class="model-page">
+    <div class="container">
+      <h1 id="modelTitle"></h1>
+      <img id="modelImage" class="model-banner">
+      <p id="modelDescription"></p>
+    </div>
+  </main>
+
+  <script>
+    async function loadModel() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = Number(urlParams.get("id"));
+
+      const res = await fetch("models.json");
+      const models = await res.json();
+
+      const model = models.find(m => m.id === id);
+      if (!model) return;
+
+      document.getElementById("modelTitle").textContent = model.title;
+      document.getElementById("modelDescription").textContent = model.description;
+      document.getElementById("modelImage").src = model.image;
+    }
+
+    loadModel();
+  </script>
+</body>
+</html>
