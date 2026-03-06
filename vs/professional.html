@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Store — Profissional</title>
+  
+  <!-- SCRIPT CRÍTICO ANTES DO CSS - PREVINE FLASH -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof loadProfessional === 'function') {
+        loadProfessional();
+      }
+    });
+  </script>
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html">Loja</a>
+      <a href="anuncie.html">Anuncie</a>
+      <a href="login.html">Entrar</a>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="professional-page">
+      <div class="container">
+        <!-- Cabeçalho do profissional -->
+        <div class="professional-header">
+          <div id="professionalAvatar" class="professional-avatar-large"></div>
+          <h1 id="professionalName">Carregando...</h1>
+          <p id="professionalSpecialty" class="professional-specialty"></p>
+          <div class="professional-rating" id="professionalRating">⭐ 0.0</div>
+        </div>
+
+        <!-- Bio e informações -->
+        <div class="professional-content">
+          <div class="professional-bio-section">
+            <h2>Sobre</h2>
+            <p id="professionalBio" class="professional-bio">Carregando informações do profissional...</p>
+            
+            <div class="professional-stats">
+              <div class="stat">
+                <span class="stat-value" id="professionalProjects">0</span>
+                <span class="stat-label">Projetos</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value" id="professionalRating">0.0</span>
+                <span class="stat-label">Avaliação</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value" id="professionalHourlyRate">R$ 0</span>
+                <span class="stat-label">Hora</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Serviços oferecidos -->
+          <div class="professional-services-section">
+            <h2>Serviços disponíveis</h2>
+            <ul id="professionalServices" class="services-list">
+              <!-- Preenchido via JS -->
+            </ul>
+          </div>
+
+          <!-- Modelos criados por este profissional -->
+          <div class="professional-models-section">
+            <h2>Modelos criados</h2>
+            <div class="related-grid" id="professionalModels">
+              <!-- Cards dos modelos serão inseridos aqui -->
+            </div>
+          </div>
+
+          <!-- Botão de contato/contratação -->
+          <div class="professional-contact">
+            <button class="cta" onclick="contactProfessional()">Solicitar serviço</button>
+            <button class="cta outline" onclick="viewPortfolio()">Ver portfólio</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label>
+      <button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row">
+      <label>Conta</label>
+      <a href="login.html" class="small-btn">Entrar / Cadastrar</a>
+    </div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer>
+    <p>AI Store — protótipo • © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

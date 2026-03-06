@@ -4,41 +4,62 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AI Store — Loja</title>
+  
+  <!-- SCRIPT CRÍTICO ANTES DO CSS - PREVINE FLASH -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="light">
+<body>
   <header>
     <div class="brand" onclick="goHome()">AI Store</div>
     <nav>
       <a href="index.html">Home</a>
       <a href="store.html" class="active">Loja</a>
+      <a href="anuncie.html">Anuncie</a>
       <a href="login.html">Entrar</a>
       <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
     </nav>
   </header>
 
   <main>
-    <section class="store-hero">
-      <h1>Modelos disponíveis</h1>
-      <p>Clique em um bloco para ver detalhes. Se o anunciante enviou imagem, ela aparecerá no topo.</p>
-      <button class="home-btn" onclick="goHome()">Home</button>
+    <!-- CARROSSEL DE MODELOS -->
+    <section class="carousel-section">
+      <div class="container">
+        <h2>Modelos disponíveis</h2>
+        <div class="carousel-wrapper">
+          <button class="carousel-btn left" onclick="prevSlideModels()">‹</button>
+          <div class="carousel" id="modelsCarousel"></div>
+          <button class="carousel-btn right" onclick="nextSlideModels()">›</button>
+        </div>
+      </div>
     </section>
 
-    <section class="carousel-section large">
-       <div class="carousel-wrapper">
-            <button class="carousel-btn left" onclick="prevSlide()">‹</button>
-
-            <div class="carousel" id="carouselContainer">
-                <!-- items adicionados dinamicamente -->
-            </div>
-
-            <button class="carousel-btn right" onclick="nextSlide()">›</button>
+    <!-- CARROSSEL DE PROFISSIONAIS - APENAS CRIADOS -->
+    <section class="carousel-section professionals">
+      <div class="container">
+        <h2>Profissionais em Destaque</h2>
+        <div class="carousel-wrapper">
+          <button class="carousel-btn left" onclick="prevSlideProfessionals()">‹</button>
+          <div class="carousel" id="professionalsCarousel"></div>
+          <button class="carousel-btn right" onclick="nextSlideProfessionals()">›</button>
         </div>
+      </div>
     </section>
   </main>
 
   <div id="settingsPanel" class="settings-panel">
-    <h3>Configurações</h3>
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
     <div class="settings-row">
       <label>Tema</label>
       <button onclick="toggleTheme()" class="small-btn">Alternar</button>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Store — Publicar Modelo</title>
+  
+  <!-- SCRIPT CRÍTICO ANTES DO CSS - PREVINE FLASH -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html">Loja</a>
+      <a href="anuncie.html" class="active">Anuncie</a>
+      <a href="login.html">Entrar</a>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="publish-container">
+      <h1 id="formTitle">Publicar Novo Modelo</h1>
+      
+      <form id="modelForm">
+        <input type="hidden" id="modelId" value="">
+        
+        <div class="form-group">
+          <label for="modelType">Tipo de publicação *</label>
+          <select id="modelType" required onchange="window.toggleTypeFields()">
+            <option value="model">Modelo de IA</option>
+            <option value="professional">Profissional / Serviço</option>
+          </select>
+        </div>
+        
+        <!-- Campos para Modelo -->
+        <div id="modelFields">
+          <div class="form-group">
+            <label for="modelTitle">Título do modelo *</label>
+            <input type="text" id="modelTitle" placeholder="Ex: IA de Atendimento para WhatsApp">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="modelPrice">Preço (R$) *</label>
+              <input type="number" id="modelPrice" step="0.01" min="0" placeholder="199.00">
+            </div>
+            
+            <div class="form-group">
+              <label for="modelSeller">Vendedor *</label>
+              <input type="text" id="modelSeller" placeholder="Ex: BotLabs">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Campos para Profissional -->
+        <div id="professionalFields" style="display: none;">
+          <div class="form-group">
+            <label for="profName">Nome do profissional *</label>
+            <input type="text" id="profName" placeholder="Ex: Ana Silva">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="profSpecialty">Especialidade *</label>
+              <input type="text" id="profSpecialty" placeholder="Ex: NLP, Visão Computacional">
+            </div>
+            
+            <div class="form-group">
+              <label for="profRating">Avaliação (0-5)</label>
+              <input type="number" id="profRating" step="0.1" min="0" max="5" value="5.0">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="profProjects">Projetos realizados</label>
+              <input type="number" id="profProjects" min="0" value="0">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Campos comuns -->
+        <div class="form-group">
+          <label for="modelDescription">Descrição *</label>
+          <textarea id="modelDescription" rows="4" placeholder="Descreva detalhadamente o modelo ou serviço..." oninput="window.updateCharCounter()"></textarea>
+          <div class="char-counter"><span id="charCount">0</span>/500 caracteres</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="modelImage">URL da imagem (opcional)</label>
+          <input type="url" id="modelImage" placeholder="https://exemplo.com/imagem.jpg" onchange="window.previewImage()">
+          <div class="image-preview" id="imagePreview"></div>
+        </div>
+        
+        <div class="btn-group">
+          <button type="submit" class="cta" id="submitBtn">Publicar</button>
+          <button type="button" class="cta outline" onclick="window.clearForm()">Limpar</button>
+          <button type="button" class="cta danger" id="deleteBtn" style="display: none;" onclick="window.deleteCurrent()">Excluir</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label>
+      <button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row">
+      <label>Conta</label>
+      <a href="login.html" class="small-btn">Entrar / Cadastrar</a>
+    </div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer>
+    <p>AI Store — protótipo • © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="publish.js"></script>
+</body>
+</html>

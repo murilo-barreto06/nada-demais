@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Store — Home</title>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html">Loja</a>
+      <a href="anuncie.html"class="active">Anuncie</a>
+      <a href="login.html">Entrar</a>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>  
+
+  <main class="dashboard">
+    <h1>Painel do Vendedor</h1>
+    <p class="dashboard-subtitle">Aqui você gerencia seus modelos, preços e documentação.</p>
+
+    <div class="dashboard-actions">
+        <button class="hero-btn" onclick="window.location.href='publicar-modelo.html'">
+          Publicar modelo
+        </button>
+        <button class="hero-btn" onclick="window.location.href='inscricao-professionals.html'">
+          Cadastrar como profissional
+        </button>
+    </div>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label>
+      <button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row">
+      <label>Conta</label>
+      <a href="login.html" class="small-btn">Entrar / Cadastrar</a>
+    </div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer>
+    <p>AI Store — protótipo • © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

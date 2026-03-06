@@ -3,44 +3,381 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI Store — Minhas IAs</title>
+  <title>AI Store — Meu Painel</title>
+  
+  <!-- SCRIPT CRÍTICO ANTES DO CSS - PREVINE FLASH -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Estilos específicos do dashboard */
+    .dashboard-tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(128,128,128,0.2);
+      padding-bottom: 1rem;
+    }
+    
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 0.5rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 30px;
+      transition: all var(--transition);
+    }
+    
+    .tab-btn:hover {
+      color: var(--accent);
+      background: rgba(21, 115, 71, 0.1);
+    }
+    
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .section-header h2 {
+      font-size: 1.8rem;
+      color: var(--text);
+    }
+    
+    .badge {
+      background: var(--accent);
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: transform var(--transition);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+    }
+    
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.2;
+    }
+    
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    
+    .professional-card {
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .professional-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    
+    .professional-card-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .professional-card h3 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .professional-card .specialty {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 1rem;
+    }
+    
+    .professional-stats {
+      display: flex;
+      gap: 2rem;
+      margin: 1.5rem 0;
+    }
+    
+    .professional-stats .stat {
+      text-align: center;
+    }
+    
+    .professional-stats .stat .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: block;
+    }
+    
+    .professional-stats .stat .label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
+    .professional-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .professional-actions .cta {
+      background: white;
+      color: var(--accent);
+    }
+    
+    .professional-actions .cta:hover {
+      background: rgba(255,255,255,0.9);
+      transform: scale(1.02);
+    }
+    
+    .empty-state {
+      background: var(--panel);
+      padding: 3rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      color: var(--muted);
+      border: 2px dashed rgba(128,128,128,0.2);
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    .empty-state p {
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+    }
+    
+    .sale-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: var(--panel);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .sale-item .title {
+      font-weight: 600;
+    }
+    
+    .sale-item .price {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    
+    .sale-item .date {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    
+    @media (max-width: 600px) {
+      .professional-stats {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .professional-actions {
+        flex-direction: column;
+      }
+      
+      .dashboard-tabs {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
 </head>
-<body class="light">
+<body>
   <header>
     <div class="brand" onclick="goHome()">AI Store</div>
     <nav>
       <a href="index.html">Home</a>
       <a href="store.html">Loja</a>
-      <a href="buyer-dashboard.html" class="active">Minhas IAs</a>
+      <a href="anuncie.html">Anuncie</a>
+      <a href="buyer-dashboard.html" class="active">Meu Painel</a>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
     </nav>
   </header>
 
   <main class="dashboard">
-    <h1>Minhas IAs</h1>
-    <p>Modelos que você adquiriu.</p>
-
-    <div class="card-grid">
-      <div class="small-card">
-        <h3>IA Atendimento</h3>
-        <button class="hero-btn" onclick="alert('Abrir documentação')">Abrir documentação</button>
+    <div class="container">
+      <!-- Cabeçalho do dashboard -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap;">
+        <h1>Meu Painel</h1>
+        <div style="display: flex; gap: 1rem;">
+          <span class="badge">Comprador</span>
+          <span class="badge" id="vendedorBadge" style="display: none;">Vendedor</span>
+          <span class="badge" id="profissionalBadge" style="display: none;">Profissional</span>
+        </div>
       </div>
-      <div class="small-card">
-        <h3>IA Recomendador</h3>
-        <button class="hero-btn" onclick="alert('Abrir documentação')">Abrir documentação</button>
+
+      <!-- Abas de navegação -->
+      <div class="dashboard-tabs">
+        <button class="tab-btn active" onclick="mudarAba('adquiridos')"> Adquiridos</button>
+        <button class="tab-btn" onclick="mudarAba('publicados')"> Meus Modelos</button>
+        <button class="tab-btn" onclick="mudarAba('profissional')"> Perfil Profissional</button>
+        <button class="tab-btn" onclick="mudarAba('vendas')"> Vendas</button>
+      </div>
+
+      <!-- ABA 1: MODELOS ADQUIRIDOS -->
+      <div id="aba-adquiridos" class="tab-content active">
+        <div class="section-header">
+          <h2>Modelos que você adquiriu</h2>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="totalAdquiridos">0</div>
+            <div class="stat-label">Modelos comprados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="totalGasto">R$ 0</div>
+            <div class="stat-label">Total investido</div>
+          </div>
+        </div>
+        
+        <div class="card-grid" id="modelosAdquiridos">
+          <!-- Cards serão inseridos via JS -->
+        </div>
+      </div>
+
+      <!-- ABA 2: MODELOS PUBLICADOS PELO USUÁRIO -->
+      <div id="aba-publicados" class="tab-content">
+        <div class="section-header">
+          <h2>Meus modelos publicados</h2>
+          <a href="publicar-modelo.html" class="cta small" style="padding: 0.5rem 1.5rem;">+ Novo modelo</a>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="totalPublicados">0</div>
+            <div class="stat-label">Modelos publicados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="totalVendas">0</div>
+            <div class="stat-label">Vendas totais</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="faturamento">R$ 0</div>
+            <div class="stat-label">Faturamento</div>
+          </div>
+        </div>
+        
+        <div class="card-grid" id="modelosPublicados">
+          <!-- Cards serão inseridos via JS -->
+        </div>
+      </div>
+
+      <!-- ABA 3: PERFIL PROFISSIONAL -->
+      <div id="aba-profissional" class="tab-content">
+        <div class="section-header">
+          <h2>Perfil Profissional</h2>
+        </div>
+        
+        <div id="profissionalContainer">
+          <!-- Conteúdo será inserido via JS -->
+        </div>
+      </div>
+
+      <!-- ABA 4: VENDAS REALIZADAS -->
+      <div id="aba-vendas" class="tab-content">
+        <div class="section-header">
+          <h2>Histórico de vendas</h2>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="vendasMes">0</div>
+            <div class="stat-label">Vendas este mês</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="receitaMes">R$ 0</div>
+            <div class="stat-label">Receita no mês</div>
+          </div>
+        </div>
+        
+        <div id="vendasContainer" style="background: var(--panel); padding: 1.5rem; border-radius: var(--border-radius);">
+          <!-- Lista de vendas será inserida via JS -->
+        </div>
       </div>
     </div>
   </main>
 
   <div id="settingsPanel" class="settings-panel">
-    <h3>Configurações</h3>
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
     <div class="settings-row">
       <label>Tema</label>
       <button onclick="toggleTheme()" class="small-btn">Alternar</button>
     </div>
     <div class="settings-row">
       <label>Conta</label>
-      <a href="login.html" class="small-btn">Entrar / Cadastrar</a>
+      <a href="login.html" class="small-btn">Sair</a>
     </div>
     <button class="small-btn" onclick="toggleSettings()">Fechar</button>
   </div>
@@ -50,5 +387,281 @@
   </footer>
 
   <script src="app.js"></script>
+  <script>
+    // ===== FUNÇÕES ESPECÍFICAS DO DASHBOARD =====
+    
+    // Mock de modelos adquiridos (simula compras do usuário)
+    const MODELOS_ADQUIRIDOS = [
+      { id: 1, title: 'IA Atendimento', seller: 'BotLabs', price: 'R$ 199,00', dataCompra: '2025-02-15' },
+      { id: 3, title: 'Recomendador de Produtos', seller: 'RecoSys', price: 'R$ 149,00', dataCompra: '2025-02-20' }
+    ];
+    
+    // Mock de vendas realizadas (para modelos publicados)
+    const VENDAS_REALIZADAS = [
+      { id: 101, modeloId: 1001, comprador: 'Empresa X', valor: 299, data: '2025-03-01' },
+      { id: 102, modeloId: 1002, comprador: 'Startup Y', valor: 199, data: '2025-03-02' },
+      { id: 103, modeloId: 1001, comprador: 'Consultoria Z', valor: 299, data: '2025-03-03' }
+    ];
+    
+    // Função para mudar de aba
+    window.mudarAba = function(aba) {
+      // Remove active de todas as abas e conteúdos
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      // Ativa a aba clicada
+      event.target.classList.add('active');
+      
+      // Ativa o conteúdo correspondente
+      document.getElementById(`aba-${aba}`).classList.add('active');
+    };
+    
+    // Carregar modelos adquiridos
+    function carregarAdquiridos() {
+      const container = document.getElementById('modelosAdquiridos');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      
+      if (MODELOS_ADQUIRIDOS.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>Você ainda não adquiriu nenhum modelo.</p>
+            <a href="store.html" class="cta">Explorar loja</a>
+          </div>
+        `;
+        return;
+      }
+      
+      // Calcular total gasto
+      const totalGasto = MODELOS_ADQUIRIDOS.reduce((acc, item) => {
+        const valor = parseFloat(item.price.replace('R$', '').replace(',', '.'));
+        return acc + valor;
+      }, 0);
+      
+      document.getElementById('totalAdquiridos').textContent = MODELOS_ADQUIRIDOS.length;
+      document.getElementById('totalGasto').textContent = `R$ ${totalGasto.toFixed(2)}`;
+      
+      MODELOS_ADQUIRIDOS.forEach(model => {
+        const card = document.createElement('div');
+        card.className = 'small-card';
+        card.innerHTML = `
+          <h4>${model.title}</h4>
+          <p>Vendedor: ${model.seller}</p>
+          <p style="color: var(--accent); font-weight: bold;">${model.price}</p>
+          <p style="font-size: 0.8rem; color: var(--muted);">Adquirido em: ${new Date(model.dataCompra).toLocaleDateString()}</p>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <button class="small-btn" onclick="window.location.href='model.html?id=${model.id}'">Ver detalhes</button>
+            <button class="small-btn" onclick="alert('Documentação do modelo ${model.title}')">📄 Documentação</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+    
+    // Carregar modelos publicados pelo usuário
+    function carregarPublicados() {
+      const container = document.getElementById('modelosPublicados');
+      if (!container) return;
+      
+      // Busca modelos do localStorage
+      const models = JSON.parse(localStorage.getItem('models') || '[]');
+      
+      document.getElementById('totalPublicados').textContent = models.length;
+      
+      // Simula vendas para cada modelo
+      const vendasPorModelo = {};
+      VENDAS_REALIZADAS.forEach(venda => {
+        vendasPorModelo[venda.modeloId] = (vendasPorModelo[venda.modeloId] || 0) + 1;
+      });
+      
+      const totalVendas = VENDAS_REALIZADAS.length;
+      const faturamento = VENDAS_REALIZADAS.reduce((acc, v) => acc + v.valor, 0);
+      
+      document.getElementById('totalVendas').textContent = totalVendas;
+      document.getElementById('faturamento').textContent = `R$ ${faturamento.toFixed(2)}`;
+      
+      container.innerHTML = '';
+      
+      if (models.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>Você ainda não publicou nenhum modelo.</p>
+            <a href="publicar-modelo.html" class="cta">Publicar agora</a>
+          </div>
+        `;
+        return;
+      }
+      
+      models.forEach(model => {
+        const vendas = vendasPorModelo[model.id] || 0;
+        const receita = VENDAS_REALIZADAS.filter(v => v.modeloId === model.id).reduce((acc, v) => acc + v.valor, 0);
+        
+        const card = document.createElement('div');
+        card.className = 'small-card';
+        card.innerHTML = `
+          <h4>${model.title}</h4>
+          <p>${model.seller || 'Você'}</p>
+          <p style="color: var(--accent); font-weight: bold;">${model.price}</p>
+          <div style="display: flex; justify-content: space-between; margin: 1rem 0; padding: 0.5rem; background: var(--bg); border-radius: 8px;">
+            <span> Vendas: <strong>${vendas}</strong></span>
+            <span> Receita: <strong>R$ ${receita.toFixed(2)}</strong></span>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="small-btn" onclick="window.location.href='model.html?id=${model.id}'">Ver</button>
+            <button class="small-btn" onclick="editarModelo(${model.id})">Editar</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+    
+    // Função para editar modelo
+    window.editarModelo = function(id) {
+      localStorage.setItem('editItem', JSON.stringify({ type: 'model', id: id }));
+      window.location.href = 'publicar-modelo.html';
+    };
+    
+    // Carregar perfil profissional
+    function carregarPerfilProfissional() {
+      const container = document.getElementById('profissionalContainer');
+      if (!container) return;
+      
+      // Busca profissionais do localStorage
+      const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+      
+      if (professionals.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>Você ainda não tem um perfil profissional.</p>
+            <a href="inscricao-professionals.html" class="cta">Criar perfil</a>
+          </div>
+        `;
+        document.getElementById('profissionalBadge').style.display = 'none';
+        return;
+      }
+      
+      // Mostra o primeiro profissional (ou você pode permitir múltiplos)
+      const prof = professionals[0];
+      document.getElementById('profissionalBadge').style.display = 'inline-block';
+      
+      // Simula serviços (se não tiver no objeto)
+      const servicos = prof.services || ['Instalação', 'Treinamento', 'Customização'];
+      
+      container.innerHTML = `
+        <div class="professional-card">
+          <div class="professional-card-content">
+            <h3>${prof.name}</h3>
+            <p class="specialty">${prof.specialty}</p>
+            
+            <div class="professional-stats">
+              <div class="stat">
+                <span class="value"> ${prof.rating}</span>
+                <span class="label">Avaliação</span>
+              </div>
+              <div class="stat">
+                <span class="value">${prof.projects || 0}</span>
+                <span class="label">Projetos</span>
+              </div>
+              <div class="stat">
+                <span class="value">${prof.hourlyRate ? `R$ ${prof.hourlyRate}` : 'Consultar'}</span>
+                <span class="label">Hora</span>
+              </div>
+            </div>
+            
+            <p style="margin-bottom: 1.5rem;">${prof.description || 'Profissional disponível para serviços.'}</p>
+            
+            <div style="margin-bottom: 1.5rem;">
+              <strong>Serviços oferecidos:</strong>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                ${servicos.map(s => `<span style="background: rgba(255,255,255,0.2); padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.9rem;">${s}</span>`).join('')}
+              </div>
+            </div>
+            
+            <div class="professional-actions">
+              <button class="cta" onclick="window.location.href='professional.html?id=${prof.id}'">Ver perfil público</button>
+              <button class="cta" onclick="editarProfissional(${prof.id})">Editar perfil</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Função para editar profissional
+    window.editarProfissional = function(id) {
+      localStorage.setItem('editItem', JSON.stringify({ type: 'professional', id: id }));
+      window.location.href = 'publicar-modelo.html?type=professional';
+    };
+    
+    // Carregar vendas realizadas
+    function carregarVendas() {
+      const container = document.getElementById('vendasContainer');
+      if (!container) return;
+      
+      if (VENDAS_REALIZADAS.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>Nenhuma venda realizada ainda.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Estatísticas do mês atual
+      const dataAtual = new Date();
+      const mesAtual = dataAtual.getMonth();
+      const anoAtual = dataAtual.getFullYear();
+      
+      const vendasEsteMes = VENDAS_REALIZADAS.filter(v => {
+        const data = new Date(v.data);
+        return data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
+      });
+      
+      const totalVendasMes = vendasEsteMes.length;
+      const receitaMes = vendasEsteMes.reduce((acc, v) => acc + v.valor, 0);
+      
+      document.getElementById('vendasMes').textContent = totalVendasMes;
+      document.getElementById('receitaMes').textContent = `R$ ${receitaMes.toFixed(2)}`;
+      
+      // Lista de vendas
+      let html = '<h3 style="margin-bottom: 1rem;">Últimas vendas</h3>';
+      
+      VENDAS_REALIZADAS.sort((a, b) => new Date(b.data) - new Date(a.data)).forEach(venda => {
+        // Busca o nome do modelo
+        const models = JSON.parse(localStorage.getItem('models') || '[]');
+        const modelo = models.find(m => m.id == venda.modeloId);
+        const nomeModelo = modelo ? modelo.title : `Modelo #${venda.modeloId}`;
+        
+        html += `
+          <div class="sale-item">
+            <div>
+              <div class="title">${nomeModelo}</div>
+              <div class="date">${new Date(venda.data).toLocaleDateString()}</div>
+            </div>
+            <div style="text-align: right;">
+              <div class="price">R$ ${venda.valor.toFixed(2)}</div>
+              <div style="font-size: 0.8rem; color: var(--muted);">${venda.comprador}</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+      carregarAdquiridos();
+      carregarPublicados();
+      carregarPerfilProfissional();
+      carregarVendas();
+      
+      // Verifica se é vendedor (tem modelos publicados)
+      const models = JSON.parse(localStorage.getItem('models') || '[]');
+      if (models.length > 0) {
+        document.getElementById('vendedorBadge').style.display = 'inline-block';
+      }
+    });
+  </script>
 </body>
 </html>
