@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "name": "Ana Silva",
+    "specialty": "NLP e Chatbots",
+    "avatar": "assets/professionals/ana.jpg",
+    "rating": 4.8,
+    "projects": 12,
+    "bio": "Especialista em NLP com 5 anos de experiência em atendimento automatizado.",
+    "portfolio": [1, 3], 
+    "services": ["instalação", "treinamento", "customização"],
+    "hourlyRate": 150
+  },
+  {
+    "id": 2,
+    "name": "Carlos Mendes",
+    "specialty": "Visão Computacional",
+    "avatar": "assets/professionals/carlos.jpg",
+    "rating": 4.8,
+    "projects": 12,
+    "bio": "Especialista em NLP com 5 anos de experiência em atendimento automatizado.",
+    "portfolio": [1, 3], 
+    "services": ["instalação", "treinamento", "customização"],
+    "hourlyRate": 150
+  },
+  {
+    "id": 3,
+    "name": "Mariana Costa",
+    "specialty": "Modelos Generativos",
+    "avatar": "assets/professionals/mariana.jpg",
+    "rating": 4.8,
+    "projects": 12,
+    "bio": "Especialista em NLP com 5 anos de experiência em atendimento automatizado.",
+    "portfolio": [1, 3], 
+    "services": ["instalação", "treinamento", "customização"],
+    "hourlyRate": 150
+  },
+  {
+    "id": 4,
+    "name": "João Oliveira",
+    "specialty": "Otimização de Modelos",
+    "avatar": "assets/professionals/joao.jpg",
+    "rating": 4.8,
+    "projects": 12,
+    "bio": "Especialista em NLP com 5 anos de experiência em atendimento automatizado.",
+    "portfolio": [1, 3], 
+    "services": ["instalação", "treinamento", "customização"],
+    "hourlyRate": 150
+  }
+]

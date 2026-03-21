@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Store — Modelo</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html" class="active">Loja</a>
+      <a href="anuncie.html">Anuncie</a>
+      <div id="auth-container" style="display: inline-block;"></div>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="product-page">
+      <div class="container">
+        <div class="product-left">
+          <div id="productImage" class="product-img"></div>
+        </div>
+
+        <div class="product-info">
+          <h2 id="productTitle">Carregando...</h2>
+          <p id="productShort" class="desc"></p>
+
+          <div class="meta">
+            <div><strong>Preço:</strong> <span id="productPrice"></span></div>
+            <div><strong>Vendedor:</strong> <span id="productSeller"></span></div>
+          </div>
+
+          <h3>Documentação</h3>
+          <ul id="productDocs">
+            <li>Instalação via Docker</li>
+            <li>API REST - Exemplo</li>
+            <li>Exemplos de integração</li>
+          </ul>
+
+          <div class="buy-section">
+            <a class="buy-btn" href="#" onclick="alert('Funcionalidade de compra será implementada em breve!')">Adquirir agora</a>
+          </div>
+        </div>
+      </div>  
+    </section>
+
+    <section class="related">
+      <div class="container">
+        <h3>Modelos relacionados</h3>
+        <div class="related-grid" id="relatedGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label>
+      <button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row account-row">
+      <label>Conta</label>
+    </div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer>
+    <p>AI Store — protótipo • © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+  
+  <script>
+    // ===== FUNÇÃO PARA CARREGAR MODELO =====
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      
+      if (!id) {
+        window.location.href = 'store.html';
+        return;
+      }
+      
+      // Buscar modelo do localStorage
+      const models = JSON.parse(localStorage.getItem('models') || '[]');
+      const model = models.find(m => m.id == id);
+      
+      if (model) {
+        // Preencher página
+        document.getElementById('productTitle').textContent = model.title;
+        document.getElementById('productShort').textContent = model.description;
+        document.getElementById('productPrice').textContent = model.price || 'R$ 0,00';
+        document.getElementById('productSeller').textContent = model.seller || 'Vendedor';
+        
+        const img = document.getElementById('productImage');
+        if (model.image) {
+          img.style.backgroundImage = `url('${model.image}')`;
+          img.style.backgroundSize = 'cover';
+        } else {
+          img.style.background = 'linear-gradient(180deg,#cfeeff,#9fd8ff,#7bc35b)';
+        }
+        
+        // Modelos relacionados (outros modelos)
+        const rel = document.getElementById('relatedGrid');
+        rel.innerHTML = '';
+        
+        const outros = models.filter(m => m.id != model.id).slice(0, 3);
+        outros.forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'small-card';
+          card.innerHTML = `<h4>${m.title}</h4><p>${m.seller || ''}</p>`;
+          card.style.cursor = 'pointer';
+          card.onclick = () => window.location.href = `model.html?id=${m.id}`;
+          rel.appendChild(card);
+        });
+        
+      } else {
+        alert('Modelo não encontrado');
+        window.location.href = 'store.html';
+      }
+    });
+  </script>
+</body>
+</html>

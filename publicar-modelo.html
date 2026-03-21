@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Store — Publicar Modelo</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html">Loja</a>
+      <a href="anuncie.html" class="active">Anuncie</a>
+      <div id="auth-container" style="display: inline-block;"></div>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="form-page">
+      <div class="container">
+        <div class="form-container">
+          <h1>Publicar Modelo de IA</h1>
+          <p class="form-subtitle">Preencha os dados do seu modelo para aparecer na loja</p>
+          
+          <form id="modelForm" class="professional-form">
+            <!-- Título do modelo -->
+            <div class="form-group">
+              <label for="modelTitle">Título do modelo *</label>
+              <input type="text" id="modelTitle" name="modelTitle" required placeholder="Ex: IA de Atendimento para WhatsApp">
+            </div>
+            
+            <!-- Preço -->
+            <div class="form-group">
+              <label for="modelPrice">Preço (R$) *</label>
+              <input type="number" id="modelPrice" name="modelPrice" step="0.01" min="0" required placeholder="199.00">
+            </div>
+            
+            <!-- Vendedor -->
+            <div class="form-group">
+              <label for="modelSeller">Nome do vendedor *</label>
+              <input type="text" id="modelSeller" name="modelSeller" required placeholder="Ex: BotLabs">
+            </div>
+            
+            <!-- Descrição -->
+            <div class="form-group">
+              <label for="modelDescription">Descrição do modelo *</label>
+              <textarea id="modelDescription" name="modelDescription" rows="5" required placeholder="Descreva detalhadamente o que seu modelo faz, suas funcionalidades e benefícios..."></textarea>
+            </div>
+            
+            <!-- URL da imagem -->
+            <div class="form-group">
+              <label for="modelImage">URL da imagem (opcional)</label>
+              <input type="url" id="modelImage" name="modelImage" placeholder="https://exemplo.com/imagem.jpg">
+              <small>Deixe em branco para usar imagem padrão</small>
+            </div>
+            
+            <!-- Categoria (opcional) -->
+            <div class="form-group">
+              <label for="modelCategory">Categoria</label>
+              <select id="modelCategory" name="modelCategory">
+                <option value="">Selecione uma categoria</option>
+                <option value="atendimento">Atendimento / Chatbot</option>
+                <option value="analise">Análise de Dados</option>
+                <option value="visao">Visão Computacional</option>
+                <option value="nlp">Processamento de Linguagem</option>
+                <option value="generativo">IA Generativa</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="cta" id="btnSalvar">Publicar modelo</button>
+              <button type="button" class="cta outline" onclick="window.history.back()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label>
+      <button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row account-row">
+      <label>Conta</label>
+    </div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer>
+    <p>AI Store — protótipo • © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+  
+  <script>
+    // ===== FUNÇÃO PARA SALVAR MODELO =====
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Página de publicação carregada');
+      
+      const form = document.getElementById('modelForm');
+      
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('Formulário enviado!');
+        
+        // Coletar dados
+        const title = document.getElementById('modelTitle').value;
+        const price = document.getElementById('modelPrice').value;
+        const seller = document.getElementById('modelSeller').value;
+        const description = document.getElementById('modelDescription').value;
+        const image = document.getElementById('modelImage').value;
+        const category = document.getElementById('modelCategory').value;
+        
+        // Validar campos obrigatórios
+        if (!title || !price || !seller || !description) {
+          alert('Por favor, preencha todos os campos obrigatórios');
+          return;
+        }
+        
+        // Criar objeto do modelo
+        const model = {
+          id: Date.now(), // ID único
+          title: title,
+          price: `R$ ${parseFloat(price).toFixed(2)}`,
+          seller: seller,
+          description: description,
+          short: description.substring(0, 100) + '...',
+          image: image || '',
+          category: category || 'outro',
+          type: 'model',
+          createdAt: new Date().toISOString()
+        };
+        
+        console.log('Modelo a ser salvo:', model);
+        
+        // Salvar no localStorage
+        let models = [];
+        const saved = localStorage.getItem('models');
+        
+        if (saved) {
+          models = JSON.parse(saved);
+          console.log('Modelos existentes:', models);
+        }
+        
+        models.push(model);
+        localStorage.setItem('models', JSON.stringify(models));
+        
+        // Verificar se salvou
+        const check = localStorage.getItem('models');
+        console.log('Verificação após salvar:', JSON.parse(check));
+        
+        // Mostrar mensagem de sucesso
+        alert('✅ Modelo publicado com sucesso!');
+        
+        // Redirecionar para a loja
+        window.location.href = 'store.html';
+      });
+      
+      // Se veio para editar (opcional)
+      const editData = localStorage.getItem('editItem');
+      if (editData) {
+        const item = JSON.parse(editData);
+        if (item.type === 'model') {
+          const models = JSON.parse(localStorage.getItem('models') || '[]');
+          const model = models.find(m => m.id == item.id);
+          
+          if (model) {
+            document.getElementById('modelTitle').value = model.title;
+            document.getElementById('modelPrice').value = parseFloat(model.price.replace('R$', ''));
+            document.getElementById('modelSeller').value = model.seller;
+            document.getElementById('modelDescription').value = model.description;
+            document.getElementById('modelImage').value = model.image || '';
+            
+            // Mudar texto do botão
+            document.querySelector('#btnSalvar').textContent = 'Atualizar modelo';
+          }
+        }
+        localStorage.removeItem('editItem');
+      }
+    });
+  </script>
+</body>
+</html>

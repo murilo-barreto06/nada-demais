@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Store — Profissional</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html" class="active">Loja</a>
+      <a href="anuncie.html">Anuncie</a>
+      <div id="auth-container" style="display: inline-block;"></div>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="professional-page">
+      <div class="container">
+        <div class="professional-header">
+          <div id="professionalAvatar" class="professional-avatar-large"></div>
+          <h1 id="professionalName">Carregando...</h1>
+          <p id="professionalSpecialty" class="professional-specialty"></p>
+          <div class="professional-rating" id="professionalRating"></div>
+        </div>
+
+        <div class="professional-content">
+          <div class="professional-bio-section">
+            <h2>Sobre</h2>
+            <p id="professionalBio" class="professional-bio"></p>
+            
+            <div class="professional-stats">
+              <div class="stat">
+                <span class="stat-value" id="professionalProjects">0</span>
+                <span class="stat-label">Projetos</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value" id="professionalRating">0.0</span>
+                <span class="stat-label">Avaliação</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value" id="professionalHourlyRate">R$ 0</span>
+                <span class="stat-label">Hora</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="professional-services-section">
+            <h2>Serviços disponíveis</h2>
+            <ul id="professionalServices" class="services-list"></ul>
+          </div>
+
+          <div class="professional-contact">
+            <button class="cta" onclick="alert('Funcionalidade de contato será implementada em breve!')">Solicitar serviço</button>
+            <button class="cta outline" onclick="window.history.back()">Voltar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label>
+      <button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row account-row">
+      <label>Conta</label>
+    </div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer>
+    <p>AI Store — protótipo • © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+  
+  <script>
+    // ===== FUNÇÃO PARA CARREGAR PROFISSIONAL =====
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      
+      if (!id) {
+        window.location.href = 'store.html';
+        return;
+      }
+      
+      // Buscar profissional do localStorage
+      const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+      const prof = professionals.find(p => p.id == id);
+      
+      if (prof) {
+        // Nome
+        document.getElementById('professionalName').textContent = prof.name;
+        
+        // Especialidade
+        document.getElementById('professionalSpecialty').textContent = prof.specialty;
+        
+        // Rating
+        document.getElementById('professionalRating').innerHTML = `⭐ ${prof.rating.toFixed(1)}`;
+        
+        // Bio
+        document.getElementById('professionalBio').textContent = prof.bio || `${prof.name} é especialista em ${prof.specialty} com ${prof.projects} projetos realizados.`;
+        
+        // Projetos
+        document.getElementById('professionalProjects').textContent = prof.projects;
+        
+        // Rating (stats)
+        document.getElementById('professionalRating').textContent = prof.rating.toFixed(1);
+        
+        // Hourly rate
+        document.getElementById('professionalHourlyRate').textContent = prof.hourlyRate ? `R$ ${prof.hourlyRate}` : 'Consultar';
+        
+        // Avatar
+        const avatarEl = document.getElementById('professionalAvatar');
+        if (prof.avatar) {
+          avatarEl.style.backgroundImage = `url('${prof.avatar}')`;
+          avatarEl.style.backgroundSize = 'cover';
+          avatarEl.style.backgroundPosition = 'center';
+          avatarEl.style.background = ''; // Remove o gradiente
+        } else {
+          avatarEl.style.background = `linear-gradient(135deg, var(--accent), #4ade80)`;
+          avatarEl.innerHTML = `<span style="font-size: 3rem; color: white; line-height: 150px;">${prof.name.charAt(0)}</span>`;
+        }
+        
+        // Serviços
+        const servicesEl = document.getElementById('professionalServices');
+        if (prof.services && prof.services.length > 0) {
+          servicesEl.innerHTML = '';
+          prof.services.forEach(service => {
+            const li = document.createElement('li');
+            li.textContent = service;
+            servicesEl.appendChild(li);
+          });
+        } else {
+          servicesEl.innerHTML = '<li>Instalação</li><li>Treinamento</li><li>Customização</li>';
+        }
+        
+      } else {
+        alert('Profissional não encontrado');
+        window.location.href = 'store.html';
+      }
+    });
+  </script>
+</body>
+</html>

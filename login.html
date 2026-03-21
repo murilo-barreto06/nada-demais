@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Store — Login</title>
+  
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .login-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: var(--muted);
+      margin: 1.5rem 0;
+    }
+    
+    .login-divider::before,
+    .login-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(128,128,128,0.2);
+    }
+    
+    .login-divider span {
+      padding: 0 1rem;
+    }
+    
+    .google-btn-container {
+      display: flex;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+    
+    .error-message {
+      color: #dc3545;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    
+    .error-message.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html">Loja</a>
+      <a href="anuncie.html">Anuncie</a>
+      <div id="auth-container" style="display: inline-block;"></div>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main class="login-page">
+    <div class="login-container">
+      <h2>Entrar</h2>
+      
+      <!-- Mensagem de erro -->
+      <div id="loginError" class="error-message"></div>
+      
+      <!-- Formulário de login -->
+      <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Senha" required />
+        
+        <button type="submit" class="hero-btn">Entrar</button>
+      </form>
+      
+      <div class="login-divider">
+        <span>ou</span>
+      </div>
+      
+      <!-- Botão do Google -->
+      <div class="google-btn-container">
+        <div id="g_id_onload"
+             data-client_id="403584715171-6deavg3parn356t386htibjstjl4nt25.apps.googleusercontent.com"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleGoogleLogin"
+             data-auto_prompt="false">
+        </div>
+        
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="signin_with"
+             data-size="large"
+             data-logo_alignment="left">
+        </div>
+      </div>
+      
+      <p>Não tem conta? <a href="criar-conta.html">Criar conta</a></p>
+    </div>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label>
+      <button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row account-row"> <!-- ADICIONE ESTA CLASSE -->
+      <label>Conta</label>
+      <!-- O conteúdo será preenchido dinamicamente pelo auth.js -->
+    </div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer>
+    <p>AI Store — protótipo • © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    // ===== FUNÇÕES DE LOGIN =====
+    
+    const USERS_KEY = 'ai_store_users';
+    
+    function getUsers() {
+      return JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+    }
+    
+    function showError(message) {
+      const errorEl = document.getElementById('loginError');
+      errorEl.textContent = message;
+      errorEl.classList.add('show');
+      
+      setTimeout(() => {
+        errorEl.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Login com email/senha
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      
+      const users = getUsers();
+      const user = users.find(u => u.email === email && u.password === btoa(password));
+      
+      if (user) {
+        // Login bem-sucedido
+        localStorage.setItem('currentUser', JSON.stringify({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          authType: user.authType || 'email'
+        }));
+        
+        // Redireciona para o dashboard
+        window.location.href = 'buyer-dashboard.html';
+      } else {
+        showError('Email ou senha incorretos');
+      }
+    });
+    
+    // Login com Google
+    window.handleGoogleLogin = function(response) {
+      const payload = JSON.parse(atob(response.credential.split('.')[1]));
+      
+      const email = payload.email;
+      const name = payload.name;
+      const googleId = payload.sub;
+      
+      const users = getUsers();
+      let user = users.find(u => u.email === email);
+      
+      if (!user) {
+        // Criar usuário automaticamente
+        user = {
+          id: Date.now(),
+          name: name,
+          email: email,
+          googleId: googleId,
+          createdAt: new Date().toISOString(),
+          authType: 'google'
+        };
+        
+        users.push(user);
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+      }
+      
+      // Fazer login
+      localStorage.setItem('currentUser', JSON.stringify({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        authType: 'google'
+      }));
+      
+      window.location.href = 'buyer-dashboard.html';
+    };
+  </script>
+  <script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Store — Meu Painel</title>
+  
+  <!-- SCRIPT CRÍTICO ANTES DO CSS - PREVINE FLASH -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Estilos específicos do dashboard */
+    .dashboard-tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(128,128,128,0.2);
+      padding-bottom: 1rem;
+    }
+    
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 0.5rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 30px;
+      transition: all var(--transition);
+    }
+    
+    .tab-btn:hover {
+      color: var(--accent);
+      background: rgba(21, 115, 71, 0.1);
+    }
+    
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .section-header h2 {
+      font-size: 1.8rem;
+      color: var(--text);
+    }
+    
+    .badge {
+      background: var(--accent);
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: transform var(--transition);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+    }
+    
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.2;
+    }
+    
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    
+    .professional-card {
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .professional-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    
+    .professional-card-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .professional-card h3 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .professional-card .specialty {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 1rem;
+    }
+    
+    .professional-stats {
+      display: flex;
+      gap: 2rem;
+      margin: 1.5rem 0;
+    }
+    
+    .professional-stats .stat {
+      text-align: center;
+    }
+    
+    .professional-stats .stat .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: block;
+    }
+    
+    .professional-stats .stat .label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
+    .professional-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .professional-actions .cta {
+      background: white;
+      color: var(--accent);
+    }
+    
+    .professional-actions .cta:hover {
+      background: rgba(255,255,255,0.9);
+      transform: scale(1.02);
+    }
+    
+    .empty-state {
+      background: var(--panel);
+      padding: 3rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      color: var(--muted);
+      border: 2px dashed rgba(128,128,128,0.2);
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    .empty-state p {
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+    }
+    
+    .sale-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: var(--panel);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .sale-item .title {
+      font-weight: 600;
+    }
+    
+    .sale-item .price {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    
+    .sale-item .date {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    
+    /* ===== NOVOS ESTILOS PARA AS FUNÇÕES ADICIONADAS ===== */
+    .profile-header {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding: 2rem;
+      background: var(--panel);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+    }
+    
+    .profile-avatar {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--bg);
+      cursor: pointer;
+      overflow: hidden;
+      border: 3px solid var(--accent);
+    }
+    
+    .avatar-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), #4ade80);
+    }
+    
+    .avatar-content img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .avatar-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    
+    .profile-avatar:hover .avatar-overlay {
+      opacity: 1;
+    }
+    
+    .profile-info {
+      flex: 1;
+      position: relative;
+    }
+    
+    .name-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+      position: relative; /* Adicionado para posicionamento absoluto */
+    }
+
+    .name-container h1 {
+      font-size: 2rem;
+      color: var(--text);
+      margin: 0;
+    }
+    
+    .edit-icon {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.2rem;
+      border-radius: 4px;
+      transition: all var(--transition);
+      opacity: 0; /* Escondido por padrão */
+      position: absolute;
+      right: -30px; /* Posiciona no canto direito */
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .name-container:hover .edit-icon {
+      opacity: 1; /* Aparece ao passar o mouse */
+    }
+
+    .edit-icon:hover {
+      color: var(--accent);
+      transform: translateY(-50%) scale(1.1);
+    }
+    
+    .profile-email {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    
+    .profile-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .small-btn {
+      background-color: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-size: 0.9rem;
+    }
+    
+    .small-btn:hover {
+      background-color: var(--accent);
+      color: white;
+    }
+    
+    /* Edit inline form */
+    .edit-name-inline {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+    
+    .edit-name-inline.show {
+      display: flex;
+    }
+    
+    .edit-name-inline input {
+      padding: 0.5rem 1rem;
+      border: 2px solid var(--accent);
+      border-radius: 30px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1.2rem;
+      width: 300px;
+    }
+    
+    .edit-name-inline input:focus {
+      outline: none;
+    }
+    
+    .edit-name-inline button {
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .edit-name-inline button:hover {
+      background: var(--accent-hover);
+    }
+    
+    .edit-name-inline .cancel-btn {
+      background: transparent;
+      border: 1px solid var(--muted);
+      color: var(--muted);
+    }
+    
+    .edit-name-inline .cancel-btn:hover {
+      background: var(--muted);
+      color: white;
+    }
+    
+    @media (max-width: 600px) {
+      .professional-stats {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .professional-actions {
+        flex-direction: column;
+      }
+      
+      .dashboard-tabs {
+        flex-wrap: wrap;
+      }
+      
+      .profile-header {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .name-container {
+        justify-content: center;
+      }
+      
+      .edit-name-inline {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .edit-name-inline input {
+        width: 100%;
+      }
+
+      .edit-icon {
+        right: -20px; /* Ajuste para telas menores */
+      }
+      
+      .edit-icon img {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html">Loja</a>
+      <a href="anuncie.html">Anuncie</a>
+      <div id="auth-container" style="display: inline-block;"></div>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main class="dashboard">
+    <div class="container">
+      <!-- PERFIL DO USUÁRIO COM OPÇÕES -->
+      <div class="profile-header">
+        <div class="profile-avatar" onclick="document.getElementById('profileUpload').click()">
+          <div class="avatar-content" id="avatarContent">
+            <span id="avatarInitial"></span>
+          </div>
+          <div class="avatar-overlay">
+            <img src="" alt="">
+          </div>
+          <input type="file" id="profileUpload" accept="image/*" style="display: none;" onchange="handleProfileUpload(event)">
+        </div>
+        <div class="profile-info">
+          <!-- Nome normal -->
+          <div class="name-container" id="nameDisplay">
+            <h1 id="profileName"></h1>
+            <button class="edit-icon" onclick="mostrarEditorNome()">
+              <img src="assets/lapis.png" alt="Editar" style="width: 16px; height: 16px;">
+            </button>
+          </div>
+          
+          <!-- Editor de nome inline -->
+          <div class="edit-name-inline" id="nameEditor">
+            <input type="text" id="editNameInput" placeholder="Seu novo nome">
+            <button onclick="salvarNomeInline()">Salvar</button>
+            <button class="cancel-btn" onclick="esconderEditorNome()">Cancelar</button>
+          </div>
+          
+          <p id="profileEmail" class="profile-email"></p>
+          <div class="profile-actions">
+            <button class="small-btn" onclick="document.getElementById('profileUpload').click()"> Trocar foto</button>
+            <button class="small-btn" onclick="removerFoto()"> Remover foto</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Badges -->
+      <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <span class="badge" id="compradorBadge" style="display: none;">Comprador</span>
+        <span class="badge" id="vendedorBadge" style="display: none;">Vendedor</span>
+        <span class="badge" id="profissionalBadge" style="display: none;">Profissional</span>
+      </div>
+
+      <!-- Abas de navegação -->
+      <div class="dashboard-tabs">
+        <button class="tab-btn active" onclick="mudarAba('adquiridos')"> Adquiridos</button>
+        <button class="tab-btn" onclick="mudarAba('publicados')"> Meus Modelos</button>
+        <button class="tab-btn" onclick="mudarAba('profissional')"> Perfil Profissional</button>
+        <button class="tab-btn" onclick="mudarAba('vendas')"> Vendas</button>
+      </div>
+
+      <!-- ABA 1: MODELOS ADQUIRIDOS -->
+      <div id="aba-adquiridos" class="tab-content active">
+        <div class="section-header">
+          <h2>Modelos que você adquiriu</h2>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="totalAdquiridos">0</div>
+            <div class="stat-label">Modelos comprados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="totalGasto">R$ 0</div>
+            <div class="stat-label">Total investido</div>
+          </div>
+        </div>
+        
+        <div class="card-grid" id="modelosAdquiridos">
+          <!-- Cards serão inseridos via JS -->
+        </div>
+      </div>
+
+      <!-- ABA 2: MODELOS PUBLICADOS PELO USUÁRIO -->
+      <div id="aba-publicados" class="tab-content">
+        <div class="section-header">
+          <h2>Meus modelos publicados</h2>
+          <a href="publicar-modelo.html" class="cta small" style="padding: 0.5rem 1.5rem;">+ Novo modelo</a>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="totalPublicados">0</div>
+            <div class="stat-label">Modelos publicados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="totalVendas">0</div>
+            <div class="stat-label">Vendas totais</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="faturamento">R$ 0</div>
+            <div class="stat-label">Faturamento</div>
+          </div>
+        </div>
+        
+        <div class="card-grid" id="modelosPublicados">
+          <!-- Cards serão inseridos via JS -->
+        </div>
+      </div>
+
+      <!-- ABA 3: PERFIL PROFISSIONAL (EDITÁVEL) -->
+      <div id="aba-profissional" class="tab-content">
+        <div class="section-header">
+          <h2>Perfil Profissional</h2>
+        </div>
+        
+        <div id="profissionalContainer">
+          <!-- Conteúdo será inserido via JS -->
+        </div>
+      </div>
+
+      <!-- ABA 4: VENDAS REALIZADAS -->
+      <div id="aba-vendas" class="tab-content">
+        <div class="section-header">
+          <h2>Histórico de vendas</h2>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="vendasMes">0</div>
+            <div class="stat-label">Vendas este mês</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="receitaMes">R$ 0</div>
+            <div class="stat-label">Receita no mês</div>
+          </div>
+        </div>
+        
+        <div id="vendasContainer" style="background: var(--panel); padding: 1.5rem; border-radius: var(--border-radius);">
+          <!-- Lista de vendas será inserida via JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label>
+      <button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row account-row">
+      <label>Conta</label>
+      <!-- O conteúdo será preenchido dinamicamente pelo auth.js -->
+    </div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer>
+    <p>AI Store — protótipo • © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    // ===== FUNÇÕES ESPECÍFICAS DO DASHBOARD =====
+    
+    // Mock de modelos adquiridos (simula compras do usuário)
+    const MODELOS_ADQUIRIDOS = [
+      { id: 1, title: 'IA Atendimento', seller: 'BotLabs', price: 'R$ 199,00', dataCompra: '2025-02-15' },
+      { id: 3, title: 'Recomendador de Produtos', seller: 'RecoSys', price: 'R$ 149,00', dataCompra: '2025-02-20' }
+    ];
+    
+    // Mock de vendas realizadas (para modelos publicados)
+    const VENDAS_REALIZADAS = [
+      { id: 101, modeloId: 1001, comprador: 'Empresa X', valor: 299, data: '2025-03-01' },
+      { id: 102, modeloId: 1002, comprador: 'Startup Y', valor: 199, data: '2025-03-02' },
+      { id: 103, modeloId: 1001, comprador: 'Consultoria Z', valor: 299, data: '2025-03-03' }
+    ];
+    
+    // Variável global para o usuário atual
+    let currentUser = null;
+    
+    // Função para mudar de aba
+    window.mudarAba = function(aba) {
+      // Remove active de todas as abas e conteúdos
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      // Ativa a aba clicada
+      event.target.classList.add('active');
+      
+      // Ativa o conteúdo correspondente
+      document.getElementById(`aba-${aba}`).classList.add('active');
+    };
+    
+    // ===== FUNÇÕES DE PERFIL =====
+    
+    function carregarDadosUsuario() {
+      currentUser = getCurrentUser();
+      if (!currentUser) return;
+      
+      document.getElementById('profileName').textContent = currentUser.name;
+      document.getElementById('profileEmail').textContent = currentUser.email;
+      
+      // Carregar foto
+      const savedAvatar = localStorage.getItem(`avatar_${currentUser.id}`);
+      const avatarContent = document.getElementById('avatarContent');
+      
+      if (savedAvatar) {
+        avatarContent.innerHTML = `<img src="${savedAvatar}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">`;
+      } else {
+        const initial = currentUser.name.charAt(0).toUpperCase();
+        avatarContent.innerHTML = `<span style="font-size: 3rem; line-height: 100px;">${initial}</span>`;
+      }
+    }
+    
+    // Upload da foto
+    window.handleProfileUpload = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor, selecione uma imagem válida');
+        return;
+      }
+      
+      if (file.size > 2 * 1024 * 1024) {
+        alert('A imagem deve ter no máximo 2MB');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imageData = e.target.result;
+        localStorage.setItem(`avatar_${currentUser.id}`, imageData);
+        
+        const avatarContent = document.getElementById('avatarContent');
+        avatarContent.innerHTML = `<img src="${imageData}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">`;
+        
+        // Reset do input para permitir selecionar o mesmo arquivo novamente
+        event.target.value = '';
+      };
+      
+      reader.readAsDataURL(file);
+    };
+    
+    window.removerFoto = function() {
+      if (currentUser && confirm('Remover foto de perfil?')) {
+        localStorage.removeItem(`avatar_${currentUser.id}`);
+        const initial = currentUser.name.charAt(0).toUpperCase();
+        const avatarContent = document.getElementById('avatarContent');
+        avatarContent.innerHTML = `<span style="font-size: 3rem; line-height: 100px;">${initial}</span>`;
+      }
+    };
+    
+    // Editar nome inline
+    window.mostrarEditorNome = function() {
+      document.getElementById('nameDisplay').style.display = 'none';
+      document.getElementById('nameEditor').classList.add('show');
+      document.getElementById('editNameInput').value = currentUser.name;
+      document.getElementById('editNameInput').focus();
+    };
+    
+    window.esconderEditorNome = function() {
+      document.getElementById('nameDisplay').style.display = 'flex';
+      document.getElementById('nameEditor').classList.remove('show');
+    };
+    
+    window.salvarNomeInline = function() {
+      const novoNome = document.getElementById('editNameInput').value.trim();
+      if (!novoNome) {
+        alert('O nome não pode estar vazio');
+        return;
+      }
+      
+      // Atualizar no localStorage
+      const users = JSON.parse(localStorage.getItem('ai_store_users') || '[]');
+      const userIndex = users.findIndex(u => u.id === currentUser.id);
+      
+      if (userIndex >= 0) {
+        users[userIndex].name = novoNome;
+        localStorage.setItem('ai_store_users', JSON.stringify(users));
+        
+        // Atualizar currentUser
+        currentUser.name = novoNome;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        document.getElementById('profileName').textContent = novoNome;
+        
+        // Se não tiver foto, atualizar inicial
+        if (!localStorage.getItem(`avatar_${currentUser.id}`)) {
+          const initial = novoNome.charAt(0).toUpperCase();
+          document.getElementById('avatarContent').innerHTML = `<span style="font-size: 3rem; line-height: 100px;">${initial}</span>`;
+        }
+        
+        esconderEditorNome();
+      }
+    };
+    
+    // ===== FUNÇÕES DOS CARDS =====
+    
+    // Carregar modelos adquiridos
+    function carregarAdquiridos() {
+      const container = document.getElementById('modelosAdquiridos');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      
+      if (MODELOS_ADQUIRIDOS.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>Você ainda não adquiriu nenhum modelo.</p>
+            <a href="store.html" class="cta">Explorar loja</a>
+          </div>
+        `;
+        return;
+      }
+      
+      // Calcular total gasto
+      const totalGasto = MODELOS_ADQUIRIDOS.reduce((acc, item) => {
+        const valor = parseFloat(item.price.replace('R$', '').replace(',', '.'));
+        return acc + valor;
+      }, 0);
+      
+      document.getElementById('totalAdquiridos').textContent = MODELOS_ADQUIRIDOS.length;
+      document.getElementById('totalGasto').textContent = `R$ ${totalGasto.toFixed(2)}`;
+      
+      MODELOS_ADQUIRIDOS.forEach(model => {
+        const card = document.createElement('div');
+        card.className = 'small-card';
+        card.innerHTML = `
+          <h4>${model.title}</h4>
+          <p>Vendedor: ${model.seller}</p>
+          <p style="color: var(--accent); font-weight: bold;">${model.price}</p>
+          <p style="font-size: 0.8rem; color: var(--muted);">Adquirido em: ${new Date(model.dataCompra).toLocaleDateString()}</p>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <button class="small-btn" onclick="window.location.href='model.html?id=${model.id}'">Ver detalhes</button>
+            <button class="small-btn" onclick="alert('Documentação do modelo ${model.title}')"> Documentação</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+    
+    // Carregar modelos publicados pelo usuário
+    function carregarPublicados() {
+      const container = document.getElementById('modelosPublicados');
+      if (!container) return;
+      
+      // Busca modelos do localStorage
+      const models = JSON.parse(localStorage.getItem('models') || '[]');
+      
+      document.getElementById('totalPublicados').textContent = models.length;
+      
+      // Simula vendas para cada modelo
+      const vendasPorModelo = {};
+      VENDAS_REALIZADAS.forEach(venda => {
+        vendasPorModelo[venda.modeloId] = (vendasPorModelo[venda.modeloId] || 0) + 1;
+      });
+      
+      const totalVendas = VENDAS_REALIZADAS.length;
+      const faturamento = VENDAS_REALIZADAS.reduce((acc, v) => acc + v.valor, 0);
+      
+      document.getElementById('totalVendas').textContent = totalVendas;
+      document.getElementById('faturamento').textContent = `R$ ${faturamento.toFixed(2)}`;
+      
+      container.innerHTML = '';
+      
+      if (models.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>Você ainda não publicou nenhum modelo.</p>
+            <a href="publicar-modelo.html" class="cta">Publicar agora</a>
+          </div>
+        `;
+        return;
+      }
+      
+      models.forEach(model => {
+        const vendas = vendasPorModelo[model.id] || 0;
+        const receita = VENDAS_REALIZADAS.filter(v => v.modeloId === model.id).reduce((acc, v) => acc + v.valor, 0);
+        
+        const card = document.createElement('div');
+        card.className = 'small-card';
+        card.innerHTML = `
+          <h4>${model.title}</h4>
+          <p>${model.seller || 'Você'}</p>
+          <p style="color: var(--accent); font-weight: bold;">${model.price}</p>
+          <div style="display: flex; justify-content: space-between; margin: 1rem 0; padding: 0.5rem; background: var(--bg); border-radius: 8px;">
+            <span> Vendas: <strong>${vendas}</strong></span>
+            <span> Receita: <strong>R$ ${receita.toFixed(2)}</strong></span>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="small-btn" onclick="window.location.href='model.html?id=${model.id}'">Ver</button>
+            <button class="small-btn" onclick="editarModelo(${model.id})">Editar</button>
+            <button class="small-btn" onclick="excluirModelo(${model.id})" style="border-color: #dc3545; color: #dc3545;">Excluir</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+    
+    // Função para editar modelo
+    window.editarModelo = function(id) {
+      localStorage.setItem('editItem', JSON.stringify({ type: 'model', id: id }));
+      window.location.href = 'publicar-modelo.html';
+    };
+    
+    // Função para excluir modelo
+    window.excluirModelo = function(id) {
+      if (!confirm('Tem certeza que deseja excluir este modelo?')) return;
+      
+      let models = JSON.parse(localStorage.getItem('models') || '[]');
+      models = models.filter(m => m.id != id);
+      localStorage.setItem('models', JSON.stringify(models));
+      
+      alert('Modelo excluído com sucesso!');
+      carregarPublicados();
+    };
+    
+    // Carregar perfil profissional (editável)
+    function carregarPerfilProfissional() {
+      const container = document.getElementById('profissionalContainer');
+      if (!container) return;
+      
+      // Busca profissionais do localStorage
+      const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+      
+      if (professionals.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>Você ainda não tem um perfil profissional.</p>
+            <a href="inscricao-professionals.html" class="cta">Criar perfil</a>
+          </div>
+        `;
+        document.getElementById('profissionalBadge').style.display = 'none';
+        return;
+      }
+      
+      document.getElementById('profissionalBadge').style.display = 'inline-block';
+      
+      // Listar todos os profissionais
+      let html = '<div style="margin-bottom: 2rem;">';
+      
+      professionals.forEach(prof => {
+        const servicos = prof.services || ['Instalação', 'Treinamento', 'Customização'];
+        
+        html += `
+          <div class="professional-card" style="margin-bottom: 2rem;">
+            <div class="professional-card-content">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <h3>${prof.name}</h3>
+                <div>
+                  <button class="small-btn" onclick="editarProfissional(${prof.id})">✏️ Editar</button>
+                  <button class="small-btn" onclick="excluirProfissional(${prof.id})" style="border-color: #dc3545; color: #dc3545;"> Excluir</button>
+                </div>
+              </div>
+              <p class="specialty">${prof.specialty}</p>
+              
+              <div class="professional-stats">
+                <div class="stat">
+                  <span class="value">⭐ ${prof.rating}</span>
+                  <span class="label">Avaliação</span>
+                </div>
+                <div class="stat">
+                  <span class="value">${prof.projects || 0}</span>
+                  <span class="label">Projetos</span>
+                </div>
+                <div class="stat">
+                  <span class="value">${prof.hourlyRate ? `R$ ${prof.hourlyRate}` : 'Consultar'}</span>
+                  <span class="label">Hora</span>
+                </div>
+              </div>
+              
+              <p style="margin-bottom: 1.5rem;">${prof.bio || prof.description || 'Profissional disponível para serviços.'}</p>
+              
+              <div style="margin-bottom: 1.5rem;">
+                <strong>Serviços oferecidos:</strong>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                  ${servicos.map(s => `<span style="background: rgba(255,255,255,0.2); padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.9rem;">${s}</span>`).join('')}
+                </div>
+              </div>
+              
+              <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="cta" onclick="window.location.href='professional.html?id=${prof.id}'">Ver perfil público</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // Editar profissional
+    window.editarProfissional = function(id) {
+      localStorage.setItem('editItem', JSON.stringify({ type: 'professional', id: id }));
+      window.location.href = 'publicar-modelo.html?type=professional';
+    };
+    
+    // Excluir profissional
+    window.excluirProfissional = function(id) {
+      if (!confirm('Tem certeza que deseja excluir este perfil profissional?')) return;
+      
+      let professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+      professionals = professionals.filter(p => p.id != id);
+      localStorage.setItem('professionals', JSON.stringify(professionals));
+      
+      alert('Perfil excluído com sucesso!');
+      carregarPerfilProfissional();
+    };
+    
+    // Carregar vendas realizadas
+    function carregarVendas() {
+      const container = document.getElementById('vendasContainer');
+      if (!container) return;
+      
+      if (VENDAS_REALIZADAS.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>Nenhuma venda realizada ainda.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Estatísticas do mês atual
+      const dataAtual = new Date();
+      const mesAtual = dataAtual.getMonth();
+      const anoAtual = dataAtual.getFullYear();
+      
+      const vendasEsteMes = VENDAS_REALIZADAS.filter(v => {
+        const data = new Date(v.data);
+        return data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
+      });
+      
+      const totalVendasMes = vendasEsteMes.length;
+      const receitaMes = vendasEsteMes.reduce((acc, v) => acc + v.valor, 0);
+      
+      document.getElementById('vendasMes').textContent = totalVendasMes;
+      document.getElementById('receitaMes').textContent = `R$ ${receitaMes.toFixed(2)}`;
+      
+      // Lista de vendas
+      let html = '<h3 style="margin-bottom: 1rem;">Últimas vendas</h3>';
+      
+      VENDAS_REALIZADAS.sort((a, b) => new Date(b.data) - new Date(a.data)).forEach(venda => {
+        // Busca o nome do modelo
+        const models = JSON.parse(localStorage.getItem('models') || '[]');
+        const modelo = models.find(m => m.id == venda.modeloId);
+        const nomeModelo = modelo ? modelo.title : `Modelo #${venda.modeloId}`;
+        
+        html += `
+          <div class="sale-item">
+            <div>
+              <div class="title">${nomeModelo}</div>
+              <div class="date">${new Date(venda.data).toLocaleDateString()}</div>
+            </div>
+            <div style="text-align: right;">
+              <div class="price">R$ ${venda.valor.toFixed(2)}</div>
+              <div style="font-size: 0.8rem; color: var(--muted);">${venda.comprador}</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', function() {
+      carregarDadosUsuario();
+      carregarAdquiridos();
+      carregarPublicados();
+      carregarPerfilProfissional();
+      carregarVendas();
+      
+      // Verifica se é vendedor (tem modelos publicados)
+      const models = JSON.parse(localStorage.getItem('models') || '[]');
+      if (models.length > 0) {
+        document.getElementById('vendedorBadge').style.display = 'inline-block';
+      }
+      
+      const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+      if (professionals.length > 0) {
+        document.getElementById('profissionalBadge').style.display = 'inline-block';
+      }
+    });
+
+    // Garantir que o link Meu Painel fique ativo
+    function setActiveMenu() {
+      const meuPainelLink = document.querySelector('.meu-painel-link');
+      if (meuPainelLink) {
+        meuPainelLink.classList.add('active');
+      }
+    }
+
+    // Chamar após carregar tudo
+    setTimeout(setActiveMenu, 100);
+  </script>
+  <script src="auth.js"></script>
+</body>
+</html>

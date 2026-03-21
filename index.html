@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Store — Home</title>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="store.html">Loja</a>
+      <a href="anuncie.html">Anuncie</a>
+      <div id="auth-container" style="display: inline-block;"></div>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">   <!-- ADICIONADO -->
+        <h1>Marketplace de modelos de IA para negócios</h1>
+        <p>Compre, teste e implemente modelos prontos — documentação e integração facilitadas.</p>
+        <div class="hero-actions">
+          <a class="cta" href="store.html">Compre uma IA</a>
+          <a class="cta outline" href="anuncie.html">Quero vender</a>
+        </div>
+      </div>                    <!-- FECHA CONTAINER -->
+    </section>
+
+    <section id="featured" class="carousel-section">
+      <div class="container">
+        <h2>Modelos em Destaque</h2>
+        <div class="carousel-wrapper">
+            <button class="carousel-btn left" onclick="prevSlide()">‹</button>
+
+            <div class="carousel" id="carouselContainer">
+                <!-- items adicionados dinamicamente -->
+            </div>
+
+            <button class="carousel-btn right" onclick="nextSlide()">›</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="carousel-section professionals">
+      <div class="container">
+        <h2>Profissionais em Destaque</h2>
+        <div class="carousel-wrapper">
+          <button class="carousel-btn left" onclick="prevSlideProfessionals()">‹</button>
+          <div class="carousel" id="professionalsCarouselHome"></div>
+          <button class="carousel-btn right" onclick="nextSlideProfessionals()">›</button>
+        </div>
+      </div>
+    </section>
+    
+    <section class="how">
+      <div class="container">
+        <h2>Como funciona</h2>
+        <div class="steps">
+          <div class="step">
+            <h3>1. Escolha</h3>
+            <p>Encontre o modelo ideal para seu negócio por categoria.</p>
+          </div>
+          <div class="step">
+            <h3>2. Teste</h3>
+            <p>Experimente no browser antes de comprar.</p>
+          </div>
+          <div class="step">
+            <h3>3. Implemente</h3>
+            <p>Documentação passo-a-passo e integração automática.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label>
+      <button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row account-row"> <!-- ADICIONE ESTA CLASSE -->
+      <label>Conta</label>
+      <!-- O conteúdo será preenchido dinamicamente pelo auth.js -->
+    </div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer>
+    <p>AI Store — protótipo • © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

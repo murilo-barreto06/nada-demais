@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Store — Cadastro de Profissional</title>
+  
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html">Loja</a>
+      <a href="anuncie.html" class="active">Anuncie</a>
+      <div id="auth-container" style="display: inline-block;"></div>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="form-page">
+      <div class="container">
+        <div class="form-container">
+          <h1>Cadastro de Profissional</h1>
+          <p class="form-subtitle">Preencha seus dados para aparecer no carrossel de profissionais da loja</p>
+          
+          <form id="professionalForm" class="professional-form">
+            <!-- Nome -->
+            <div class="form-group">
+              <label for="name">Nome completo *</label>
+              <input type="text" id="name" name="name" required placeholder="Seu nome completo">
+            </div>
+            
+            <!-- Especialidade -->
+            <div class="form-group">
+              <label for="specialty">Especialidade *</label>
+              <input type="text" id="specialty" name="specialty" required placeholder="Ex: NLP, Visão Computacional, etc">
+            </div>
+            
+            <!-- Avatar (URL da imagem) -->
+            <div class="form-group">
+              <label for="avatar">URL da foto (opcional)</label>
+              <input type="url" id="avatar" name="avatar" placeholder="https://exemplo.com/minha-foto.jpg">
+              <small>Deixe em branco para usar iniciais</small>
+            </div>
+            
+            <!-- Avaliação -->
+            <div class="form-group">
+              <label for="rating">Avaliação (0 a 5) *</label>
+              <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" required placeholder="4.8">
+            </div>
+            
+            <!-- Projetos -->
+            <div class="form-group">
+              <label for="projects">Número de projetos realizados *</label>
+              <input type="number" id="projects" name="projects" min="0" required placeholder="12">
+            </div>
+            
+            <!-- Biografia -->
+            <div class="form-group">
+              <label for="bio">Biografia / Descrição *</label>
+              <textarea id="bio" name="bio" rows="4" required placeholder="Conte um pouco sobre sua experiência..."></textarea>
+            </div>
+            
+            <!-- Serviços (múltiplos) -->
+            <div class="form-group">
+              <label>Serviços oferecidos *</label>
+              <div class="checkbox-group">
+                <label><input type="checkbox" name="services" value="Instalação"> Instalação</label>
+                <label><input type="checkbox" name="services" value="Treinamento"> Treinamento</label>
+                <label><input type="checkbox" name="services" value="Customização"> Customização</label>
+                <label><input type="checkbox" name="services" value="Suporte"> Suporte</label>
+                <label><input type="checkbox" name="services" value="Consultoria"> Consultoria</label>
+                <label><input type="checkbox" name="services" value="Implementação"> Implementação</label>
+              </div>
+              <input type="text" id="otherServices" placeholder="Outros (separados por vírgula)">
+            </div>
+            
+            <!-- Valor por hora -->
+            <div class="form-group">
+              <label for="hourlyRate">Valor por hora (R$) *</label>
+              <input type="number" id="hourlyRate" name="hourlyRate" min="0" step="10" required placeholder="150">
+            </div>
+            
+            <!-- Modelos (IDs) -->
+            <div class="form-group">
+              <label for="portfolio">IDs dos modelos que criou (opcional)</label>
+              <input type="text" id="portfolio" name="portfolio" placeholder="Ex: 1,3,5 (separados por vírgula)">
+              <small>Consulte os IDs na página de modelos</small>
+            </div>
+            
+            <div class="form-actions">
+              <button type="submit" class="cta" id="btnSalvar">Cadastrar profissional</button>
+              <button type="button" class="cta outline" onclick="window.history.back()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label>
+      <button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row account-row">
+      <label>Conta</label>
+    </div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer>
+    <p>AI Store — protótipo • © 2025</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+  
+  <script>
+    // ===== FUNÇÃO PARA SALVAR PROFISSIONAL (VERSÃO SIMPLIFICADA E GARANTIDA) =====
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Página de cadastro carregada');
+      
+      const form = document.getElementById('professionalForm');
+      
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('Formulário enviado!');
+        
+        // Coletar dados básicos
+        const name = document.getElementById('name').value;
+        const specialty = document.getElementById('specialty').value;
+        const avatar = document.getElementById('avatar').value;
+        const rating = parseFloat(document.getElementById('rating').value) || 5.0;
+        const projects = parseInt(document.getElementById('projects').value) || 0;
+        const bio = document.getElementById('bio').value;
+        const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+        
+        // Validar campos obrigatórios
+        if (!name || !specialty) {
+          alert('Por favor, preencha nome e especialidade');
+          return;
+        }
+        
+        // Criar objeto do profissional
+        const professional = {
+          id: Date.now(), // ID único
+          name: name,
+          specialty: specialty,
+          avatar: avatar || '',
+          rating: rating,
+          projects: projects,
+          bio: bio,
+          hourlyRate: hourlyRate,
+          type: 'professional',
+          createdAt: new Date().toISOString()
+        };
+        
+        console.log('Profissional a ser salvo:', professional);
+        
+
+        let professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+        const editingId = sessionStorage.getItem('editingProfessionalId');
+
+        if (editingId) {
+          // Atualizar existente
+          const index = professionals.findIndex(p => p.id == editingId);
+          if (index >= 0) {
+            professional.id = parseInt(editingId);
+            professionals[index] = professional;
+          }
+          sessionStorage.removeItem('editingProfessionalId');
+        } else {
+          // Novo profissional
+          professional.id = Date.now();
+          professionals.push(professional);
+        }
+
+        localStorage.setItem('professionals', JSON.stringify(professionals));
+        
+        // Verificar se salvou
+        const check = localStorage.getItem('professionals');
+        console.log('Verificação após salvar:', JSON.parse(check));
+        
+        // Mostrar mensagem de sucesso
+        alert('✅ Profissional cadastrado com sucesso!');
+        
+        // Redirecionar para a loja
+        window.location.href = 'store.html';
+      });
+    });
+  </script>
+  <script>
+    // ===== VERIFICAR SE É EDIÇÃO =====
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const editId = urlParams.get('edit');
+      
+      if (editId) {
+        // Carregar dados do profissional para edição
+        const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+        const prof = professionals.find(p => p.id == editId);
+        
+        if (prof) {
+          document.getElementById('name').value = prof.name;
+          document.getElementById('specialty').value = prof.specialty;
+          document.getElementById('avatar').value = prof.avatar || '';
+          document.getElementById('rating').value = prof.rating;
+          document.getElementById('projects').value = prof.projects;
+          document.getElementById('bio').value = prof.bio || '';
+          document.getElementById('hourlyRate').value = prof.hourlyRate || '';
+          
+          // Marcar serviços
+          if (prof.services) {
+            prof.services.forEach(service => {
+              const checkbox = document.querySelector(`input[name="services"][value="${service}"]`);
+              if (checkbox) checkbox.checked = true;
+            });
+          }
+          
+          // Portfolio
+          if (prof.portfolio) {
+            document.getElementById('portfolio').value = prof.portfolio.join(', ');
+          }
+          
+          // Mudar texto do botão
+          document.querySelector('#btnSalvar').textContent = 'Atualizar profissional';
+          
+          // Guardar ID para atualização
+          sessionStorage.setItem('editingProfessionalId', editId);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
