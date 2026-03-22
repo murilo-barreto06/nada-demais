@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI Store — Publicar Modelo</title>
+  <title>AI Store — Cadastro de Profissional</title>
   
   <script>
     (function() {
@@ -16,7 +16,7 @@
   
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* ===== PÁGINA DE PUBLICAÇÃO - DESIGN REFINADO ===== */
+    /* ===== PÁGINA DE CADASTRO DE PROFISSIONAL - DESIGN REFINADO ===== */
     
     .publish-wrapper {
       max-width: 1000px;
@@ -49,12 +49,6 @@
       border-radius: 24px;
       box-shadow: var(--shadow);
       overflow: hidden;
-      transition: transform 0.2s ease;
-    }
-    
-    .publish-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-hover);
     }
     
     .publish-form {
@@ -110,7 +104,6 @@
       gap: 1.5rem;
     }
     
-    /* Portfólio Section */
     .portfolio-section {
       background: var(--bg);
       border-radius: 20px;
@@ -118,13 +111,6 @@
       margin-bottom: 1.5rem;
     }
     
-    .portfolio-section h3 {
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-    }
-    
-    /* Upload Box */
     .upload-box {
       background: var(--bg);
       border: 2px dashed rgba(128,128,128,0.3);
@@ -154,7 +140,6 @@
       color: var(--muted);
     }
     
-    /* Media Grid */
     .media-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -194,6 +179,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 10;
     }
     
     .media-item .remove-media:hover {
@@ -219,27 +205,30 @@
       text-align: right;
     }
     
-    /* Categoria */
-    .category-row-modern {
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.8rem;
+      background: var(--bg);
+      padding: 1rem;
+      border-radius: 16px;
+      margin-top: 0.5rem;
+    }
+    
+    .service-checkbox {
       display: flex;
-      gap: 1rem;
-      align-items: flex-start;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
     }
     
-    .category-row-modern select {
-      flex: 2;
+    .service-checkbox input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      margin: 0;
     }
     
-    .category-row-modern .new-category {
-      flex: 1;
-      display: none;
-    }
-    
-    .category-row-modern .new-category.active {
-      display: block;
-    }
-    
-    /* Botões */
     .form-actions-modern {
       display: flex;
       gap: 1rem;
@@ -269,10 +258,6 @@
       box-shadow: 0 4px 12px rgba(21, 115, 71, 0.3);
     }
     
-    .btn-primary:active {
-      transform: translateY(0);
-    }
-    
     .btn-outline {
       flex: 1;
       background: transparent;
@@ -293,10 +278,6 @@
       transform: translateY(-2px);
     }
     
-    .btn-outline:active {
-      transform: translateY(0);
-    }
-    
     .btn-clear {
       flex: 0.5;
       background: transparent;
@@ -314,12 +295,7 @@
     .btn-clear:hover {
       background: var(--muted);
       color: white;
-      border-color: var(--muted);
       transform: translateY(-2px);
-    }
-    
-    .btn-clear:active {
-      transform: translateY(0);
     }
     
     .loading-spinner {
@@ -350,42 +326,29 @@
       margin-top: 0.3rem;
     }
     
-    /* Responsividade */
     @media (max-width: 768px) {
       .publish-wrapper {
         padding: 0 1rem;
         margin: 1rem auto;
       }
-      
       .publish-form {
         padding: 1.5rem;
       }
-      
       .form-row-modern {
         grid-template-columns: 1fr;
         gap: 1rem;
       }
-      
       .form-actions-modern {
         flex-direction: column;
       }
-      
       .btn-clear {
         flex: 1;
       }
-      
       .media-grid {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       }
-    }
-    
-    @media (max-width: 480px) {
-      .publish-header h1 {
-        font-size: 1.5rem;
-      }
-      
-      .publish-form {
-        padding: 1rem;
+      .services-grid {
+        grid-template-columns: 1fr 1fr;
       }
     }
   </style>
@@ -405,41 +368,35 @@
   <main>
     <div class="publish-wrapper">
       <div class="publish-header">
-        <h1>Publicar Modelo de IA</h1>
-        <p>Preencha os dados do seu modelo para aparecer na loja</p>
+        <h1>Cadastro de Profissional</h1>
+        <p>Preencha seus dados para aparecer no carrossel de profissionais da loja</p>
       </div>
       
       <div class="publish-card">
-        <form id="modelForm" class="publish-form">
-          <!-- Título -->
+        <form id="professionalForm" class="publish-form">
+          <!-- Nome completo -->
           <div class="form-group-modern">
-            <label>Título do modelo <span>*</span></label>
-            <input type="text" id="modelTitle" placeholder="Ex: IA de Atendimento para WhatsApp">
+            <label>Nome completo <span>*</span></label>
+            <input type="text" id="name" placeholder="Seu nome completo">
           </div>
           
-          <!-- Preço e Vendedor -->
-          <div class="form-row-modern">
-            <div class="form-group-modern">
-              <label>Preço (R$) <span>*</span></label>
-              <input type="number" id="modelPrice" step="0.01" min="0" placeholder="199.00">
-            </div>
-            <div class="form-group-modern">
-              <label>Nome do vendedor <span>*</span></label>
-              <input type="text" id="modelSeller" placeholder="Ex: BotLabs">
-            </div>
+          <!-- Especialidade -->
+          <div class="form-group-modern">
+            <label>Especialidade <span>*</span></label>
+            <input type="text" id="specialty" placeholder="Ex: NLP, Visão Computacional, Desenvolvimento de Chatbots">
           </div>
           
-          <!-- Descrição -->
+          <!-- Biografia -->
           <div class="form-group-modern">
-            <label>Descrição <span>*</span></label>
-            <textarea id="modelDescription" maxlength="2000" rows="6" placeholder="Descreva detalhadamente o que seu modelo faz, suas funcionalidades e benefícios..."></textarea>
+            <label>Biografia <span>*</span></label>
+            <textarea id="bio" maxlength="2000" rows="6" placeholder="Conte um pouco sobre sua experiência..."></textarea>
             <div class="char-counter" id="charCounter">0 / 2000 caracteres</div>
           </div>
           
           <!-- Portfólio de Mídias -->
           <div class="portfolio-section">
-            <h3>Portfólio de Mídias</h3>
-            <p class="help-text">Adicione imagens e vídeos demonstrando seu modelo em ação (máximo 6 imagens e 6 vídeos)</p>
+            <h3>Portfólio de Projetos</h3>
+            <p class="help-text">Adicione imagens e vídeos dos seus trabalhos (máximo 6 imagens e 6 vídeos)</p>
             
             <div class="upload-box" id="mediaUploadBox">
               <div class="upload-text">Clique ou arraste arquivos para enviar</div>
@@ -454,38 +411,35 @@
           <!-- Link de portfólio externo -->
           <div class="form-group-modern">
             <label>Link de portfólio externo</label>
-            <input type="url" id="portfolioLink" placeholder="https://github.com/seuprojeto ou https://seudominio.com/portfolio">
-            <div class="help-text">Link para portfólio, GitHub ou site pessoal (opcional)</div>
+            <input type="url" id="portfolioLink" placeholder="https://github.com/seuperfil ou https://linkedin.com/in/seuperfil">
           </div>
           
-          <!-- Categoria -->
+          <!-- Valor por hora -->
           <div class="form-group-modern">
-            <label>Categoria</label>
-            <div class="category-row-modern">
-              <select id="modelCategory">
-                <option value="">Selecione uma categoria</option>
-                <option value="atendimento">Atendimento / Chatbot</option>
-                <option value="analise">Análise de Dados</option>
-                <option value="visao">Visão Computacional</option>
-                <option value="nlp">Processamento de Linguagem</option>
-                <option value="generativo">IA Generativa</option>
-                <option value="outro">Outra (digite abaixo)</option>
-              </select>
-              <input type="text" id="newCategory" class="new-category" placeholder="Digite a nova categoria">
-            </div>
+            <label>Valor por hora (R$) <span>*</span></label>
+            <input type="number" id="hourlyRate" step="10" min="0" placeholder="150">
           </div>
           
-          <!-- Botões -->
+          <!-- Serviços oferecidos -->
+          <div class="form-group-modern">
+            <label>Serviços oferecidos</label>
+            <div class="services-grid">
+              <label class="service-checkbox"><input type="checkbox" name="services" value="Instalação"> Instalação</label>
+              <label class="service-checkbox"><input type="checkbox" name="services" value="Treinamento"> Treinamento</label>
+              <label class="service-checkbox"><input type="checkbox" name="services" value="Customização"> Customização</label>
+              <label class="service-checkbox"><input type="checkbox" name="services" value="Suporte"> Suporte</label>
+              <label class="service-checkbox"><input type="checkbox" name="services" value="Consultoria"> Consultoria</label>
+              <label class="service-checkbox"><input type="checkbox" name="services" value="Implementação"> Implementação</label>
+              <label class="service-checkbox"><input type="checkbox" name="services" value="Otimização"> Otimização</label>
+              <label class="service-checkbox"><input type="checkbox" name="services" value="Integração"> Integração</label>
+            </div>
+            <input type="text" id="otherServices" style="margin-top: 0.8rem; width:100%; padding:0.8rem; border-radius:16px; border:2px solid rgba(128,128,128,0.15); background:var(--bg);" placeholder="Outros serviços (separados por vírgula)">
+          </div>
+          
           <div class="form-actions-modern">
-            <button type="submit" class="btn-primary" id="btnSalvar">
-              Publicar modelo
-            </button>
-            <button type="button" class="btn-outline" onclick="window.location.href='store.html'">
-              Cancelar
-            </button>
-            <button type="button" class="btn-clear" onclick="clearAllFields()">
-              Limpar tudo
-            </button>
+            <button type="submit" class="btn-primary" id="btnSalvar">Cadastrar profissional</button>
+            <button type="button" class="btn-outline" onclick="window.location.href='store.html'">Cancelar</button>
+            <button type="button" class="btn-clear" onclick="clearAllFields()">Limpar tudo</button>
           </div>
         </form>
       </div>
@@ -515,50 +469,24 @@
   <script src="auth.js"></script>
   
   <script>
-    // ===== DEBUG: Monitorar estado =====
-    function logEstado() {
-      const imageCount = mediaItems.filter(m => m.type === 'image').length;
-      const videoCount = mediaItems.filter(m => m.type === 'video').length;
-      console.log(`Estado atual: ${imageCount} imagens, ${videoCount} vídeos, total: ${mediaItems.length} mídias`);
-    }
-
-    // Chamar após cada modificação
-    function updateMediaCounter() {
-      const imageCount = mediaItems.filter(m => m.type === 'image').length;
-      const videoCount = mediaItems.filter(m => m.type === 'video').length;
-      mediaCounter.textContent = `${imageCount} imagens | ${videoCount} vídeos (máximo 6 de cada)`;
-      
-      logEstado(); // Debug
-      
-      if (imageCount >= MAX_IMAGES || videoCount >= MAX_VIDEOS) {
-        mediaUploadBox.style.opacity = '0.5';
-        mediaUploadBox.style.pointerEvents = 'none';
-      } else {
-        mediaUploadBox.style.opacity = '1';
-        mediaUploadBox.style.pointerEvents = 'auto';
-      }
-    }
-
     // ===== VARIÁVEIS GLOBAIS =====
     let mediaItems = [];
-    const MAX_IMAGES = 6;  // Máximo de 6 imagens
-    const MAX_VIDEOS = 6;   // Máximo de 6 vídeos
+    const MAX_IMAGES = 6;
+    const MAX_VIDEOS = 6;
     
     // Elementos DOM
     const mediaUploadBox = document.getElementById('mediaUploadBox');
     const mediaFileInput = document.getElementById('mediaFileInput');
     const mediaGrid = document.getElementById('mediaGrid');
     const mediaCounter = document.getElementById('mediaCounter');
-    const descTextarea = document.getElementById('modelDescription');
+    const bioTextarea = document.getElementById('bio');
     const charCounter = document.getElementById('charCounter');
-    const form = document.getElementById('modelForm');
+    const form = document.getElementById('professionalForm');
     const submitBtn = document.getElementById('btnSalvar');
-    const categorySelect = document.getElementById('modelCategory');
-    const newCategoryInput = document.getElementById('newCategory');
     
     // ===== CONTADOR DE CARACTERES =====
-    if (descTextarea) {
-      descTextarea.addEventListener('input', function() {
+    if (bioTextarea) {
+      bioTextarea.addEventListener('input', function() {
         const count = this.value.length;
         charCounter.textContent = `${count} / 2000 caracteres`;
         charCounter.style.color = count > 1900 ? '#ffc107' : 'var(--muted)';
@@ -572,11 +500,15 @@
       mediaCounter.textContent = `${imageCount} imagens | ${videoCount} vídeos (máximo 6 de cada)`;
       
       if (imageCount >= MAX_IMAGES || videoCount >= MAX_VIDEOS) {
-        mediaUploadBox.style.opacity = '0.5';
-        mediaUploadBox.style.pointerEvents = 'none';
+        if (mediaUploadBox) {
+          mediaUploadBox.style.opacity = '0.5';
+          mediaUploadBox.style.pointerEvents = 'none';
+        }
       } else {
-        mediaUploadBox.style.opacity = '1';
-        mediaUploadBox.style.pointerEvents = 'auto';
+        if (mediaUploadBox) {
+          mediaUploadBox.style.opacity = '1';
+          mediaUploadBox.style.pointerEvents = 'auto';
+        }
       }
     }
     
@@ -593,31 +525,38 @@
           mediaDiv.innerHTML = `
             <img src="${item.data}" alt="Imagem do portfólio">
             <span class="media-type-badge">Imagem</span>
-            <button class="remove-media" onclick="removeMedia(${index})">✕</button>
+            <button class="remove-media" data-index="${index}">✕</button>
           `;
         } else {
           mediaDiv.innerHTML = `
             <video src="${item.data}" style="width:100%; height:100%; object-fit:cover;"></video>
             <span class="media-type-badge">Vídeo</span>
-            <button class="remove-media" onclick="removeMedia(${index})">✕</button>
+            <button class="remove-media" data-index="${index}">✕</button>
           `;
         }
         
         mediaGrid.appendChild(mediaDiv);
       });
       
+      // Adicionar eventos de remoção
+      document.querySelectorAll('.remove-media').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const index = parseInt(this.getAttribute('data-index'));
+          removeMedia(index);
+        });
+      });
+      
       updateMediaCounter();
     }
     
     // ===== REMOVER MÍDIA =====
-    window.removeMedia = function(index) {
+    function removeMedia(index) {
       console.log(`Removendo mídia no índice ${index}`);
-      const removed = mediaItems[index];
-      console.log(`Removido: ${removed.type} - ${removed.name}`);
       mediaItems.splice(index, 1);
       renderMediaGrid();
       console.log(`Mídias restantes: ${mediaItems.length}`);
-    };
+    }
     
     // ===== ADICIONAR MÍDIA =====
     async function addMedia(file) {
@@ -632,51 +571,34 @@
       const imageCount = mediaItems.filter(m => m.type === 'image').length;
       const videoCount = mediaItems.filter(m => m.type === 'video').length;
       
-      // Verificar limites
       if (isImage && imageCount >= MAX_IMAGES) {
-        alert(`Máximo de ${MAX_IMAGES} imagens atingido. Remova alguma imagem para adicionar outra.`);
+        alert(`Máximo de ${MAX_IMAGES} imagens atingido.`);
         return false;
       }
       
       if (isVideo && videoCount >= MAX_VIDEOS) {
-        alert(`Máximo de ${MAX_VIDEOS} vídeos atingido. Remova algum vídeo para adicionar outro.`);
+        alert(`Máximo de ${MAX_VIDEOS} vídeos atingido.`);
         return false;
       }
       
-      // Validar tamanho
       const maxSize = isImage ? 2 * 1024 * 1024 : 10 * 1024 * 1024;
       if (file.size > maxSize) {
-        alert(`Arquivo muito grande! Máximo ${isImage ? '2MB' : '10MB'}. Tamanho do arquivo: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
-        return false;
-      }
-      
-      // Validar tipo de imagem (apenas jpg/png)
-      if (isImage && !['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
-        alert('Formato de imagem inválido. Use JPG ou PNG.');
-        return false;
-      }
-      
-      // Validar tipo de vídeo (apenas mp4)
-      if (isVideo && !['video/mp4'].includes(file.type)) {
-        alert('Formato de vídeo inválido. Use MP4.');
+        alert(`Arquivo muito grande! Máximo ${isImage ? '2MB' : '10MB'}.`);
         return false;
       }
       
       try {
-        console.log(`Processando ${isImage ? 'imagem' : 'vídeo'}: ${file.name} (${(file.size / 1024).toFixed(2)}KB)`);
         const data = await readFileAsDataURL(file);
         mediaItems.push({
           type: isImage ? 'image' : 'video',
           data: data,
-          name: file.name,
-          size: file.size
+          name: file.name
         });
         renderMediaGrid();
-        console.log(`Arquivo adicionado com sucesso! Total: ${mediaItems.length} mídias`);
         return true;
       } catch (err) {
         console.error('Erro ao processar arquivo:', err);
-        alert('Erro ao processar arquivo. Tente novamente com um arquivo menor.');
+        alert('Erro ao processar arquivo.');
         return false;
       }
     }
@@ -695,8 +617,7 @@
         mediaUploadBox.classList.add('dragover');
       });
       
-      mediaUploadBox.addEventListener('dragleave', (e) => {
-        e.preventDefault();
+      mediaUploadBox.addEventListener('dragleave', () => {
         mediaUploadBox.classList.remove('dragover');
       });
       
@@ -720,123 +641,108 @@
       });
     }
     
-    // ===== CATEGORIA PERSONALIZADA =====
-    if (categorySelect) {
-      categorySelect.addEventListener('change', () => {
-        if (categorySelect.value === 'outro') {
-          newCategoryInput.classList.add('active');
-          newCategoryInput.required = true;
-        } else {
-          newCategoryInput.classList.remove('active');
-          newCategoryInput.required = false;
-          newCategoryInput.value = '';
-        }
-      });
-    }
-    
     // ===== LIMPAR TODOS OS CAMPOS =====
     window.clearAllFields = function() {
       if (confirm('Tem certeza que deseja limpar todos os campos?')) {
-        const form = document.getElementById('modelForm');
-        if (form) form.reset();
+        const formEl = document.getElementById('professionalForm');
+        if (formEl) formEl.reset();
         mediaItems = [];
         renderMediaGrid();
         if (charCounter) {
           charCounter.textContent = '0 / 2000 caracteres';
           charCounter.style.color = 'var(--muted)';
         }
-        if (newCategoryInput) {
-          newCategoryInput.classList.remove('active');
-          newCategoryInput.value = '';
-        }
       }
     };
-
-    // ===== SUBMIT DO FORMULÁRIO (CORRIGIDO) =====
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
+    
+    // ===== COLETAR SERVIÇOS =====
+    function getSelectedServices() {
+      const services = [];
+      document.querySelectorAll('input[name="services"]:checked').forEach(cb => {
+        services.push(cb.value);
+      });
       
-      console.log('=== INICIANDO PUBLICAÇÃO ===');
-      logEstado();
-      
-      // Validações
-      const title = document.getElementById('modelTitle').value.trim();
-      const price = document.getElementById('modelPrice').value;
-      const seller = document.getElementById('modelSeller').value.trim();
-      const description = document.getElementById('modelDescription').value.trim();
-      
-      if (!title || !price || !seller || !description) {
-        alert('Preencha todos os campos obrigatórios.');
-        return;
+      const otherServices = document.getElementById('otherServices').value.trim();
+      if (otherServices) {
+        otherServices.split(',').forEach(s => {
+          const service = s.trim();
+          if (service) services.push(service);
+        });
       }
-      
-      // Verificar se tem pelo menos uma imagem
-      const imageCount = mediaItems.filter(m => m.type === 'image').length;
-      if (imageCount === 0) {
-        alert('Adicione pelo menos uma imagem do modelo.');
-        return;
-      }
-      
-      console.log(`Imagens válidas: ${imageCount}`);
-      
-      // Desabilitar botão
-      submitBtn.disabled = true;
-      const originalText = submitBtn.textContent;
-      submitBtn.innerHTML = 'Publicando... <span class="loading-spinner"></span>';
-      
-      try {
-        // Categoria
-        let category = categorySelect.value;
-        if (category === 'outro') {
-          const newCat = newCategoryInput.value.trim();
-          if (!newCat) {
-            alert('Digite o nome da nova categoria.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-            return;
-          }
-          category = newCat.toLowerCase().replace(/\s+/g, '-');
+      return services;
+    }
+    
+    // ===== SUBMIT DO FORMULÁRIO =====
+    if (form) {
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Validações
+        const name = document.getElementById('name').value.trim();
+        const specialty = document.getElementById('specialty').value.trim();
+        const bio = document.getElementById('bio').value.trim();
+        const hourlyRate = document.getElementById('hourlyRate').value;
+        
+        if (!name || !specialty || !bio || !hourlyRate) {
+          alert('Preencha todos os campos obrigatórios.');
+          return;
         }
         
-        // Montar objeto do modelo
-        const model = {
-          id: Date.now(),
-          title: title,
-          price: `R$ ${parseFloat(price).toFixed(2)}`,
-          seller: seller,
-          description: description,
-          short: description.substring(0, 150) + '...',
-          media: mediaItems,
-          portfolioLink: document.getElementById('portfolioLink').value.trim(),
-          category: category,
-          type: 'model',
-          createdAt: new Date().toISOString()
-        };
+        if (mediaItems.length === 0) {
+          alert('Adicione pelo menos uma imagem ao seu portfólio.');
+          return;
+        }
         
-        console.log('Salvando modelo:', {
-          id: model.id,
-          title: model.title,
-          mediaCount: model.media.length,
-          images: model.media.filter(m => m.type === 'image').length,
-          videos: model.media.filter(m => m.type === 'video').length
-        });
+        // Desabilitar botão
+        submitBtn.disabled = true;
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = 'Cadastrando... <span class="loading-spinner"></span>';
         
-        // Salvar no localStorage
-        let models = JSON.parse(localStorage.getItem('models') || '[]');
-        models.push(model);
-        localStorage.setItem('models', JSON.stringify(models));
-        
-        console.log('✅ Modelo salvo com sucesso! Total de modelos:', models.length);
-        alert('Modelo publicado com sucesso!');
-        window.location.href = 'store.html';
-        
-      } catch (err) {
-        console.error('❌ Erro ao publicar:', err);
-        alert('Erro ao publicar. Tente novamente.');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-      }
-    });
+        try {
+          // Criar objeto do profissional
+          const professional = {
+            id: Date.now(),
+            name: name,
+            specialty: specialty,
+            bio: bio,
+            hourlyRate: parseFloat(hourlyRate),
+            services: getSelectedServices(),
+            media: mediaItems,
+            portfolioLink: document.getElementById('portfolioLink').value.trim(),
+            type: 'professional',
+            createdAt: new Date().toISOString()
+          };
+          
+          console.log('Salvando profissional:', professional);
+          
+          // Salvar no localStorage
+          let professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+          
+          const editingId = sessionStorage.getItem('editingProfessionalId');
+          if (editingId) {
+            const index = professionals.findIndex(p => p.id == editingId);
+            if (index >= 0) {
+              professional.id = parseInt(editingId);
+              professionals[index] = professional;
+            }
+            sessionStorage.removeItem('editingProfessionalId');
+          } else {
+            professionals.push(professional);
+          }
+          
+          localStorage.setItem('professionals', JSON.stringify(professionals));
+          
+          alert('Profissional cadastrado com sucesso!');
+          window.location.href = 'store.html';
+          
+        } catch (err) {
+          console.error('Erro:', err);
+          alert('Erro ao cadastrar. Tente novamente.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      });
+    }
     
     function readFileAsDataURL(file) {
       return new Promise((resolve, reject) => {
@@ -852,40 +758,44 @@
     if (editData) {
       try {
         const item = JSON.parse(editData);
-        if (item.type === 'model') {
-          const models = JSON.parse(localStorage.getItem('models') || '[]');
-          const model = models.find(m => m.id == item.id);
-          if (model) {
-            document.getElementById('modelTitle').value = model.title;
-            document.getElementById('modelPrice').value = parseFloat(model.price.replace('R$', ''));
-            document.getElementById('modelSeller').value = model.seller;
-            document.getElementById('modelDescription').value = model.description;
-            document.getElementById('portfolioLink').value = model.portfolioLink || '';
+        if (item.type === 'professional') {
+          const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+          const prof = professionals.find(p => p.id == item.id);
+          if (prof) {
+            document.getElementById('name').value = prof.name;
+            document.getElementById('specialty').value = prof.specialty;
+            document.getElementById('bio').value = prof.bio || '';
+            document.getElementById('hourlyRate').value = prof.hourlyRate || '';
+            document.getElementById('portfolioLink').value = prof.portfolioLink || '';
             
-            if (model.media) {
-              mediaItems = [...model.media];
+            if (prof.media) {
+              mediaItems = [...prof.media];
               renderMediaGrid();
             }
             
-            if (model.category) {
-              const optionExists = Array.from(categorySelect.options).some(opt => opt.value === model.category);
-              if (optionExists) {
-                categorySelect.value = model.category;
-              } else {
-                categorySelect.value = 'outro';
-                newCategoryInput.value = model.category;
-                newCategoryInput.classList.add('active');
-              }
+            if (prof.services) {
+              prof.services.forEach(service => {
+                const checkbox = document.querySelector(`input[name="services"][value="${service}"]`);
+                if (checkbox) checkbox.checked = true;
+                else {
+                  const otherInput = document.getElementById('otherServices');
+                  const current = otherInput.value;
+                  if (!current.includes(service)) {
+                    otherInput.value = current ? `${current}, ${service}` : service;
+                  }
+                }
+              });
             }
             
             if (charCounter) {
-              charCounter.textContent = `${model.description.length} / 2000 caracteres`;
+              charCounter.textContent = `${(prof.bio || '').length} / 2000 caracteres`;
             }
-            submitBtn.innerHTML = 'Atualizar modelo';
+            submitBtn.innerHTML = 'Atualizar profissional';
+            sessionStorage.setItem('editingProfessionalId', item.id);
           }
         }
-      } catch (e) {
-        console.error('Erro ao carregar dados de edição:', e);
+      } catch(e) {
+        console.error('Erro na edição:', e);
       }
       localStorage.removeItem('editItem');
     }
