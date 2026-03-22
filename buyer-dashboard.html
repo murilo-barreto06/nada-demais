@@ -683,7 +683,7 @@
       }
     }
     
-    // Upload da foto
+    // Processar upload
     window.handleProfileUpload = function(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -701,12 +701,23 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const imageData = e.target.result;
-        localStorage.setItem(`avatar_${currentUser.id}`, imageData);
+        const user = getCurrentUser();
         
+        // Salvar no localStorage separado para avatar
+        localStorage.setItem(`avatar_${user.id}`, imageData);
+        
+        // TAMBÉM SALVAR NO OBJETO DO USUÁRIO
+        const users = JSON.parse(localStorage.getItem('ai_store_users') || '[]');
+        const userIndex = users.findIndex(u => u.id === user.id);
+        if (userIndex >= 0) {
+          users[userIndex].avatar = imageData;
+          localStorage.setItem('ai_store_users', JSON.stringify(users));
+        }
+        
+        // Atualizar exibição
         const avatarContent = document.getElementById('avatarContent');
         avatarContent.innerHTML = `<img src="${imageData}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">`;
         
-        // Reset do input para permitir selecionar o mesmo arquivo novamente
         event.target.value = '';
       };
       
