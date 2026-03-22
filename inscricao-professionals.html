@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI Store — Cadastro de Profissional</title>
+  <title>AI Store — Publicar Modelo</title>
   
   <script>
     (function() {
@@ -16,10 +16,9 @@
   
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* ===== PÁGINA DE CADASTRO DE PROFISSIONAL - DESIGN REFINADO ===== */
-    
+    /* ===== MESMOS ESTILOS DA VERSÃO DO PROFISSIONAL ===== */
     .publish-wrapper {
-      max-width: 900px;
+      max-width: 1000px;
       margin: 2rem auto;
       padding: 0 1.5rem;
     }
@@ -49,12 +48,6 @@
       border-radius: 24px;
       box-shadow: var(--shadow);
       overflow: hidden;
-      transition: transform 0.2s ease;
-    }
-    
-    .publish-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-hover);
     }
     
     .publish-form {
@@ -110,35 +103,29 @@
       gap: 1.5rem;
     }
     
-    /* Upload Box */
-    .upload-area {
-      margin-top: 0.5rem;
+    .portfolio-section {
+      background: var(--bg);
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
     }
     
     .upload-box {
       background: var(--bg);
       border: 2px dashed rgba(128,128,128,0.3);
       border-radius: 20px;
-      padding: 2rem;
+      padding: 1.5rem;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s ease;
+      margin-top: 0.5rem;
     }
     
-    .upload-box:hover {
+    .upload-box:hover,
+    .upload-box.dragover {
       border-color: var(--accent);
       background: rgba(21, 115, 71, 0.05);
       transform: translateY(-2px);
-    }
-    
-    .upload-box.selected {
-      border-color: var(--accent);
-      background: rgba(21, 115, 71, 0.1);
-    }
-    
-    .upload-icon {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
     }
     
     .upload-text {
@@ -148,85 +135,94 @@
     }
     
     .upload-hint {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--muted);
     }
     
-    /* Preview */
-    .preview-container {
-      position: relative;
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
       margin-top: 1rem;
-      border-radius: 16px;
+    }
+    
+    .media-item {
+      position: relative;
+      border-radius: 12px;
       overflow: hidden;
-      background: var(--bg);
-      display: none;
+      background: var(--card);
+      border: 1px solid rgba(128,128,128,0.1);
+      aspect-ratio: 1;
     }
     
-    .preview-container.show {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-    
-    .preview-avatar {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
+    .media-item img,
+    .media-item video {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      display: block;
-      margin: 0 auto;
-      border: 3px solid var(--accent);
     }
     
-    .remove-preview {
+    .media-item .remove-media {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 8px;
+      right: 8px;
       background: rgba(0,0,0,0.7);
       color: white;
       border: none;
-      border-radius: 30px;
-      padding: 0.3rem 0.8rem;
-      font-size: 0.8rem;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
       cursor: pointer;
       transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       z-index: 10;
     }
     
-    .remove-preview:hover {
+    .media-item .remove-media:hover {
       background: #dc3545;
+      transform: scale(1.05);
     }
     
-    /* Serviços */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 0.8rem;
-      background: var(--bg);
-      padding: 1rem;
-      border-radius: 16px;
-      margin-top: 0.5rem;
+    .media-type-badge {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 11px;
     }
     
-    .service-checkbox {
+    .media-counter {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.8rem;
+      text-align: right;
+    }
+    
+    .category-row-modern {
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
+      gap: 1rem;
+      align-items: flex-start;
     }
     
-    .service-checkbox input {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
+    .category-row-modern select {
+      flex: 2;
     }
     
-    .service-checkbox label {
-      cursor: pointer;
-      margin: 0;
-      font-weight: normal;
+    .category-row-modern .new-category {
+      flex: 1;
+      display: none;
     }
     
-    /* Botões */
+    .category-row-modern .new-category.active {
+      display: block;
+    }
+    
     .form-actions-modern {
       display: flex;
       gap: 1rem;
@@ -238,7 +234,7 @@
     
     .btn-primary {
       flex: 1;
-      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      background: var(--accent);
       color: white;
       border: none;
       padding: 0.9rem;
@@ -247,21 +243,13 @@
       font-size: 1rem;
       cursor: pointer;
       transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
+      text-align: center;
     }
     
     .btn-primary:hover {
+      background: var(--accent-hover);
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(21, 115, 71, 0.3);
-    }
-    
-    .btn-primary:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: none;
     }
     
     .btn-outline {
@@ -275,11 +263,13 @@
       font-size: 1rem;
       cursor: pointer;
       transition: all 0.2s ease;
+      text-align: center;
     }
     
     .btn-outline:hover {
       background: var(--accent);
       color: white;
+      transform: translateY(-2px);
     }
     
     .btn-clear {
@@ -293,15 +283,15 @@
       font-size: 1rem;
       cursor: pointer;
       transition: all 0.2s ease;
+      text-align: center;
     }
     
     .btn-clear:hover {
       background: var(--muted);
       color: white;
-      border-color: var(--muted);
+      transform: translateY(-2px);
     }
     
-    /* Loading spinner */
     .loading-spinner {
       display: inline-block;
       width: 20px;
@@ -317,7 +307,6 @@
       to { transform: rotate(360deg); }
     }
     
-    /* Help text */
     .help-text {
       font-size: 0.75rem;
       color: var(--muted);
@@ -331,75 +320,26 @@
       margin-top: 0.3rem;
     }
     
-    /* Animações */
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes bounce {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-    
-    /* Responsividade */
     @media (max-width: 768px) {
       .publish-wrapper {
         padding: 0 1rem;
         margin: 1rem auto;
       }
-      
       .publish-form {
         padding: 1.5rem;
       }
-      
       .form-row-modern {
         grid-template-columns: 1fr;
         gap: 1rem;
       }
-      
       .form-actions-modern {
         flex-direction: column;
       }
-      
       .btn-clear {
         flex: 1;
       }
-      
-      .services-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .publish-header h1 {
-        font-size: 1.5rem;
-      }
-      
-      .publish-form {
-        padding: 1.2rem;
-      }
-      
-      .form-group-modern input,
-      .form-group-modern textarea,
-      .form-group-modern select {
-        padding: 0.7rem;
-      }
-      
-      .btn-primary,
-      .btn-outline,
-      .btn-clear {
-        padding: 0.7rem;
-      }
-      
-      .services-grid {
-        grid-template-columns: 1fr;
+      .media-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       }
     }
   </style>
@@ -419,98 +359,73 @@
   <main>
     <div class="publish-wrapper">
       <div class="publish-header">
-        <h1> Cadastro de Profissional</h1>
-        <p>Mostre sua expertise e encontre novos clientes</p>
+        <h1>Publicar Modelo de IA</h1>
+        <p>Preencha os dados do seu modelo para aparecer na loja</p>
       </div>
       
       <div class="publish-card">
-        <form id="professionalForm" class="publish-form">
-          <!-- Nome completo -->
+        <form id="modelForm" class="publish-form">
           <div class="form-group-modern">
-            <label>Nome completo <span>*</span></label>
-            <input type="text" id="name" placeholder="Seu nome completo">
+            <label>Título do modelo <span>*</span></label>
+            <input type="text" id="modelTitle" placeholder="Ex: IA de Atendimento para WhatsApp">
           </div>
           
-          <!-- Especialidade -->
-          <div class="form-group-modern">
-            <label>Especialidade <span>*</span></label>
-            <input type="text" id="specialty" placeholder="Ex: NLP, Visão Computacional, Desenvolvimento de Chatbots">
-          </div>
-          
-          <!-- Biografia -->
-          <div class="form-group-modern">
-            <label>Biografia <span>*</span></label>
-            <textarea id="bio" rows="5" maxlength="500" placeholder="Conte um pouco sobre sua experiência, projetos que já realizou, sua abordagem de trabalho..."></textarea>
-            <div class="char-counter" id="charCounter">0 / 500 caracteres</div>
-          </div>
-          
-          <!-- Upload de Foto -->
-          <div class="form-group-modern">
-            <label>Foto de perfil</label>
-            <div class="upload-area">
-              <div class="upload-box" id="avatarUploadBox" onclick="document.getElementById('avatarFile').click()">
-                <div class="upload-icon">📸</div>
-                <div class="upload-text">Clique para selecionar uma foto</div>
-                <div class="upload-hint">JPG ou PNG, até 2MB</div>
-              </div>
-              <input type="file" id="avatarFile" accept="image/jpeg,image/png,image/jpg" style="display: none;">
+          <div class="form-row-modern">
+            <div class="form-group-modern">
+              <label>Preço (R$) <span>*</span></label>
+              <input type="number" id="modelPrice" step="0.01" min="0" placeholder="199.00">
             </div>
-            <div class="preview-container" id="avatarPreviewContainer">
-              <img class="preview-avatar" id="avatarPreview" alt="Preview da foto">
-              <button type="button" class="remove-preview" onclick="removeAvatarPreview()">✕ Remover</button>
+            <div class="form-group-modern">
+              <label>Nome do vendedor <span>*</span></label>
+              <input type="text" id="modelSeller" placeholder="Ex: BotLabs">
             </div>
           </div>
           
-          <!-- Valor por hora -->
           <div class="form-group-modern">
-            <label>Valor por hora (R$) <span>*</span></label>
-            <input type="number" id="hourlyRate" step="10" min="0" placeholder="150">
-            <div class="help-text">Valor sugerido para serviços de consultoria e desenvolvimento</div>
+            <label>Descrição <span>*</span></label>
+            <textarea id="modelDescription" maxlength="2000" rows="6" placeholder="Descreva detalhadamente o que seu modelo faz..."></textarea>
+            <div class="char-counter" id="charCounter">0 / 2000 caracteres</div>
           </div>
           
-          <!-- Serviços oferecidos -->
-          <div class="form-group-modern">
-            <label>Serviços oferecidos</label>
-            <div class="services-grid">
-              <label class="service-checkbox">
-                <input type="checkbox" name="services" value="Instalação"> Instalação
-              </label>
-              <label class="service-checkbox">
-                <input type="checkbox" name="services" value="Treinamento"> Treinamento
-              </label>
-              <label class="service-checkbox">
-                <input type="checkbox" name="services" value="Customização"> Customização
-              </label>
-              <label class="service-checkbox">
-                <input type="checkbox" name="services" value="Suporte"> Suporte
-              </label>
-              <label class="service-checkbox">
-                <input type="checkbox" name="services" value="Consultoria"> Consultoria
-              </label>
-              <label class="service-checkbox">
-                <input type="checkbox" name="services" value="Implementação"> Implementação
-              </label>
-              <label class="service-checkbox">
-                <input type="checkbox" name="services" value="Otimização"> Otimização
-              </label>
-              <label class="service-checkbox">
-                <input type="checkbox" name="services" value="Integração"> Integração
-              </label>
+          <div class="portfolio-section">
+            <h3>Portfólio de Mídias</h3>
+            <p class="help-text">Adicione imagens e vídeos demonstrando seu modelo em ação (máximo 6 imagens e 6 vídeos)</p>
+            
+            <div class="upload-box" id="mediaUploadBox">
+              <div class="upload-text">Clique ou arraste arquivos para enviar</div>
+              <div class="upload-hint">Imagens (JPG, PNG) até 2MB | Vídeos (MP4) até 10MB</div>
             </div>
-            <input type="text" id="otherServices" class="form-group-modern" style="margin-top: 0.8rem;" placeholder="Outros serviços (separados por vírgula)">
+            <input type="file" id="mediaFileInput" accept="image/jpeg,image/png,image/jpg,video/mp4" multiple style="display: none;">
+            
+            <div class="media-counter" id="mediaCounter">0 imagens | 0 vídeos</div>
+            <div class="media-grid" id="mediaGrid"></div>
           </div>
           
-          <!-- Botões -->
+          <div class="form-group-modern">
+            <label>Link de portfólio externo</label>
+            <input type="url" id="portfolioLink" placeholder="https://github.com/seuprojeto ou https://seudominio.com/portfolio">
+          </div>
+          
+          <div class="form-group-modern">
+            <label>Categoria</label>
+            <div class="category-row-modern">
+              <select id="modelCategory">
+                <option value="">Selecione uma categoria</option>
+                <option value="atendimento">Atendimento / Chatbot</option>
+                <option value="analise">Análise de Dados</option>
+                <option value="visao">Visão Computacional</option>
+                <option value="nlp">Processamento de Linguagem</option>
+                <option value="generativo">IA Generativa</option>
+                <option value="outro">Outra (digite abaixo)</option>
+              </select>
+              <input type="text" id="newCategory" class="new-category" placeholder="Digite a nova categoria">
+            </div>
+          </div>
+          
           <div class="form-actions-modern">
-            <button type="submit" class="btn-primary" id="btnSalvar">
-              Cadastrar profissional
-            </button>
-            <button type="button" class="btn-outline" onclick="window.location.href='store.html'">
-              Cancelar
-            </button>
-            <button type="button" class="btn-clear" onclick="clearAllFields()">
-              Limpar tudo
-            </button>
+            <button type="submit" class="btn-primary" id="btnSalvar">Publicar modelo</button>
+            <button type="button" class="btn-outline" onclick="window.location.href='store.html'">Cancelar</button>
+            <button type="button" class="btn-clear" onclick="clearAllFields()">Limpar tudo</button>
           </div>
         </form>
       </div>
@@ -540,174 +455,295 @@
   <script src="auth.js"></script>
   
   <script>
-    // ===== ELEMENTOS DOM =====
-    const avatarFile = document.getElementById('avatarFile');
-    const avatarPreview = document.getElementById('avatarPreview');
-    const avatarPreviewContainer = document.getElementById('avatarPreviewContainer');
-    const avatarUploadBox = document.getElementById('avatarUploadBox');
-    const bioTextarea = document.getElementById('bio');
+    // ===== VARIÁVEIS GLOBAIS =====
+    let mediaItems = [];
+    const MAX_IMAGES = 6;
+    const MAX_VIDEOS = 6;
+    
+    // Elementos DOM
+    const mediaUploadBox = document.getElementById('mediaUploadBox');
+    const mediaFileInput = document.getElementById('mediaFileInput');
+    const mediaGrid = document.getElementById('mediaGrid');
+    const mediaCounter = document.getElementById('mediaCounter');
+    const descTextarea = document.getElementById('modelDescription');
     const charCounter = document.getElementById('charCounter');
-    const form = document.getElementById('professionalForm');
+    const form = document.getElementById('modelForm');
     const submitBtn = document.getElementById('btnSalvar');
-    
-    // ===== FUNÇÃO DE VALIDAÇÃO DE ARQUIVO =====
-    function validateFile(file, maxSize, allowedTypes, typeName) {
-      if (!file) return false;
-      
-      if (!allowedTypes.includes(file.type)) {
-        alert(`Formato de ${typeName} inválido. Use ${allowedTypes.join(', ')}.`);
-        return false;
-      }
-      
-      if (file.size > maxSize) {
-        alert(`${typeName} muito grande! Máximo ${maxSize / (1024 * 1024)}MB.`);
-        return false;
-      }
-      
-      return true;
-    }
-    
-    // ===== PREVIEW DA FOTO =====
-    avatarFile.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        if (validateFile(file, 2 * 1024 * 1024, ['image/jpeg', 'image/png'], 'Foto')) {
-          avatarUploadBox.classList.add('selected');
-          
-          const reader = new FileReader();
-          reader.onload = function(event) {
-            avatarPreview.src = event.target.result;
-            avatarPreviewContainer.classList.add('show');
-          };
-          reader.readAsDataURL(file);
-        } else {
-          avatarFile.value = '';
-          avatarUploadBox.classList.remove('selected');
-        }
-      } else {
-        avatarUploadBox.classList.remove('selected');
-      }
-    });
-    
-    window.removeAvatarPreview = function() {
-      avatarFile.value = '';
-      avatarPreviewContainer.classList.remove('show');
-      avatarPreview.src = '';
-      avatarUploadBox.classList.remove('selected');
-    };
+    const categorySelect = document.getElementById('modelCategory');
+    const newCategoryInput = document.getElementById('newCategory');
     
     // ===== CONTADOR DE CARACTERES =====
-    bioTextarea.addEventListener('input', function() {
-      const count = this.value.length;
-      charCounter.textContent = `${count} / 500 caracteres`;
-      if (count > 450) {
-        charCounter.style.color = '#ffc107';
+    if (descTextarea) {
+      descTextarea.addEventListener('input', function() {
+        const count = this.value.length;
+        charCounter.textContent = `${count} / 2000 caracteres`;
+        charCounter.style.color = count > 1900 ? '#ffc107' : 'var(--muted)';
+      });
+    }
+    
+    // ===== ATUALIZAR CONTADOR DE MÍDIAS =====
+    function updateMediaCounter() {
+      const imageCount = mediaItems.filter(m => m.type === 'image').length;
+      const videoCount = mediaItems.filter(m => m.type === 'video').length;
+      mediaCounter.textContent = `${imageCount} imagens | ${videoCount} vídeos (máximo 6 de cada)`;
+      
+      if (imageCount >= MAX_IMAGES || videoCount >= MAX_VIDEOS) {
+        if (mediaUploadBox) {
+          mediaUploadBox.style.opacity = '0.5';
+          mediaUploadBox.style.pointerEvents = 'none';
+        }
       } else {
-        charCounter.style.color = 'var(--muted)';
+        if (mediaUploadBox) {
+          mediaUploadBox.style.opacity = '1';
+          mediaUploadBox.style.pointerEvents = 'auto';
+        }
       }
-    });
+    }
+    
+    // ===== RENDERIZAR GRADE DE MÍDIAS =====
+    function renderMediaGrid() {
+      if (!mediaGrid) return;
+      mediaGrid.innerHTML = '';
+      
+      mediaItems.forEach((item, index) => {
+        const mediaDiv = document.createElement('div');
+        mediaDiv.className = 'media-item';
+        
+        if (item.type === 'image') {
+          mediaDiv.innerHTML = `
+            <img src="${item.data}" alt="Imagem do portfólio">
+            <span class="media-type-badge">Imagem</span>
+            <button class="remove-media" data-index="${index}">✕</button>
+          `;
+        } else {
+          mediaDiv.innerHTML = `
+            <video src="${item.data}" style="width:100%; height:100%; object-fit:cover;"></video>
+            <span class="media-type-badge">Vídeo</span>
+            <button class="remove-media" data-index="${index}">✕</button>
+          `;
+        }
+        
+        mediaGrid.appendChild(mediaDiv);
+      });
+      
+      // Adicionar eventos de remoção
+      document.querySelectorAll('.remove-media').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const index = parseInt(this.getAttribute('data-index'));
+          removeMedia(index);
+        });
+      });
+      
+      updateMediaCounter();
+    }
+    
+    // ===== REMOVER MÍDIA =====
+    function removeMedia(index) {
+      console.log(`Removendo mídia no índice ${index}`);
+      mediaItems.splice(index, 1);
+      renderMediaGrid();
+      console.log(`Mídias restantes: ${mediaItems.length}`);
+    }
+    
+    // ===== ADICIONAR MÍDIA =====
+    async function addMedia(file) {
+      const isImage = file.type.startsWith('image/');
+      const isVideo = file.type.startsWith('video/');
+      
+      if (!isImage && !isVideo) {
+        alert('Formato não suportado. Use JPG, PNG ou MP4.');
+        return false;
+      }
+      
+      const imageCount = mediaItems.filter(m => m.type === 'image').length;
+      const videoCount = mediaItems.filter(m => m.type === 'video').length;
+      
+      if (isImage && imageCount >= MAX_IMAGES) {
+        alert(`Máximo de ${MAX_IMAGES} imagens atingido. Remova alguma imagem para adicionar outra.`);
+        return false;
+      }
+      
+      if (isVideo && videoCount >= MAX_VIDEOS) {
+        alert(`Máximo de ${MAX_VIDEOS} vídeos atingido. Remova algum vídeo para adicionar outro.`);
+        return false;
+      }
+      
+      const maxSize = isImage ? 2 * 1024 * 1024 : 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert(`Arquivo muito grande! Máximo ${isImage ? '2MB' : '10MB'}.`);
+        return false;
+      }
+      
+      if (isImage && !['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+        alert('Formato de imagem inválido. Use JPG ou PNG.');
+        return false;
+      }
+      
+      if (isVideo && !['video/mp4'].includes(file.type)) {
+        alert('Formato de vídeo inválido. Use MP4.');
+        return false;
+      }
+      
+      try {
+        const data = await readFileAsDataURL(file);
+        mediaItems.push({
+          type: isImage ? 'image' : 'video',
+          data: data,
+          name: file.name,
+          size: file.size
+        });
+        renderMediaGrid();
+        return true;
+      } catch (err) {
+        console.error('Erro ao processar arquivo:', err);
+        alert('Erro ao processar arquivo.');
+        return false;
+      }
+    }
+    
+    // ===== PROCESSAR MÚLTIPLOS ARQUIVOS =====
+    async function processFiles(files) {
+      for (const file of files) {
+        await addMedia(file);
+      }
+    }
+    
+    // ===== DRAG AND DROP =====
+    if (mediaUploadBox) {
+      mediaUploadBox.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        mediaUploadBox.classList.add('dragover');
+      });
+      
+      mediaUploadBox.addEventListener('dragleave', () => {
+        mediaUploadBox.classList.remove('dragover');
+      });
+      
+      mediaUploadBox.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        mediaUploadBox.classList.remove('dragover');
+        const files = Array.from(e.dataTransfer.files);
+        await processFiles(files);
+      });
+      
+      mediaUploadBox.addEventListener('click', () => {
+        if (mediaFileInput) mediaFileInput.click();
+      });
+    }
+    
+    if (mediaFileInput) {
+      mediaFileInput.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        await processFiles(files);
+        mediaFileInput.value = '';
+      });
+    }
+    
+    // ===== CATEGORIA PERSONALIZADA =====
+    if (categorySelect) {
+      categorySelect.addEventListener('change', () => {
+        if (categorySelect.value === 'outro') {
+          newCategoryInput.classList.add('active');
+          newCategoryInput.required = true;
+        } else {
+          newCategoryInput.classList.remove('active');
+          newCategoryInput.required = false;
+          newCategoryInput.value = '';
+        }
+      });
+    }
     
     // ===== LIMPAR TODOS OS CAMPOS =====
     window.clearAllFields = function() {
       if (confirm('Tem certeza que deseja limpar todos os campos?')) {
-        document.getElementById('professionalForm').reset();
-        removeAvatarPreview();
-        charCounter.textContent = '0 / 500 caracteres';
-        charCounter.style.color = 'var(--muted)';
+        const formEl = document.getElementById('modelForm');
+        if (formEl) formEl.reset();
+        mediaItems = [];
+        renderMediaGrid();
+        if (charCounter) {
+          charCounter.textContent = '0 / 2000 caracteres';
+          charCounter.style.color = 'var(--muted)';
+        }
+        if (newCategoryInput) {
+          newCategoryInput.classList.remove('active');
+          newCategoryInput.value = '';
+        }
       }
     };
     
-    // ===== COLETAR SERVIÇOS SELECIONADOS =====
-    function getSelectedServices() {
-      const services = [];
-      document.querySelectorAll('input[name="services"]:checked').forEach(cb => {
-        services.push(cb.value);
-      });
-      
-      const otherServices = document.getElementById('otherServices').value.trim();
-      if (otherServices) {
-        otherServices.split(',').map(s => s.trim()).forEach(s => {
-          if (s) services.push(s);
-        });
-      }
-      
-      return services;
-    }
-    
     // ===== SUBMIT DO FORMULÁRIO =====
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      // Validações
-      const name = document.getElementById('name').value.trim();
-      const specialty = document.getElementById('specialty').value.trim();
-      const bio = document.getElementById('bio').value.trim();
-      const hourlyRate = document.getElementById('hourlyRate').value;
-      
-      if (!name || !specialty || !bio || !hourlyRate) {
-        alert('Preencha todos os campos obrigatórios.');
-        return;
-      }
-      
-      // Desabilitar botão e mostrar loading
-      submitBtn.disabled = true;
-      const originalText = submitBtn.innerHTML;
-      submitBtn.innerHTML = ' Cadastrando... <span class="loading-spinner"></span>';
-      
-      try {
-        // Processar foto (se houver)
-        let avatarBase64 = null;
-        if (avatarFile.files[0]) {
-          avatarBase64 = await readFileAsDataURL(avatarFile.files[0]);
-        } else if (avatarPreview.src && avatarPreview.src.startsWith('data:image')) {
-          avatarBase64 = avatarPreview.src;
+    if (form) {
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Validações
+        const title = document.getElementById('modelTitle').value.trim();
+        const price = document.getElementById('modelPrice').value;
+        const seller = document.getElementById('modelSeller').value.trim();
+        const description = document.getElementById('modelDescription').value.trim();
+        
+        if (!title || !price || !seller || !description) {
+          alert('Preencha todos os campos obrigatórios.');
+          return;
         }
         
-        // Serviços
-        const services = getSelectedServices();
+        const imageCount = mediaItems.filter(m => m.type === 'image').length;
+        if (imageCount === 0) {
+          alert('Adicione pelo menos uma imagem do modelo.');
+          return;
+        }
         
-        // Criar objeto do profissional
-        const professional = {
-          id: Date.now(),
-          name: name,
-          specialty: specialty,
-          avatar: avatarBase64 || '',
-          bio: bio,
-          hourlyRate: parseFloat(hourlyRate),
-          services: services,
-          type: 'professional',
-          createdAt: new Date().toISOString()
-        };
+        // Desabilitar botão
+        submitBtn.disabled = true;
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = 'Publicando... <span class="loading-spinner"></span>';
         
-        // Salvar no localStorage
-        let professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
-        
-        // Verificar se é edição
-        const editingId = sessionStorage.getItem('editingProfessionalId');
-        if (editingId) {
-          const index = professionals.findIndex(p => p.id == editingId);
-          if (index >= 0) {
-            professional.id = parseInt(editingId);
-            professionals[index] = professional;
+        try {
+          // Categoria
+          let category = categorySelect ? categorySelect.value : '';
+          if (category === 'outro') {
+            const newCat = newCategoryInput.value.trim();
+            if (!newCat) {
+              alert('Digite o nome da nova categoria.');
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalText;
+              return;
+            }
+            category = newCat.toLowerCase().replace(/\s+/g, '-');
           }
-          sessionStorage.removeItem('editingProfessionalId');
-        } else {
-          professionals.push(professional);
+          
+          // Montar objeto do modelo
+          const model = {
+            id: Date.now(),
+            title: title,
+            price: `R$ ${parseFloat(price).toFixed(2)}`,
+            seller: seller,
+            description: description,
+            short: description.substring(0, 150) + '...',
+            media: mediaItems,
+            portfolioLink: document.getElementById('portfolioLink').value.trim(),
+            category: category,
+            type: 'model',
+            createdAt: new Date().toISOString()
+          };
+          
+          // Salvar no localStorage
+          let models = JSON.parse(localStorage.getItem('models') || '[]');
+          models.push(model);
+          localStorage.setItem('models', JSON.stringify(models));
+          
+          alert('Modelo publicado com sucesso!');
+          window.location.href = 'store.html';
+          
+        } catch (err) {
+          console.error('Erro ao publicar:', err);
+          alert('Erro ao publicar. Tente novamente.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
         }
-        
-        localStorage.setItem('professionals', JSON.stringify(professionals));
-        
-        // Sucesso
-        alert('✅ Profissional cadastrado com sucesso!');
-        window.location.href = 'store.html';
-        
-      } catch (err) {
-        console.error(err);
-        alert('Erro ao processar os dados. Tente novamente.');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-      }
-    });
+      });
+    }
     
     function readFileAsDataURL(file) {
       return new Promise((resolve, reject) => {
@@ -718,44 +754,45 @@
       });
     }
     
-    // ===== EDIÇÃO (se veio para editar) =====
+    // ===== EDIÇÃO =====
     const editData = localStorage.getItem('editItem');
     if (editData) {
-      const item = JSON.parse(editData);
-      if (item.type === 'professional') {
-        const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
-        const prof = professionals.find(p => p.id == item.id);
-        if (prof) {
-          document.getElementById('name').value = prof.name;
-          document.getElementById('specialty').value = prof.specialty;
-          document.getElementById('bio').value = prof.bio || '';
-          document.getElementById('hourlyRate').value = prof.hourlyRate || '';
-          
-          if (prof.avatar && prof.avatar.startsWith('data:image')) {
-            avatarPreview.src = prof.avatar;
-            avatarPreviewContainer.classList.add('show');
-            avatarUploadBox.classList.add('selected');
-          }
-          
-          if (prof.services) {
-            prof.services.forEach(service => {
-              const checkbox = document.querySelector(`input[name="services"][value="${service}"]`);
-              if (checkbox) checkbox.checked = true;
-              else {
-                // Se for serviço não listado, colocar no campo "Outros"
-                const otherInput = document.getElementById('otherServices');
-                const current = otherInput.value;
-                if (!current.includes(service)) {
-                  otherInput.value = current ? `${current}, ${service}` : service;
-                }
+      try {
+        const item = JSON.parse(editData);
+        if (item.type === 'model') {
+          const models = JSON.parse(localStorage.getItem('models') || '[]');
+          const model = models.find(m => m.id == item.id);
+          if (model) {
+            document.getElementById('modelTitle').value = model.title;
+            document.getElementById('modelPrice').value = parseFloat(model.price.replace('R$', ''));
+            document.getElementById('modelSeller').value = model.seller;
+            document.getElementById('modelDescription').value = model.description;
+            document.getElementById('portfolioLink').value = model.portfolioLink || '';
+            
+            if (model.media) {
+              mediaItems = [...model.media];
+              renderMediaGrid();
+            }
+            
+            if (model.category) {
+              const optionExists = Array.from(categorySelect.options).some(opt => opt.value === model.category);
+              if (optionExists) {
+                categorySelect.value = model.category;
+              } else {
+                categorySelect.value = 'outro';
+                newCategoryInput.value = model.category;
+                newCategoryInput.classList.add('active');
               }
-            });
+            }
+            
+            if (charCounter) {
+              charCounter.textContent = `${model.description.length} / 2000 caracteres`;
+            }
+            submitBtn.innerHTML = 'Atualizar modelo';
           }
-          
-          charCounter.textContent = `${(prof.bio || '').length} / 500 caracteres`;
-          submitBtn.innerHTML = '<span>✏️</span> Atualizar profissional';
-          sessionStorage.setItem('editingProfessionalId', item.id);
         }
+      } catch(e) {
+        console.error('Erro na edição:', e);
       }
       localStorage.removeItem('editItem');
     }
