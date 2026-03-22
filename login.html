@@ -215,5 +215,16 @@
     };
   </script>
   <script src="auth.js"></script>
+  <script>
+    // Garantir que o link "Entrar" fique ativo na página de login
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        const loginLink = document.querySelector('.login-link');
+        if (loginLink) {
+          loginLink.classList.add('active');
+        }
+      }, 100);
+    });
+  </script>
 </body>
 </html>

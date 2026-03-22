@@ -76,7 +76,6 @@ function renderAuthSection() {
         <a href="buyer-dashboard.html" class="meu-painel-link ${currentPage === 'buyer-dashboard.html' ? 'active' : ''}">Meu painel</a>
         <div class="user-dropdown" style="display: none;">
           <a href="buyer-dashboard.html"> Meu Painel</a>
-          <a href="anuncie.html"> Anunciar</a>
           <a href="#" onclick="logout(); return false;"> Sair</a>
         </div>
       </div>
@@ -114,6 +113,9 @@ function renderAuthSection() {
     // Usuário não logado - mostrar link Entrar
     authContainer.innerHTML = '<a href="login.html" class="login-link">Entrar</a>';
   }
+  
+  // Atualiza o link ativo no header
+  updateActiveLink();
   
   // Atualiza o painel de configurações
   updateSettingsPanel();
@@ -160,3 +162,32 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('popstate', function() {
   renderAuthSection();
 });
+
+// Atualizar o link ativo no header
+function updateActiveLink() {
+  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+  const navLinks = document.querySelectorAll('nav a');
+  
+  // Mapeamento de páginas que devem manter o link "Anuncie" ativo
+  const anunciePages = ['anuncie.html', 'publicar-modelo.html', 'inscricao-professionals.html'];
+  
+  navLinks.forEach(link => {
+    const href = link.getAttribute('href');
+    
+    // Se for a página atual exata
+    if (href === currentPage) {
+      link.classList.add('active');
+    }
+    // Se estiver em uma página que pertence à seção "Anuncie"
+    else if (anunciePages.includes(currentPage) && href === 'anuncie.html') {
+      link.classList.add('active');
+    }
+    // Se estiver em uma página que pertence à seção "Loja"
+    else if (currentPage === 'store.html' && href === 'store.html') {
+      link.classList.add('active');
+    }
+    else {
+      link.classList.remove('active');
+    }
+  });
+}

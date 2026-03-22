@@ -15,6 +15,394 @@
   </script>
   
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ===== PÁGINA DE CADASTRO DE PROFISSIONAL - DESIGN REFINADO ===== */
+    
+    .publish-wrapper {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    
+    .publish-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .publish-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #4ade80);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    
+    .publish-header p {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    
+    .publish-card {
+      background: var(--panel);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+    
+    .publish-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+    
+    .publish-form {
+      padding: 2rem;
+    }
+    
+    .form-group-modern {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group-modern label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    
+    .form-group-modern label span {
+      color: #dc3545;
+      margin-left: 0.2rem;
+    }
+    
+    .form-group-modern input,
+    .form-group-modern textarea,
+    .form-group-modern select {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: var(--bg);
+      border: 2px solid rgba(128,128,128,0.15);
+      border-radius: 16px;
+      color: var(--text);
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+    
+    .form-group-modern input:focus,
+    .form-group-modern textarea:focus,
+    .form-group-modern select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(21, 115, 71, 0.1);
+    }
+    
+    .form-group-modern textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+    
+    .form-row-modern {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    
+    /* Upload Box */
+    .upload-area {
+      margin-top: 0.5rem;
+    }
+    
+    .upload-box {
+      background: var(--bg);
+      border: 2px dashed rgba(128,128,128,0.3);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .upload-box:hover {
+      border-color: var(--accent);
+      background: rgba(21, 115, 71, 0.05);
+      transform: translateY(-2px);
+    }
+    
+    .upload-box.selected {
+      border-color: var(--accent);
+      background: rgba(21, 115, 71, 0.1);
+    }
+    
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .upload-text {
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+    
+    .upload-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    
+    /* Preview */
+    .preview-container {
+      position: relative;
+      margin-top: 1rem;
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--bg);
+      display: none;
+    }
+    
+    .preview-container.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .preview-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto;
+      border: 3px solid var(--accent);
+    }
+    
+    .remove-preview {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+    
+    .remove-preview:hover {
+      background: #dc3545;
+    }
+    
+    /* Serviços */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.8rem;
+      background: var(--bg);
+      padding: 1rem;
+      border-radius: 16px;
+      margin-top: 0.5rem;
+    }
+    
+    .service-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+    
+    .service-checkbox input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    
+    .service-checkbox label {
+      cursor: pointer;
+      margin: 0;
+      font-weight: normal;
+    }
+    
+    /* Botões */
+    .form-actions-modern {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(128,128,128,0.1);
+      flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+      flex: 1;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      border: none;
+      padding: 0.9rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(21, 115, 71, 0.3);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-outline {
+      flex: 1;
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      padding: 0.9rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-outline:hover {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-clear {
+      flex: 0.5;
+      background: transparent;
+      border: 2px solid var(--muted);
+      color: var(--muted);
+      padding: 0.9rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-clear:hover {
+      background: var(--muted);
+      color: white;
+      border-color: var(--muted);
+    }
+    
+    /* Loading spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.6s linear infinite;
+      margin-left: 0.5rem;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Help text */
+    .help-text {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+    
+    .char-counter {
+      text-align: right;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+    
+    /* Animações */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .publish-wrapper {
+        padding: 0 1rem;
+        margin: 1rem auto;
+      }
+      
+      .publish-form {
+        padding: 1.5rem;
+      }
+      
+      .form-row-modern {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .form-actions-modern {
+        flex-direction: column;
+      }
+      
+      .btn-clear {
+        flex: 1;
+      }
+      
+      .services-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .publish-header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .publish-form {
+        padding: 1.2rem;
+      }
+      
+      .form-group-modern input,
+      .form-group-modern textarea,
+      .form-group-modern select {
+        padding: 0.7rem;
+      }
+      
+      .btn-primary,
+      .btn-outline,
+      .btn-clear {
+        padding: 0.7rem;
+      }
+      
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -29,85 +417,104 @@
   </header>
 
   <main>
-    <section class="form-page">
-      <div class="container">
-        <div class="form-container">
-          <h1>Cadastro de Profissional</h1>
-          <p class="form-subtitle">Preencha seus dados para aparecer no carrossel de profissionais da loja</p>
-          
-          <form id="professionalForm" class="professional-form">
-            <!-- Nome -->
-            <div class="form-group">
-              <label for="name">Nome completo *</label>
-              <input type="text" id="name" name="name" required placeholder="Seu nome completo">
-            </div>
-            
-            <!-- Especialidade -->
-            <div class="form-group">
-              <label for="specialty">Especialidade *</label>
-              <input type="text" id="specialty" name="specialty" required placeholder="Ex: NLP, Visão Computacional, etc">
-            </div>
-            
-            <!-- Avatar (URL da imagem) -->
-            <div class="form-group">
-              <label for="avatar">URL da foto (opcional)</label>
-              <input type="url" id="avatar" name="avatar" placeholder="https://exemplo.com/minha-foto.jpg">
-              <small>Deixe em branco para usar iniciais</small>
-            </div>
-            
-            <!-- Avaliação -->
-            <div class="form-group">
-              <label for="rating">Avaliação (0 a 5) *</label>
-              <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" required placeholder="4.8">
-            </div>
-            
-            <!-- Projetos -->
-            <div class="form-group">
-              <label for="projects">Número de projetos realizados *</label>
-              <input type="number" id="projects" name="projects" min="0" required placeholder="12">
-            </div>
-            
-            <!-- Biografia -->
-            <div class="form-group">
-              <label for="bio">Biografia / Descrição *</label>
-              <textarea id="bio" name="bio" rows="4" required placeholder="Conte um pouco sobre sua experiência..."></textarea>
-            </div>
-            
-            <!-- Serviços (múltiplos) -->
-            <div class="form-group">
-              <label>Serviços oferecidos *</label>
-              <div class="checkbox-group">
-                <label><input type="checkbox" name="services" value="Instalação"> Instalação</label>
-                <label><input type="checkbox" name="services" value="Treinamento"> Treinamento</label>
-                <label><input type="checkbox" name="services" value="Customização"> Customização</label>
-                <label><input type="checkbox" name="services" value="Suporte"> Suporte</label>
-                <label><input type="checkbox" name="services" value="Consultoria"> Consultoria</label>
-                <label><input type="checkbox" name="services" value="Implementação"> Implementação</label>
-              </div>
-              <input type="text" id="otherServices" placeholder="Outros (separados por vírgula)">
-            </div>
-            
-            <!-- Valor por hora -->
-            <div class="form-group">
-              <label for="hourlyRate">Valor por hora (R$) *</label>
-              <input type="number" id="hourlyRate" name="hourlyRate" min="0" step="10" required placeholder="150">
-            </div>
-            
-            <!-- Modelos (IDs) -->
-            <div class="form-group">
-              <label for="portfolio">IDs dos modelos que criou (opcional)</label>
-              <input type="text" id="portfolio" name="portfolio" placeholder="Ex: 1,3,5 (separados por vírgula)">
-              <small>Consulte os IDs na página de modelos</small>
-            </div>
-            
-            <div class="form-actions">
-              <button type="submit" class="cta" id="btnSalvar">Cadastrar profissional</button>
-              <button type="button" class="cta outline" onclick="window.history.back()">Cancelar</button>
-            </div>
-          </form>
-        </div>
+    <div class="publish-wrapper">
+      <div class="publish-header">
+        <h1> Cadastro de Profissional</h1>
+        <p>Mostre sua expertise e encontre novos clientes</p>
       </div>
-    </section>
+      
+      <div class="publish-card">
+        <form id="professionalForm" class="publish-form">
+          <!-- Nome completo -->
+          <div class="form-group-modern">
+            <label>Nome completo <span>*</span></label>
+            <input type="text" id="name" placeholder="Seu nome completo">
+          </div>
+          
+          <!-- Especialidade -->
+          <div class="form-group-modern">
+            <label>Especialidade <span>*</span></label>
+            <input type="text" id="specialty" placeholder="Ex: NLP, Visão Computacional, Desenvolvimento de Chatbots">
+          </div>
+          
+          <!-- Biografia -->
+          <div class="form-group-modern">
+            <label>Biografia <span>*</span></label>
+            <textarea id="bio" rows="5" maxlength="500" placeholder="Conte um pouco sobre sua experiência, projetos que já realizou, sua abordagem de trabalho..."></textarea>
+            <div class="char-counter" id="charCounter">0 / 500 caracteres</div>
+          </div>
+          
+          <!-- Upload de Foto -->
+          <div class="form-group-modern">
+            <label>Foto de perfil</label>
+            <div class="upload-area">
+              <div class="upload-box" id="avatarUploadBox" onclick="document.getElementById('avatarFile').click()">
+                <div class="upload-icon">📸</div>
+                <div class="upload-text">Clique para selecionar uma foto</div>
+                <div class="upload-hint">JPG ou PNG, até 2MB</div>
+              </div>
+              <input type="file" id="avatarFile" accept="image/jpeg,image/png,image/jpg" style="display: none;">
+            </div>
+            <div class="preview-container" id="avatarPreviewContainer">
+              <img class="preview-avatar" id="avatarPreview" alt="Preview da foto">
+              <button type="button" class="remove-preview" onclick="removeAvatarPreview()">✕ Remover</button>
+            </div>
+          </div>
+          
+          <!-- Valor por hora -->
+          <div class="form-group-modern">
+            <label>Valor por hora (R$) <span>*</span></label>
+            <input type="number" id="hourlyRate" step="10" min="0" placeholder="150">
+            <div class="help-text">Valor sugerido para serviços de consultoria e desenvolvimento</div>
+          </div>
+          
+          <!-- Serviços oferecidos -->
+          <div class="form-group-modern">
+            <label>Serviços oferecidos</label>
+            <div class="services-grid">
+              <label class="service-checkbox">
+                <input type="checkbox" name="services" value="Instalação"> Instalação
+              </label>
+              <label class="service-checkbox">
+                <input type="checkbox" name="services" value="Treinamento"> Treinamento
+              </label>
+              <label class="service-checkbox">
+                <input type="checkbox" name="services" value="Customização"> Customização
+              </label>
+              <label class="service-checkbox">
+                <input type="checkbox" name="services" value="Suporte"> Suporte
+              </label>
+              <label class="service-checkbox">
+                <input type="checkbox" name="services" value="Consultoria"> Consultoria
+              </label>
+              <label class="service-checkbox">
+                <input type="checkbox" name="services" value="Implementação"> Implementação
+              </label>
+              <label class="service-checkbox">
+                <input type="checkbox" name="services" value="Otimização"> Otimização
+              </label>
+              <label class="service-checkbox">
+                <input type="checkbox" name="services" value="Integração"> Integração
+              </label>
+            </div>
+            <input type="text" id="otherServices" class="form-group-modern" style="margin-top: 0.8rem;" placeholder="Outros serviços (separados por vírgula)">
+          </div>
+          
+          <!-- Botões -->
+          <div class="form-actions-modern">
+            <button type="submit" class="btn-primary" id="btnSalvar">
+              Cadastrar profissional
+            </button>
+            <button type="button" class="btn-outline" onclick="window.location.href='store.html'">
+              Cancelar
+            </button>
+            <button type="button" class="btn-clear" onclick="clearAllFields()">
+              Limpar tudo
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </main>
 
   <div id="settingsPanel" class="settings-panel">
@@ -133,53 +540,151 @@
   <script src="auth.js"></script>
   
   <script>
-    // ===== FUNÇÃO PARA SALVAR PROFISSIONAL (VERSÃO SIMPLIFICADA E GARANTIDA) =====
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('Página de cadastro carregada');
+    // ===== ELEMENTOS DOM =====
+    const avatarFile = document.getElementById('avatarFile');
+    const avatarPreview = document.getElementById('avatarPreview');
+    const avatarPreviewContainer = document.getElementById('avatarPreviewContainer');
+    const avatarUploadBox = document.getElementById('avatarUploadBox');
+    const bioTextarea = document.getElementById('bio');
+    const charCounter = document.getElementById('charCounter');
+    const form = document.getElementById('professionalForm');
+    const submitBtn = document.getElementById('btnSalvar');
+    
+    // ===== FUNÇÃO DE VALIDAÇÃO DE ARQUIVO =====
+    function validateFile(file, maxSize, allowedTypes, typeName) {
+      if (!file) return false;
       
-      const form = document.getElementById('professionalForm');
+      if (!allowedTypes.includes(file.type)) {
+        alert(`Formato de ${typeName} inválido. Use ${allowedTypes.join(', ')}.`);
+        return false;
+      }
       
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        console.log('Formulário enviado!');
-        
-        // Coletar dados básicos
-        const name = document.getElementById('name').value;
-        const specialty = document.getElementById('specialty').value;
-        const avatar = document.getElementById('avatar').value;
-        const rating = parseFloat(document.getElementById('rating').value) || 5.0;
-        const projects = parseInt(document.getElementById('projects').value) || 0;
-        const bio = document.getElementById('bio').value;
-        const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
-        
-        // Validar campos obrigatórios
-        if (!name || !specialty) {
-          alert('Por favor, preencha nome e especialidade');
-          return;
+      if (file.size > maxSize) {
+        alert(`${typeName} muito grande! Máximo ${maxSize / (1024 * 1024)}MB.`);
+        return false;
+      }
+      
+      return true;
+    }
+    
+    // ===== PREVIEW DA FOTO =====
+    avatarFile.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        if (validateFile(file, 2 * 1024 * 1024, ['image/jpeg', 'image/png'], 'Foto')) {
+          avatarUploadBox.classList.add('selected');
+          
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            avatarPreview.src = event.target.result;
+            avatarPreviewContainer.classList.add('show');
+          };
+          reader.readAsDataURL(file);
+        } else {
+          avatarFile.value = '';
+          avatarUploadBox.classList.remove('selected');
         }
+      } else {
+        avatarUploadBox.classList.remove('selected');
+      }
+    });
+    
+    window.removeAvatarPreview = function() {
+      avatarFile.value = '';
+      avatarPreviewContainer.classList.remove('show');
+      avatarPreview.src = '';
+      avatarUploadBox.classList.remove('selected');
+    };
+    
+    // ===== CONTADOR DE CARACTERES =====
+    bioTextarea.addEventListener('input', function() {
+      const count = this.value.length;
+      charCounter.textContent = `${count} / 500 caracteres`;
+      if (count > 450) {
+        charCounter.style.color = '#ffc107';
+      } else {
+        charCounter.style.color = 'var(--muted)';
+      }
+    });
+    
+    // ===== LIMPAR TODOS OS CAMPOS =====
+    window.clearAllFields = function() {
+      if (confirm('Tem certeza que deseja limpar todos os campos?')) {
+        document.getElementById('professionalForm').reset();
+        removeAvatarPreview();
+        charCounter.textContent = '0 / 500 caracteres';
+        charCounter.style.color = 'var(--muted)';
+      }
+    };
+    
+    // ===== COLETAR SERVIÇOS SELECIONADOS =====
+    function getSelectedServices() {
+      const services = [];
+      document.querySelectorAll('input[name="services"]:checked').forEach(cb => {
+        services.push(cb.value);
+      });
+      
+      const otherServices = document.getElementById('otherServices').value.trim();
+      if (otherServices) {
+        otherServices.split(',').map(s => s.trim()).forEach(s => {
+          if (s) services.push(s);
+        });
+      }
+      
+      return services;
+    }
+    
+    // ===== SUBMIT DO FORMULÁRIO =====
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      // Validações
+      const name = document.getElementById('name').value.trim();
+      const specialty = document.getElementById('specialty').value.trim();
+      const bio = document.getElementById('bio').value.trim();
+      const hourlyRate = document.getElementById('hourlyRate').value;
+      
+      if (!name || !specialty || !bio || !hourlyRate) {
+        alert('Preencha todos os campos obrigatórios.');
+        return;
+      }
+      
+      // Desabilitar botão e mostrar loading
+      submitBtn.disabled = true;
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = ' Cadastrando... <span class="loading-spinner"></span>';
+      
+      try {
+        // Processar foto (se houver)
+        let avatarBase64 = null;
+        if (avatarFile.files[0]) {
+          avatarBase64 = await readFileAsDataURL(avatarFile.files[0]);
+        } else if (avatarPreview.src && avatarPreview.src.startsWith('data:image')) {
+          avatarBase64 = avatarPreview.src;
+        }
+        
+        // Serviços
+        const services = getSelectedServices();
         
         // Criar objeto do profissional
         const professional = {
-          id: Date.now(), // ID único
+          id: Date.now(),
           name: name,
           specialty: specialty,
-          avatar: avatar || '',
-          rating: rating,
-          projects: projects,
+          avatar: avatarBase64 || '',
           bio: bio,
-          hourlyRate: hourlyRate,
+          hourlyRate: parseFloat(hourlyRate),
+          services: services,
           type: 'professional',
           createdAt: new Date().toISOString()
         };
         
-        console.log('Profissional a ser salvo:', professional);
-        
-
+        // Salvar no localStorage
         let professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+        
+        // Verificar se é edição
         const editingId = sessionStorage.getItem('editingProfessionalId');
-
         if (editingId) {
-          // Atualizar existente
           const index = professionals.findIndex(p => p.id == editingId);
           if (index >= 0) {
             professional.id = parseInt(editingId);
@@ -187,64 +692,79 @@
           }
           sessionStorage.removeItem('editingProfessionalId');
         } else {
-          // Novo profissional
-          professional.id = Date.now();
           professionals.push(professional);
         }
-
+        
         localStorage.setItem('professionals', JSON.stringify(professionals));
         
-        // Verificar se salvou
-        const check = localStorage.getItem('professionals');
-        console.log('Verificação após salvar:', JSON.parse(check));
-        
-        // Mostrar mensagem de sucesso
+        // Sucesso
         alert('✅ Profissional cadastrado com sucesso!');
-        
-        // Redirecionar para a loja
         window.location.href = 'store.html';
-      });
-    });
-  </script>
-  <script>
-    // ===== VERIFICAR SE É EDIÇÃO =====
-    document.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const editId = urlParams.get('edit');
-      
-      if (editId) {
-        // Carregar dados do profissional para edição
-        const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
-        const prof = professionals.find(p => p.id == editId);
         
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao processar os dados. Tente novamente.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    });
+    
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+    
+    // ===== EDIÇÃO (se veio para editar) =====
+    const editData = localStorage.getItem('editItem');
+    if (editData) {
+      const item = JSON.parse(editData);
+      if (item.type === 'professional') {
+        const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+        const prof = professionals.find(p => p.id == item.id);
         if (prof) {
           document.getElementById('name').value = prof.name;
           document.getElementById('specialty').value = prof.specialty;
-          document.getElementById('avatar').value = prof.avatar || '';
-          document.getElementById('rating').value = prof.rating;
-          document.getElementById('projects').value = prof.projects;
           document.getElementById('bio').value = prof.bio || '';
           document.getElementById('hourlyRate').value = prof.hourlyRate || '';
           
-          // Marcar serviços
+          if (prof.avatar && prof.avatar.startsWith('data:image')) {
+            avatarPreview.src = prof.avatar;
+            avatarPreviewContainer.classList.add('show');
+            avatarUploadBox.classList.add('selected');
+          }
+          
           if (prof.services) {
             prof.services.forEach(service => {
               const checkbox = document.querySelector(`input[name="services"][value="${service}"]`);
               if (checkbox) checkbox.checked = true;
+              else {
+                // Se for serviço não listado, colocar no campo "Outros"
+                const otherInput = document.getElementById('otherServices');
+                const current = otherInput.value;
+                if (!current.includes(service)) {
+                  otherInput.value = current ? `${current}, ${service}` : service;
+                }
+              }
             });
           }
           
-          // Portfolio
-          if (prof.portfolio) {
-            document.getElementById('portfolio').value = prof.portfolio.join(', ');
-          }
-          
-          // Mudar texto do botão
-          document.querySelector('#btnSalvar').textContent = 'Atualizar profissional';
-          
-          // Guardar ID para atualização
-          sessionStorage.setItem('editingProfessionalId', editId);
+          charCounter.textContent = `${(prof.bio || '').length} / 500 caracteres`;
+          submitBtn.innerHTML = '<span>✏️</span> Atualizar profissional';
+          sessionStorage.setItem('editingProfessionalId', item.id);
         }
+      }
+      localStorage.removeItem('editItem');
+    }
+    
+    // Garantir que o link "Anuncie" fique ativo
+    document.addEventListener('DOMContentLoaded', function() {
+      const anuncieLink = document.querySelector('nav a[href="anuncie.html"]');
+      if (anuncieLink) {
+        anuncieLink.classList.add('active');
       }
     });
   </script>

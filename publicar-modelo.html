@@ -15,6 +15,405 @@
   </script>
   
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ===== PÁGINA DE PUBLICAÇÃO - DESIGN REFINADO ===== */
+    
+    .publish-wrapper {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    
+    .publish-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .publish-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #4ade80);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    
+    .publish-header p {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    
+    .publish-card {
+      background: var(--panel);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+    
+    .publish-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+    
+    .publish-form {
+      padding: 2rem;
+    }
+    
+    .form-group-modern {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group-modern label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    
+    .form-group-modern label span {
+      color: #dc3545;
+      margin-left: 0.2rem;
+    }
+    
+    .form-group-modern input,
+    .form-group-modern textarea,
+    .form-group-modern select {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: var(--bg);
+      border: 2px solid rgba(128,128,128,0.15);
+      border-radius: 16px;
+      color: var(--text);
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+    
+    .form-group-modern input:focus,
+    .form-group-modern textarea:focus,
+    .form-group-modern select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(21, 115, 71, 0.1);
+    }
+    
+    .form-group-modern textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+    
+    .form-row-modern {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    
+    /* Upload Box */
+    .upload-area {
+      margin-top: 0.5rem;
+    }
+    
+    .upload-box {
+      background: var(--bg);
+      border: 2px dashed rgba(128,128,128,0.3);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .upload-box:hover {
+      border-color: var(--accent);
+      background: rgba(21, 115, 71, 0.05);
+      transform: translateY(-2px);
+    }
+    
+    .upload-box.selected {
+      border-color: var(--accent);
+      background: rgba(21, 115, 71, 0.1);
+    }
+    
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .upload-text {
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+    
+    .upload-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    
+    /* Preview */
+    .preview-container {
+      position: relative;
+      margin-top: 1rem;
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--bg);
+      display: none;
+    }
+    
+    .preview-container.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .preview-image {
+      width: 100%;
+      max-height: 250px;
+      object-fit: cover;
+      display: block;
+      border-radius: 12px;
+    }
+    
+    .preview-video {
+      width: 100%;
+      max-height: 250px;
+      border-radius: 12px;
+    }
+    
+    .remove-preview {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+    
+    .remove-preview:hover {
+      background: #dc3545;
+    }
+    
+    /* Opções de vídeo */
+    .video-options {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      padding: 0.5rem 0;
+      flex-wrap: wrap;
+    }
+    
+    .video-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+    
+    .video-option input {
+      width: auto;
+      margin: 0;
+    }
+    
+    /* Categoria */
+    .category-row-modern {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    
+    .category-row-modern select {
+      flex: 2;
+    }
+    
+    .category-row-modern .new-category {
+      flex: 1;
+      display: none;
+    }
+    
+    .category-row-modern .new-category.active {
+      display: block;
+    }
+    
+    /* Botões */
+    .form-actions-modern {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(128,128,128,0.1);
+      flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+      flex: 1;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      border: none;
+      padding: 0.9rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(21, 115, 71, 0.3);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-outline {
+      flex: 1;
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      padding: 0.9rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-outline:hover {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-clear {
+      flex: 0.5;
+      background: transparent;
+      border: 2px solid var(--muted);
+      color: var(--muted);
+      padding: 0.9rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-clear:hover {
+      background: var(--muted);
+      color: white;
+      border-color: var(--muted);
+    }
+    
+    /* Loading spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.6s linear infinite;
+      margin-left: 0.5rem;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Help text */
+    .help-text {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+    
+    .char-counter {
+      text-align: right;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+    
+    /* Animações */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .publish-wrapper {
+        padding: 0 1rem;
+        margin: 1rem auto;
+      }
+      
+      .publish-form {
+        padding: 1.5rem;
+      }
+      
+      .form-row-modern {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .category-row-modern {
+        flex-direction: column;
+      }
+      
+      .form-actions-modern {
+        flex-direction: column;
+      }
+      
+      .btn-clear {
+        flex: 1;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .publish-header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .publish-form {
+        padding: 1.2rem;
+      }
+      
+      .form-group-modern input,
+      .form-group-modern textarea,
+      .form-group-modern select {
+        padding: 0.7rem;
+      }
+      
+      .btn-primary,
+      .btn-outline,
+      .btn-clear {
+        padding: 0.7rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -29,66 +428,117 @@
   </header>
 
   <main>
-    <section class="form-page">
-      <div class="container">
-        <div class="form-container">
-          <h1>Publicar Modelo de IA</h1>
-          <p class="form-subtitle">Preencha os dados do seu modelo para aparecer na loja</p>
+    <div class="publish-wrapper">
+      <div class="publish-header">
+        <h1> Publicar Modelo de IA</h1>
+        <p>Compartilhe sua criação com o mundo</p>
+      </div>
+      
+      <div class="publish-card">
+        <form id="modelForm" class="publish-form">
+          <!-- Título -->
+          <div class="form-group-modern">
+            <label>Título do modelo <span>*</span></label>
+            <input type="text" id="modelTitle" placeholder="Ex: IA de Atendimento para WhatsApp">
+          </div>
           
-          <form id="modelForm" class="professional-form">
-            <!-- Título do modelo -->
-            <div class="form-group">
-              <label for="modelTitle">Título do modelo *</label>
-              <input type="text" id="modelTitle" name="modelTitle" required placeholder="Ex: IA de Atendimento para WhatsApp">
+          <!-- Preço e Vendedor -->
+          <div class="form-row-modern">
+            <div class="form-group-modern">
+              <label>Preço <span>*</span></label>
+              <input type="number" id="modelPrice" step="0.01" min="0" placeholder="199.00">
             </div>
-            
-            <!-- Preço -->
-            <div class="form-group">
-              <label for="modelPrice">Preço (R$) *</label>
-              <input type="number" id="modelPrice" name="modelPrice" step="0.01" min="0" required placeholder="199.00">
+            <div class="form-group-modern">
+              <label>Nome do vendedor <span>*</span></label>
+              <input type="text" id="modelSeller" placeholder="Ex: BotLabs">
             </div>
-            
-            <!-- Vendedor -->
-            <div class="form-group">
-              <label for="modelSeller">Nome do vendedor *</label>
-              <input type="text" id="modelSeller" name="modelSeller" required placeholder="Ex: BotLabs">
+          </div>
+          
+          <!-- Descrição com contador -->
+          <div class="form-group-modern">
+            <label>Descrição <span>*</span></label>
+            <textarea id="modelDescription" maxlength="1000" placeholder="Descreva detalhadamente o que seu modelo faz..."></textarea>
+            <div class="char-counter" id="charCounter">0 / 1000 caracteres</div>
+          </div>
+          
+          <!-- Upload de Imagem -->
+          <div class="form-group-modern">
+            <label>Imagem do modelo <span>*</span></label>
+            <div class="upload-area">
+              <div class="upload-box" id="imageUploadBox" onclick="document.getElementById('modelImageFile').click()">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">Clique para selecionar uma imagem</div>
+                <div class="upload-hint">JPG ou PNG, até 2MB</div>
+              </div>
+              <input type="file" id="modelImageFile" accept="image/jpeg,image/png,image/jpg" style="display: none;">
             </div>
-            
-            <!-- Descrição -->
-            <div class="form-group">
-              <label for="modelDescription">Descrição do modelo *</label>
-              <textarea id="modelDescription" name="modelDescription" rows="5" required placeholder="Descreva detalhadamente o que seu modelo faz, suas funcionalidades e benefícios..."></textarea>
+            <div class="preview-container" id="imagePreviewContainer">
+              <img class="preview-image" id="imagePreview" alt="Preview da imagem">
+              <button type="button" class="remove-preview" onclick="removeImagePreview()">✕ Remover</button>
             </div>
-            
-            <!-- URL da imagem -->
-            <div class="form-group">
-              <label for="modelImage">URL da imagem (opcional)</label>
-              <input type="url" id="modelImage" name="modelImage" placeholder="https://exemplo.com/imagem.jpg">
-              <small>Deixe em branco para usar imagem padrão</small>
+          </div>
+
+          <!-- Vídeo demonstrativo -->
+          <div class="form-group-modern">
+            <label>Vídeo demonstrativo</label>
+            <div class="video-options">
+              <label class="video-option">
+                <input type="radio" name="videoType" value="url" checked> URL (YouTube/Vimeo)
+              </label>
+              <label class="video-option">
+                <input type="radio" name="videoType" value="upload"> Enviar vídeo
+              </label>
             </div>
-            
-            <!-- Categoria (opcional) -->
-            <div class="form-group">
-              <label for="modelCategory">Categoria</label>
-              <select id="modelCategory" name="modelCategory">
+            <div id="videoUrlGroup">
+              <input type="url" id="videoUrl" placeholder="https://www.youtube.com/watch?v=...">
+              <div class="help-text">Cole a URL do vídeo (YouTube, Vimeo)</div>
+            </div>
+            <div id="videoUploadGroup" style="display: none;">
+              <div class="upload-box" id="videoUploadBox" onclick="document.getElementById('videoFile').click()">
+                <div class="upload-icon">🎬</div>
+                <div class="upload-text">Clique para enviar vídeo</div>
+                <div class="upload-hint">MP4 ou MOV, até 10MB</div>
+              </div>
+              <input type="file" id="videoFile" accept="video/mp4,video/quicktime" style="display: none;">
+              <div class="preview-container" id="videoPreviewContainer">
+                <video class="preview-video" id="videoPreview" controls></video>
+                <button type="button" class="remove-preview" onclick="removeVideoPreview()">✕ Remover</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Categoria -->
+          <div class="form-group-modern">
+            <label>Categoria</label>
+            <div class="category-row-modern">
+              <select id="modelCategory">
                 <option value="">Selecione uma categoria</option>
                 <option value="atendimento">Atendimento / Chatbot</option>
                 <option value="analise">Análise de Dados</option>
                 <option value="visao">Visão Computacional</option>
                 <option value="nlp">Processamento de Linguagem</option>
                 <option value="generativo">IA Generativa</option>
-                <option value="outro">Outro</option>
+                <option value="outro">Outra (digite abaixo)</option>
               </select>
+              <input type="text" id="newCategory" class="new-category" placeholder="Digite a nova categoria">
             </div>
-            
-            <div class="form-actions">
-              <button type="submit" class="cta" id="btnSalvar">Publicar modelo</button>
-              <button type="button" class="cta outline" onclick="window.history.back()">Cancelar</button>
-            </div>
-          </form>
-        </div>
+          </div>
+          
+          <!-- Botões -->
+          <div class="form-actions-modern">
+            <button type="submit" class="btn-primary" id="btnSalvar">
+             Publicar modelo
+            </button>
+            <button type="button" class="btn-outline" onclick="window.location.href='store.html'">
+              Cancelar
+            </button>
+            <button type="button" class="btn-clear" onclick="clearAllFields()">
+              Limpar tudo
+            </button>
+          </div>
+        </form>
       </div>
-    </section>
+    </div>
   </main>
 
   <div id="settingsPanel" class="settings-panel">
@@ -114,89 +564,335 @@
   <script src="auth.js"></script>
   
   <script>
-    // ===== FUNÇÃO PARA SALVAR MODELO =====
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('Página de publicação carregada');
+    // ===== ELEMENTOS DOM =====
+    const imageInput = document.getElementById('modelImageFile');
+    const imagePreview = document.getElementById('imagePreview');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const imageUploadBox = document.getElementById('imageUploadBox');
+    
+    const videoUrlRadio = document.querySelector('input[value="url"]');
+    const videoUploadRadio = document.querySelector('input[value="upload"]');
+    const videoUrlGroup = document.getElementById('videoUrlGroup');
+    const videoUploadGroup = document.getElementById('videoUploadGroup');
+    const videoFile = document.getElementById('videoFile');
+    const videoPreview = document.getElementById('videoPreview');
+    const videoPreviewContainer = document.getElementById('videoPreviewContainer');
+    const videoUploadBox = document.getElementById('videoUploadBox');
+    
+    const categorySelect = document.getElementById('modelCategory');
+    const newCategoryInput = document.getElementById('newCategory');
+    const descTextarea = document.getElementById('modelDescription');
+    const charCounter = document.getElementById('charCounter');
+    const form = document.getElementById('modelForm');
+    const submitBtn = document.getElementById('btnSalvar');
+    
+    // ===== FUNÇÃO DE VALIDAÇÃO DE ARQUIVO =====
+    function validateFile(file, maxSize, allowedTypes, typeName) {
+      if (!file) return false;
       
-      const form = document.getElementById('modelForm');
+      if (!allowedTypes.includes(file.type)) {
+        alert(`Formato de ${typeName} inválido. Use ${allowedTypes.join(', ')}.`);
+        return false;
+      }
       
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        console.log('Formulário enviado!');
-        
-        // Coletar dados
-        const title = document.getElementById('modelTitle').value;
-        const price = document.getElementById('modelPrice').value;
-        const seller = document.getElementById('modelSeller').value;
-        const description = document.getElementById('modelDescription').value;
-        const image = document.getElementById('modelImage').value;
-        const category = document.getElementById('modelCategory').value;
-        
-        // Validar campos obrigatórios
-        if (!title || !price || !seller || !description) {
-          alert('Por favor, preencha todos os campos obrigatórios');
-          return;
+      if (file.size > maxSize) {
+        alert(`${typeName} muito grande! Máximo ${maxSize / (1024 * 1024)}MB.`);
+        return false;
+      }
+      
+      return true;
+    }
+    
+    // ===== PREVIEW DE IMAGEM =====
+    imageInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        if (validateFile(file, 2 * 1024 * 1024, ['image/jpeg', 'image/png'], 'Imagem')) {
+          imageUploadBox.classList.add('selected');
+          
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            imagePreview.src = event.target.result;
+            imagePreviewContainer.classList.add('show');
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imageInput.value = '';
+          imageUploadBox.classList.remove('selected');
+        }
+      } else {
+        imageUploadBox.classList.remove('selected');
+      }
+    });
+    
+    window.removeImagePreview = function() {
+      imageInput.value = '';
+      imagePreviewContainer.classList.remove('show');
+      imagePreview.src = '';
+      imageUploadBox.classList.remove('selected');
+    };
+    
+    // ===== PREVIEW DE VÍDEO =====
+    videoFile.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        if (validateFile(file, 10 * 1024 * 1024, ['video/mp4', 'video/quicktime'], 'Vídeo')) {
+          videoUploadBox.classList.add('selected');
+          
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            videoPreview.src = event.target.result;
+            videoPreviewContainer.classList.add('show');
+          };
+          reader.readAsDataURL(file);
+        } else {
+          videoFile.value = '';
+          videoUploadBox.classList.remove('selected');
+        }
+      } else {
+        videoUploadBox.classList.remove('selected');
+      }
+    });
+    
+    window.removeVideoPreview = function() {
+      videoFile.value = '';
+      videoPreviewContainer.classList.remove('show');
+      videoPreview.src = '';
+      videoUploadBox.classList.remove('selected');
+    };
+    
+    // ===== ALTERNAR ENTRE URL E UPLOAD DE VÍDEO =====
+    videoUrlRadio.addEventListener('change', () => {
+      videoUrlGroup.style.display = 'block';
+      videoUploadGroup.style.display = 'none';
+      videoPreviewContainer.classList.remove('show');
+      removeVideoPreview();
+    });
+    
+    videoUploadRadio.addEventListener('change', () => {
+      videoUrlGroup.style.display = 'none';
+      videoUploadGroup.style.display = 'block';
+    });
+    
+    // ===== PREVIEW DE URL DO YOUTUBE =====
+    const videoUrlInput = document.getElementById('videoUrl');
+    videoUrlInput.addEventListener('blur', function() {
+      const url = this.value.trim();
+      if (url && (url.includes('youtube.com') || url.includes('youtu.be'))) {
+        let videoId = '';
+        if (url.includes('youtu.be')) {
+          videoId = url.split('/').pop();
+        } else if (url.includes('youtube.com')) {
+          const urlParams = new URLSearchParams(url.split('?')[1]);
+          videoId = urlParams.get('v');
         }
         
-        // Criar objeto do modelo
+        if (videoId) {
+          const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+          videoPreviewContainer.innerHTML = `
+            <img src="${thumbnailUrl}" style="width:100%; border-radius:12px;" alt="Thumbnail do vídeo">
+            <button type="button" class="remove-preview" onclick="removeVideoPreview()">✕ Remover</button>
+          `;
+          videoPreviewContainer.classList.add('show');
+        }
+      }
+    });
+    
+    // ===== CONTADOR DE CARACTERES =====
+    descTextarea.addEventListener('input', function() {
+      const count = this.value.length;
+      charCounter.textContent = `${count} / 1000 caracteres`;
+      if (count > 950) {
+        charCounter.style.color = '#ffc107';
+      } else {
+        charCounter.style.color = 'var(--muted)';
+      }
+    });
+    
+    // ===== CATEGORIA PERSONALIZADA =====
+    categorySelect.addEventListener('change', () => {
+      if (categorySelect.value === 'outro') {
+        newCategoryInput.classList.add('active');
+        newCategoryInput.required = true;
+      } else {
+        newCategoryInput.classList.remove('active');
+        newCategoryInput.required = false;
+        newCategoryInput.value = '';
+      }
+    });
+    
+    // ===== LIMPAR TODOS OS CAMPOS =====
+    window.clearAllFields = function() {
+      if (confirm('Tem certeza que deseja limpar todos os campos?')) {
+        document.getElementById('modelForm').reset();
+        removeImagePreview();
+        removeVideoPreview();
+        newCategoryInput.classList.remove('active');
+        newCategoryInput.value = '';
+        charCounter.textContent = '0 / 1000 caracteres';
+        charCounter.style.color = 'var(--muted)';
+        videoUrlGroup.style.display = 'block';
+        videoUploadGroup.style.display = 'none';
+      }
+    };
+    
+    // ===== SUBMIT DO FORMULÁRIO =====
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      // Validações
+      const title = document.getElementById('modelTitle').value.trim();
+      const price = document.getElementById('modelPrice').value;
+      const seller = document.getElementById('modelSeller').value.trim();
+      const description = document.getElementById('modelDescription').value.trim();
+      
+      if (!title || !price || !seller || !description) {
+        alert('Preencha todos os campos obrigatórios.');
+        return;
+      }
+      
+      if (!imageInput.files[0] && !imagePreview.src) {
+        alert('Selecione uma imagem para o modelo.');
+        return;
+      }
+      
+      // Desabilitar botão e mostrar loading
+      submitBtn.disabled = true;
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<span>🚀</span> Publicando... <span class="loading-spinner"></span>';
+      
+      try {
+        // Processar imagem
+        let imageBase64 = null;
+        if (imageInput.files[0]) {
+          imageBase64 = await readFileAsDataURL(imageInput.files[0]);
+        } else if (imagePreview.src) {
+          imageBase64 = imagePreview.src;
+        }
+        
+        // Processar vídeo
+        let videoData = null;
+        let videoType = null;
+        if (videoUploadRadio.checked && videoFile.files[0]) {
+          videoData = await readFileAsDataURL(videoFile.files[0]);
+          videoType = 'upload';
+        } else if (videoUrlRadio.checked) {
+          const url = document.getElementById('videoUrl').value.trim();
+          if (url) {
+            videoData = url;
+            videoType = 'url';
+          }
+        }
+        
+        // Categoria
+        let category = categorySelect.value;
+        if (category === 'outro') {
+          const newCat = newCategoryInput.value.trim();
+          if (!newCat) {
+            alert('Digite o nome da nova categoria.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+            return;
+          }
+          category = newCat.toLowerCase().replace(/\s+/g, '-');
+        }
+        
+        // Montar objeto do modelo
         const model = {
-          id: Date.now(), // ID único
-          title: title,
+          id: Date.now(),
+          title,
           price: `R$ ${parseFloat(price).toFixed(2)}`,
-          seller: seller,
-          description: description,
+          seller,
+          description,
           short: description.substring(0, 100) + '...',
-          image: image || '',
-          category: category || 'outro',
+          image: imageBase64,
+          video: videoData ? { data: videoData, type: videoType } : null,
+          category,
           type: 'model',
           createdAt: new Date().toISOString()
         };
         
-        console.log('Modelo a ser salvo:', model);
-        
         // Salvar no localStorage
-        let models = [];
-        const saved = localStorage.getItem('models');
-        
-        if (saved) {
-          models = JSON.parse(saved);
-          console.log('Modelos existentes:', models);
-        }
-        
+        let models = JSON.parse(localStorage.getItem('models') || '[]');
         models.push(model);
         localStorage.setItem('models', JSON.stringify(models));
         
-        // Verificar se salvou
-        const check = localStorage.getItem('models');
-        console.log('Verificação após salvar:', JSON.parse(check));
-        
-        // Mostrar mensagem de sucesso
+        // Sucesso
         alert('✅ Modelo publicado com sucesso!');
-        
-        // Redirecionar para a loja
         window.location.href = 'store.html';
+        
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao processar arquivos. Tente novamente.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    });
+    
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
       });
-      
-      // Se veio para editar (opcional)
-      const editData = localStorage.getItem('editItem');
-      if (editData) {
-        const item = JSON.parse(editData);
-        if (item.type === 'model') {
-          const models = JSON.parse(localStorage.getItem('models') || '[]');
-          const model = models.find(m => m.id == item.id);
+    }
+    
+    // ===== EDIÇÃO (se veio para editar) =====
+    const editData = localStorage.getItem('editItem');
+    if (editData) {
+      const item = JSON.parse(editData);
+      if (item.type === 'model') {
+        const models = JSON.parse(localStorage.getItem('models') || '[]');
+        const model = models.find(m => m.id == item.id);
+        if (model) {
+          document.getElementById('modelTitle').value = model.title;
+          document.getElementById('modelPrice').value = parseFloat(model.price.replace('R$', ''));
+          document.getElementById('modelSeller').value = model.seller;
+          document.getElementById('modelDescription').value = model.description;
           
-          if (model) {
-            document.getElementById('modelTitle').value = model.title;
-            document.getElementById('modelPrice').value = parseFloat(model.price.replace('R$', ''));
-            document.getElementById('modelSeller').value = model.seller;
-            document.getElementById('modelDescription').value = model.description;
-            document.getElementById('modelImage').value = model.image || '';
-            
-            // Mudar texto do botão
-            document.querySelector('#btnSalvar').textContent = 'Atualizar modelo';
+          if (model.image && model.image.startsWith('data:image')) {
+            imagePreview.src = model.image;
+            imagePreviewContainer.classList.add('show');
+            imageUploadBox.classList.add('selected');
           }
+          
+          if (model.video) {
+            if (model.video.type === 'url') {
+              videoUrlRadio.checked = true;
+              document.getElementById('videoUrl').value = model.video.data;
+            } else if (model.video.type === 'upload') {
+              videoUploadRadio.checked = true;
+              videoUploadRadio.dispatchEvent(new Event('change'));
+              videoPreview.src = model.video.data;
+              videoPreviewContainer.classList.add('show');
+              videoUploadBox.classList.add('selected');
+            }
+          }
+          
+          if (model.category) {
+            const optionExists = Array.from(categorySelect.options).some(opt => opt.value === model.category);
+            if (optionExists) {
+              categorySelect.value = model.category;
+            } else {
+              categorySelect.value = 'outro';
+              newCategoryInput.value = model.category;
+              newCategoryInput.classList.add('active');
+            }
+          }
+          
+          submitBtn.innerHTML = '<span>✏️</span> Atualizar modelo';
         }
-        localStorage.removeItem('editItem');
+      }
+      localStorage.removeItem('editItem');
+    }
+  </script>
+  <script>
+    // Garantir que o link "Anuncie" fique ativo nesta página
+    document.addEventListener('DOMContentLoaded', function() {
+      const anuncieLink = document.querySelector('nav a[href="anuncie.html"]');
+      if (anuncieLink) {
+        anuncieLink.classList.add('active');
       }
     });
   </script>

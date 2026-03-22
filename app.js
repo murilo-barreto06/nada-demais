@@ -280,35 +280,22 @@ function loadStoreProfessionals() {
     
     const card = document.createElement("a");
     card.href = `professional.html?id=${prof.id}`;
-    card.className = "carousel-item professionals";
+    card.className = 'carousel-item professionals';
     
-    // Garantir que os campos existem
-    const name = prof.name || 'Nome não informado';
-    const specialty = prof.specialty || 'Especialidade não informada';
-    const rating = prof.rating || 5.0;
-    const projects = prof.projects || 0;
-    
-    // Criar avatar
-    let avatarHTML;
-    if (prof.avatar && prof.avatar.trim() !== '') {
-      avatarHTML = `<div class="avatar" style="background-image: url('${prof.avatar}'); background-size: cover; background-position: center;"></div>`;
-    } else {
-      const initial = name.charAt(0).toUpperCase();
-      avatarHTML = `<div class="avatar-placeholder">${initial}</div>`;
-    }
+    const avatarHTML = prof.avatar
+      ? `<div class="avatar" style="background-image: url('${prof.avatar}'); background-size: cover; background-position: center;"></div>`
+      : `<div class="avatar-placeholder">${prof.name.charAt(0).toUpperCase()}</div>`;
     
     card.innerHTML = `
       ${avatarHTML}
-      <h3>${name}</h3>
-      <p class="specialty">${specialty}</p>
-      <div class="rating"> ${rating.toFixed(1)}</div>
-      <p class="projects">${projects} projetos</p>
+      <h3>${prof.name}</h3>
+      <p class="specialty">${prof.specialty}</p>
+      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
     `;
     
     carousel.appendChild(card);
   });
-  
-  console.log('Carrossel atualizado com', professionals.length, 'profissionais');
+
 }
 
 function renderModel() {
@@ -731,26 +718,23 @@ function updateUserDisplay() {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
-  applyTheme(); // Garante que o tema está correto
+  applyTheme();
   
-  // Detecta qual página está carregando
   const path = window.location.pathname;
   const filename = path.split('/').pop() || 'index.html';
   
   if (filename === 'index.html' || filename === '') {
     console.log('Carregando index.html');
-    loadFeatured();
-    loadProfessionals(); // Carrega TODOS (pré-definidos + criados)
+    loadFeatured(); // Modelos
+    loadHomeProfessionals(); // Profissionais na home
   } else if (filename === 'store.html') {
     console.log('Carregando store.html');
-    loadStoreModels();
-    loadStoreProfessionals(); // <-- DEVE ESTAR AQUI
+    // store.html tem seu próprio script
   } else if (filename === 'model.html') {
     console.log('Carregando model.html');
     renderModel();
   } else if (filename === 'professional.html') {
     console.log('Carregando professional.html');
-    // A função loadProfessional será chamada pelo script na página
   }
   
   renderStore();

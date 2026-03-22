@@ -1498,3 +1498,39 @@ nav a.active {
 .login-link:hover {
   background-color: rgba(128,128,128,0.1);
 }
+
+/* ===== CARROSSEL DE PROFISSIONAIS ===== */
+.professionals .carousel-item {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 220px;
+  transition: all 0.3s ease;
+}
+
+/* Para o card de "nenhum profissional" */
+.professionals .carousel-item[style*="text-align: center"] {
+  justify-content: center;
+  min-height: 80px;
+}
+
+.professionals .carousel-item p {
+  margin-bottom: 1rem;
+}
+
+.professionals .carousel-item a {
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Estilo para links ativos */
+nav a.active,
+.login-link.active,
+.meu-painel-link.active {
+  background-color: var(--accent);
+  color: white;
+}
