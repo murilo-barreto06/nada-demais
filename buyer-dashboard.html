@@ -633,18 +633,10 @@
   <script>
     // ===== FUNÇÕES ESPECÍFICAS DO DASHBOARD =====
     
-    // Mock de modelos adquiridos (simula compras do usuário)
-    const MODELOS_ADQUIRIDOS = [
-      { id: 1, title: 'IA Atendimento', seller: 'BotLabs', price: 'R$ 199,00', dataCompra: '2025-02-15' },
-      { id: 3, title: 'Recomendador de Produtos', seller: 'RecoSys', price: 'R$ 149,00', dataCompra: '2025-02-20' }
-    ];
-    
-    // Mock de vendas realizadas (para modelos publicados)
-    const VENDAS_REALIZADAS = [
-      { id: 101, modeloId: 1001, comprador: 'Empresa X', valor: 299, data: '2025-03-01' },
-      { id: 102, modeloId: 1002, comprador: 'Startup Y', valor: 199, data: '2025-03-02' },
-      { id: 103, modeloId: 1001, comprador: 'Consultoria Z', valor: 299, data: '2025-03-03' }
-    ];
+    // Lê compras reais do localStorage (populadas pela model.html ao clicar Adquirir)
+    function getPurchases() {
+      return JSON.parse(localStorage.getItem('purchases') || '[]');
+    }
     
     // Variável global para o usuário atual
     let currentUser = null;
@@ -779,43 +771,45 @@
     
     // ===== FUNÇÕES DOS CARDS =====
     
-    // Carregar modelos adquiridos
+    // Carregar modelos adquiridos (reais)
     function carregarAdquiridos() {
       const container = document.getElementById('modelosAdquiridos');
       if (!container) return;
       
+      const purchases = getPurchases();
       container.innerHTML = '';
       
-      if (MODELOS_ADQUIRIDOS.length === 0) {
+      if (purchases.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
             <p>Você ainda não adquiriu nenhum modelo.</p>
             <a href="store.html" class="cta">Explorar loja</a>
           </div>
         `;
+        document.getElementById('totalAdquiridos').textContent = '0';
+        document.getElementById('totalGasto').textContent = 'R$ 0,00';
         return;
       }
       
-      // Calcular total gasto
-      const totalGasto = MODELOS_ADQUIRIDOS.reduce((acc, item) => {
-        const valor = parseFloat(item.price.replace('R$', '').replace(',', '.'));
-        return acc + valor;
-      }, 0);
+      let totalGasto = 0;
+      purchases.forEach(p => {
+        const val = parseFloat((p.price||'0').replace('R$','').replace(',','.').trim());
+        if (!isNaN(val)) totalGasto += val;
+      });
       
-      document.getElementById('totalAdquiridos').textContent = MODELOS_ADQUIRIDOS.length;
+      document.getElementById('totalAdquiridos').textContent = purchases.length;
       document.getElementById('totalGasto').textContent = `R$ ${totalGasto.toFixed(2)}`;
       
-      MODELOS_ADQUIRIDOS.forEach(model => {
+      purchases.forEach(p => {
         const card = document.createElement('div');
         card.className = 'small-card';
         card.innerHTML = `
-          <h4>${model.title}</h4>
-          <p>Vendedor: ${model.seller}</p>
-          <p style="color: var(--accent); font-weight: bold;">${model.price}</p>
-          <p style="font-size: 0.8rem; color: var(--muted);">Adquirido em: ${new Date(model.dataCompra).toLocaleDateString()}</p>
-          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-            <button class="small-btn" onclick="window.location.href='model.html?id=${model.id}'">Ver detalhes</button>
-            <button class="small-btn" onclick="alert('Documentação do modelo ${model.title}')"> Documentação</button>
+          <h4>${p.title}</h4>
+          <p>Vendedor: ${p.seller||'—'}</p>
+          <p style="color:var(--accent);font-weight:bold;">${p.price||'—'}</p>
+          <p style="font-size:.8rem;color:var(--muted);">Adquirido em: ${new Date(p.date).toLocaleDateString('pt-BR')}</p>
+          <div style="margin-top:.8rem;">
+            <button class="small-btn" onclick="window.location.href='model.html?id=${p.modelId}'">Ver detalhes</button>
           </div>
         `;
         container.appendChild(card);
@@ -832,14 +826,13 @@
       
       document.getElementById('totalPublicados').textContent = models.length;
       
-      // Simula vendas para cada modelo
-      const vendasPorModelo = {};
-      VENDAS_REALIZADAS.forEach(venda => {
-        vendasPorModelo[venda.modeloId] = (vendasPorModelo[venda.modeloId] || 0) + 1;
-      });
-      
-      const totalVendas = VENDAS_REALIZADAS.length;
-      const faturamento = VENDAS_REALIZADAS.reduce((acc, v) => acc + v.valor, 0);
+      // Vendas baseadas nas compras reais
+      const purchases = getPurchases();
+      const totalVendas = purchases.length;
+      const faturamento = purchases.reduce((acc, p) => {
+        const v = parseFloat((p.price||'0').replace('R$','').replace(',','.').trim());
+        return acc + (isNaN(v)?0:v);
+      }, 0);
       
       document.getElementById('totalVendas').textContent = totalVendas;
       document.getElementById('faturamento').textContent = `R$ ${faturamento.toFixed(2)}`;
@@ -857,8 +850,12 @@
       }
       
       models.forEach(model => {
-        const vendas = vendasPorModelo[model.id] || 0;
-        const receita = VENDAS_REALIZADAS.filter(v => v.modeloId === model.id).reduce((acc, v) => acc + v.valor, 0);
+        const vendas = purchases.filter(p => p.modelId === model.id).length;
+        const receita = purchases.filter(p => p.modelId === model.id)
+          .reduce((acc, p) => {
+            const v = parseFloat((p.price||'0').replace('R$','').replace(',','.').trim());
+            return acc + (isNaN(v)?0:v);
+          }, 0);
         
         const card = document.createElement('div');
         card.className = 'small-card';
@@ -990,59 +987,47 @@
       carregarPerfilProfissional();
     };
     
-    // Carregar vendas realizadas
+    // Carregar vendas realizadas (= compras reais, pois buyer=seller no protótipo)
     function carregarVendas() {
       const container = document.getElementById('vendasContainer');
       if (!container) return;
       
-      if (VENDAS_REALIZADAS.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <p>Nenhuma venda realizada ainda.</p>
-          </div>
-        `;
+      const purchases = getPurchases();
+      
+      if (purchases.length === 0) {
+        container.innerHTML = `<div class="empty-state"><p>Nenhuma venda realizada ainda.</p></div>`;
+        document.getElementById('vendasMes').textContent = '0';
+        document.getElementById('receitaMes').textContent = 'R$ 0,00';
         return;
       }
       
-      // Estatísticas do mês atual
-      const dataAtual = new Date();
-      const mesAtual = dataAtual.getMonth();
-      const anoAtual = dataAtual.getFullYear();
-      
-      const vendasEsteMes = VENDAS_REALIZADAS.filter(v => {
-        const data = new Date(v.data);
-        return data.getMonth() === mesAtual && data.getFullYear() === anoAtual;
+      const now = new Date();
+      const thisMon = purchases.filter(p => {
+        const d = new Date(p.date);
+        return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
       });
+      const receitaMes = thisMon.reduce((acc,p) => {
+        const v = parseFloat((p.price||'0').replace('R$','').replace(',','.').trim());
+        return acc + (isNaN(v)?0:v);
+      }, 0);
       
-      const totalVendasMes = vendasEsteMes.length;
-      const receitaMes = vendasEsteMes.reduce((acc, v) => acc + v.valor, 0);
-      
-      document.getElementById('vendasMes').textContent = totalVendasMes;
+      document.getElementById('vendasMes').textContent = thisMon.length;
       document.getElementById('receitaMes').textContent = `R$ ${receitaMes.toFixed(2)}`;
       
-      // Lista de vendas
-      let html = '<h3 style="margin-bottom: 1rem;">Últimas vendas</h3>';
-      
-      VENDAS_REALIZADAS.sort((a, b) => new Date(b.data) - new Date(a.data)).forEach(venda => {
-        // Busca o nome do modelo
-        const models = JSON.parse(localStorage.getItem('models') || '[]');
-        const modelo = models.find(m => m.id == venda.modeloId);
-        const nomeModelo = modelo ? modelo.title : `Modelo #${venda.modeloId}`;
-        
+      let html = '<h3 style="margin-bottom:1rem;">Últimas vendas</h3>';
+      [...purchases].sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(p => {
         html += `
           <div class="sale-item">
             <div>
-              <div class="title">${nomeModelo}</div>
-              <div class="date">${new Date(venda.data).toLocaleDateString()}</div>
+              <div class="title">${p.title}</div>
+              <div class="date">${new Date(p.date).toLocaleDateString('pt-BR')}</div>
             </div>
-            <div style="text-align: right;">
-              <div class="price">R$ ${venda.valor.toFixed(2)}</div>
-              <div style="font-size: 0.8rem; color: var(--muted);">${venda.comprador}</div>
+            <div style="text-align:right;">
+              <div class="price">${p.price||'—'}</div>
+              <div style="font-size:.8rem;color:var(--muted);">${p.seller||'—'}</div>
             </div>
-          </div>
-        `;
+          </div>`;
       });
-      
       container.innerHTML = html;
     }
     
@@ -1053,6 +1038,11 @@
       carregarPublicados();
       carregarPerfilProfissional();
       carregarVendas();
+      
+      const purchases = getPurchases();
+      if (purchases.length > 0) {
+        document.getElementById('compradorBadge').style.display = 'inline-block';
+      }
       
       // Verifica se é vendedor (tem modelos publicados)
       const models = JSON.parse(localStorage.getItem('models') || '[]');

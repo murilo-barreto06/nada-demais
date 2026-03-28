@@ -619,6 +619,32 @@
       console.log(`Mídias restantes: ${mediaItems.length}`);
     };
     
+    // ===== COMPRIMIR IMAGEM ANTES DE SALVAR (evita estourar localStorage) =====
+    function compressImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const MAX = 800;
+            let w = img.width, h = img.height;
+            if (w > MAX || h > MAX) {
+              if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+              else { w = Math.round(w * MAX / h); h = MAX; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.75));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+    
     // ===== ADICIONAR MÍDIA COM RETORNO DE SUCESSO/ERRO =====
     async function addMedia(file) {
       const isImage = file.type.startsWith('image/');
@@ -660,7 +686,9 @@
       
       try {
         console.log(`Processando ${isImage ? 'imagem' : 'vídeo'}: ${file.name} (${(file.size / 1024).toFixed(2)}KB)`);
-        const data = await readFileAsDataURL(file);
+        const data = isImage
+          ? await compressImage(file)
+          : await readFileAsDataURL(file);
         mediaItems.push({
           type: isImage ? 'image' : 'video',
           data: data,
@@ -808,49 +836,24 @@
       console.log('=== INICIANDO PUBLICAÇÃO ===');
       logEstado();
       
-      // Validações
+      // Validações antecipadas (antes de desabilitar o botão)
       const title = document.getElementById('modelTitle').value.trim();
       const price = document.getElementById('modelPrice').value;
       const seller = document.getElementById('modelSeller').value.trim();
       const description = document.getElementById('modelDescription').value.trim();
-      const userProfile = getUserProfileData();
-
-      const model = {
-        id: Date.now(),
-        title: title,
-        price: `R$ ${parseFloat(price).toFixed(2)}`,
-        seller: seller,
-        description: description,
-        short: description.substring(0, 150) + '...',
-        media: mediaItems,
-        portfolioLink: document.getElementById('portfolioLink').value.trim(),
-        category: category,
-        type: 'model',
-        createdAt: new Date().toISOString(),
-        // Dados do perfil do usuário que está publicando
-        profile: userProfile ? {
-          userId: userProfile.userId,
-          name: userProfile.name,
-          email: userProfile.email,
-          avatar: userProfile.avatar
-        } : null
-      };
       
       if (!title || !price || !seller || !description) {
         alert('Preencha todos os campos obrigatórios.');
         return;
       }
       
-      // Verificar se tem pelo menos uma imagem
       const imageCount = mediaItems.filter(m => m.type === 'image').length;
       if (imageCount === 0) {
         alert('Adicione pelo menos uma imagem do modelo.');
         return;
       }
       
-      console.log(`Imagens válidas: ${imageCount}`);
-      
-      // Desabilitar botão
+      // Só desabilita o botão após validar
       submitBtn.disabled = true;
       const originalText = submitBtn.textContent;
       submitBtn.innerHTML = 'Publicando... <span class="loading-spinner"></span>';
@@ -869,6 +872,9 @@
           category = newCat.toLowerCase().replace(/\s+/g, '-');
         }
         
+        // Dados do perfil do usuário
+        const userProfile = getUserProfileData();
+        
         // Montar objeto do modelo
         const model = {
           id: Date.now(),
@@ -878,10 +884,17 @@
           description: description,
           short: description.substring(0, 150) + '...',
           media: mediaItems,
+          image: mediaItems.find(m => m.type === 'image')?.data || '',
           portfolioLink: document.getElementById('portfolioLink').value.trim(),
           category: category,
           type: 'model',
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          profile: userProfile ? {
+            userId: userProfile.userId,
+            name: userProfile.name,
+            email: userProfile.email,
+            avatar: userProfile.avatar
+          } : null
         };
         
         console.log('Salvando modelo:', {

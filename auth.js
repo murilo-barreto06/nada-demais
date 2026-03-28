@@ -170,6 +170,8 @@ function updateActiveLink() {
   
   // Mapeamento de páginas que devem manter o link "Anuncie" ativo
   const anunciePages = ['anuncie.html', 'publicar-modelo.html', 'inscricao-professionals.html'];
+  // Páginas que pertencem à seção "Loja"
+  const storePages = ['store.html', 'model.html', 'professional.html'];
   
   navLinks.forEach(link => {
     const href = link.getAttribute('href');
@@ -183,7 +185,7 @@ function updateActiveLink() {
       link.classList.add('active');
     }
     // Se estiver em uma página que pertence à seção "Loja"
-    else if (currentPage === 'store.html' && href === 'store.html') {
+    else if (storePages.includes(currentPage) && href === 'store.html') {
       link.classList.add('active');
     }
     else {

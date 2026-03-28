@@ -1,20 +1,192 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>AI Store — Profissional</title>
-  
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark-mode');
-      }
-    })();
-  </script>
-  
-  <link rel="stylesheet" href="style.css" />
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark-mode');})();</script>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ===== MEDIA CAROUSEL (same pattern as model.html) ===== */
+    .media-carousel {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      aspect-ratio: 4/3;
+    }
+    .media-slides-track {
+      display: flex; height: 100%;
+      transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    .media-slide { flex: 0 0 100%; height: 100%; }
+    .media-slide img, .media-slide video {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .carousel-ctrl {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
+      color: white; border: none;
+      width: 38px; height: 38px; border-radius: 50%;
+      font-size: 1.3rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s; z-index: 5;
+    }
+    .carousel-ctrl:hover { background: rgba(0,0,0,.8); }
+    .carousel-ctrl.prev { left: 10px; }
+    .carousel-ctrl.next { right: 10px; }
+    .carousel-dots-row {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 6px; z-index: 5;
+    }
+    .cdot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,.45); border: none; cursor: pointer; padding: 0;
+      transition: background .2s, transform .2s;
+    }
+    .cdot.active { background: white; transform: scale(1.25); }
+
+    /* ===== PROF PAGE ===== */
+    .prof-page { padding: 2.5rem 0 5rem; }
+    .prof-hero {
+      background: var(--panel);
+      border-radius: 24px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+    }
+    @media (max-width: 600px) {
+      .prof-hero { flex-direction: column; text-align: center; padding: 1.8rem 1.5rem; }
+    }
+    .prof-avatar-lg {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 2.8rem; font-weight: 700;
+      overflow: hidden; flex-shrink: 0;
+      border: 4px solid var(--panel);
+      box-shadow: 0 0 0 3px rgba(255,107,107,.3);
+    }
+    .prof-avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
+    .prof-hero-info { flex: 1; }
+    .prof-hero-name {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800; margin-bottom: .3rem;
+    }
+    .prof-specialty {
+      color: var(--accent); font-weight: 600;
+      font-size: 1rem; margin-bottom: .8rem;
+    }
+    .prof-hero-meta {
+      display: flex; gap: 1.2rem; flex-wrap: wrap;
+      align-items: center;
+    }
+    @media (max-width: 600px) { .prof-hero-meta { justify-content: center; } }
+    .prof-stat {
+      display: flex; flex-direction: column; align-items: center;
+      background: var(--bg); border-radius: 12px;
+      padding: .5rem .9rem; min-width: 72px;
+    }
+    .prof-stat .sv { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+    .prof-stat .sl { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+    .prof-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    @media (max-width: 780px) { .prof-body { grid-template-columns: 1fr; gap: 2rem; } }
+
+    .section-card {
+      background: var(--panel);
+      border-radius: 20px;
+      padding: 1.8rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+    }
+    .section-card h2 {
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: .6rem;
+      border-bottom: 1px solid rgba(128,128,128,.15);
+    }
+    .bio-text { color: var(--muted); line-height: 1.75; font-size: .97rem; }
+
+    .services-chips { display: flex; flex-wrap: wrap; gap: .6rem; }
+    .svc-chip {
+      background: rgba(21,115,71,.1);
+      color: var(--accent);
+      border-radius: 20px;
+      padding: .3rem .9rem;
+      font-size: .85rem; font-weight: 600;
+    }
+
+    .rate-chip {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: var(--accent); color: white;
+      border-radius: 20px; padding: .4rem 1.1rem;
+      font-size: 1rem; font-weight: 700;
+    }
+
+    .ext-link {
+      display: inline-flex; align-items: center; gap: .4rem;
+      color: var(--accent); text-decoration: none;
+      font-size: .88rem; font-weight: 600;
+      border: 1.5px solid var(--accent);
+      border-radius: 10px; padding: .4rem .85rem;
+      transition: all .2s;
+    }
+    .ext-link:hover { background: var(--accent); color: white; }
+
+    .action-row { display: flex; gap: .9rem; flex-wrap: wrap; margin-top: 1.5rem; }
+    .action-row .cta { flex: 1; min-width: 130px; text-align: center; }
+
+    .contact-feedback {
+      display: none; margin-top: .9rem;
+      padding: .7rem 1rem;
+      background: rgba(21,115,71,.1);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      color: var(--accent); font-weight: 600; text-align: center;
+    }
+
+    .no-media-box {
+      aspect-ratio: 4/3; border-radius: 20px;
+      background: linear-gradient(135deg, #ff6b6b44, #feca5744);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem; color: rgba(128,128,128,.4);
+    }
+
+    /* related */
+    .related-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 1.2rem; margin-top: 1rem;
+    }
+    .rel-card {
+      background: var(--card); border-radius: 14px; overflow: hidden;
+      box-shadow: var(--shadow); cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      text-align: center; padding: 1.2rem 1rem;
+    }
+    .rel-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+    .rel-av {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b6b, #feca57);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.4rem; font-weight: 700;
+      margin: 0 auto .6rem; overflow: hidden;
+    }
+    .rel-av img { width: 100%; height: 100%; object-fit: cover; }
+    .rel-card h4 { font-size: .9rem; font-weight: 700; }
+    .rel-card p { font-size: .8rem; color: var(--accent); }
+  </style>
 </head>
 <body>
   <header>
@@ -23,54 +195,15 @@
       <a href="index.html">Home</a>
       <a href="store.html" class="active">Loja</a>
       <a href="anuncie.html">Anuncie</a>
-      <div id="auth-container" style="display: inline-block;"></div>
+      <div id="auth-container" style="display:inline-block;"></div>
       <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
     </nav>
   </header>
 
-  <main>
-    <section class="professional-page">
-      <div class="container">
-        <div class="professional-header">
-          <div id="professionalAvatar" class="professional-avatar-large"></div>
-          <h1 id="professionalName">Carregando...</h1>
-          <p id="professionalSpecialty" class="professional-specialty"></p>
-          <div class="professional-rating" id="professionalRating"></div>
-        </div>
-
-        <div class="professional-content">
-          <div class="professional-bio-section">
-            <h2>Sobre</h2>
-            <p id="professionalBio" class="professional-bio"></p>
-            
-            <div class="professional-stats">
-              <div class="stat">
-                <span class="stat-value" id="professionalProjects">0</span>
-                <span class="stat-label">Projetos</span>
-              </div>
-              <div class="stat">
-                <span class="stat-value" id="professionalRating">0.0</span>
-                <span class="stat-label">Avaliação</span>
-              </div>
-              <div class="stat">
-                <span class="stat-value" id="professionalHourlyRate">R$ 0</span>
-                <span class="stat-label">Hora</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="professional-services-section">
-            <h2>Serviços disponíveis</h2>
-            <ul id="professionalServices" class="services-list"></ul>
-          </div>
-
-          <div class="professional-contact">
-            <button class="cta" onclick="alert('Funcionalidade de contato será implementada em breve!')">Solicitar serviço</button>
-            <button class="cta outline" onclick="window.history.back()">Voltar</button>
-          </div>
-        </div>
-      </div>
-    </section>
+  <main class="prof-page">
+    <div class="container" id="pageContent">
+      <p style="text-align:center;padding:4rem;color:var(--muted);">Carregando...</p>
+    </div>
   </main>
 
   <div id="settingsPanel" class="settings-panel">
@@ -82,85 +215,174 @@
       <label>Tema</label>
       <button onclick="toggleTheme()" class="small-btn">Alternar</button>
     </div>
-    <div class="settings-row account-row">
-      <label>Conta</label>
-    </div>
+    <div class="settings-row account-row"><label>Conta</label></div>
     <button class="small-btn" onclick="toggleSettings()">Fechar</button>
   </div>
 
-  <footer>
-    <p>AI Store — protótipo • © 2025</p>
-  </footer>
+  <footer><p>AI Store — protótipo • © 2025</p></footer>
 
   <script src="app.js"></script>
   <script src="auth.js"></script>
-  
   <script>
-    // ===== FUNÇÃO PARA CARREGAR PROFISSIONAL =====
-    document.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
-      
-      if (!id) {
-        window.location.href = 'store.html';
+    let _slides = [], _cur = 0;
+
+    function buildCarousel(media) {
+      if (!media || media.length === 0) return '<div class="no-media-box">👤</div>';
+      _slides = media; _cur = 0;
+      const slides = media.map((m,i) =>
+        `<div class="media-slide">${m.type==='video'
+          ? `<video src="${m.data}" controls></video>`
+          : `<img src="${m.data}" alt="Imagem ${i+1}">`}</div>`
+      ).join('');
+      const arrows = media.length > 1
+        ? `<button class="carousel-ctrl prev" onclick="slide(-1)">‹</button>
+           <button class="carousel-ctrl next" onclick="slide(1)">›</button>`
+        : '';
+      const dots = media.length > 1
+        ? `<div class="carousel-dots-row">
+             ${media.map((_,i)=>`<button class="cdot${i===0?' active':''}" onclick="goSlide(${i})"></button>`).join('')}
+           </div>`
+        : '';
+      return `<div class="media-carousel" id="mCarousel">
+        <div class="media-slides-track" id="mTrack">${slides}</div>
+        ${arrows}${dots}
+      </div>`;
+    }
+    window.slide = d => goSlide((_cur+d+_slides.length)%_slides.length);
+    window.goSlide = function(i) {
+      _cur = i;
+      const t = document.getElementById('mTrack');
+      if (t) t.style.transform = `translateX(-${i*100}%)`;
+      document.querySelectorAll('.cdot').forEach((d,j)=>d.classList.toggle('active',j===i));
+    };
+    function initSwipe(el) {
+      let x0 = null;
+      el.addEventListener('touchstart', e=>{x0=e.touches[0].clientX;},{passive:true});
+      el.addEventListener('touchend', e=>{
+        if(x0===null)return;
+        const dx=e.changedTouches[0].clientX-x0;
+        if(Math.abs(dx)>40) slide(dx<0?1:-1);
+        x0=null;
+      },{passive:true});
+    }
+
+    window.contactProfessional = function(id) {
+      const contacts = JSON.parse(localStorage.getItem('contacts')||'[]');
+      if (contacts.find(c=>c.profId==id)) {
+        alert('Você já solicitou contato com este profissional!');
         return;
       }
-      
-      // Buscar profissional do localStorage
-      const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
-      const prof = professionals.find(p => p.id == id);
-      
-      if (prof) {
-        // Nome
-        document.getElementById('professionalName').textContent = prof.name;
-        
-        // Especialidade
-        document.getElementById('professionalSpecialty').textContent = prof.specialty;
-        
-        // Rating
-        document.getElementById('professionalRating').innerHTML = `⭐ ${prof.rating.toFixed(1)}`;
-        
-        // Bio
-        document.getElementById('professionalBio').textContent = prof.bio || `${prof.name} é especialista em ${prof.specialty} com ${prof.projects} projetos realizados.`;
-        
-        // Projetos
-        document.getElementById('professionalProjects').textContent = prof.projects;
-        
-        // Rating (stats)
-        document.getElementById('professionalRating').textContent = prof.rating.toFixed(1);
-        
-        // Hourly rate
-        document.getElementById('professionalHourlyRate').textContent = prof.hourlyRate ? `R$ ${prof.hourlyRate}` : 'Consultar';
-        
-        // Avatar
-        const avatarEl = document.getElementById('professionalAvatar');
-        if (prof.avatar) {
-          avatarEl.style.backgroundImage = `url('${prof.avatar}')`;
-          avatarEl.style.backgroundSize = 'cover';
-          avatarEl.style.backgroundPosition = 'center';
-          avatarEl.style.background = ''; // Remove o gradiente
-        } else {
-          avatarEl.style.background = `linear-gradient(135deg, var(--accent), #4ade80)`;
-          avatarEl.innerHTML = `<span style="font-size: 3rem; color: white; line-height: 150px;">${prof.name.charAt(0)}</span>`;
-        }
-        
-        // Serviços
-        const servicesEl = document.getElementById('professionalServices');
-        if (prof.services && prof.services.length > 0) {
-          servicesEl.innerHTML = '';
-          prof.services.forEach(service => {
-            const li = document.createElement('li');
-            li.textContent = service;
-            servicesEl.appendChild(li);
-          });
-        } else {
-          servicesEl.innerHTML = '<li>Instalação</li><li>Treinamento</li><li>Customização</li>';
-        }
-        
-      } else {
-        alert('Profissional não encontrado');
-        window.location.href = 'store.html';
-      }
+      const profs = JSON.parse(localStorage.getItem('professionals')||'[]');
+      const prof = profs.find(p=>p.id==id);
+      if (!prof) return;
+      contacts.push({ profId: id, name: prof.name, specialty: prof.specialty, date: new Date().toISOString() });
+      localStorage.setItem('contacts', JSON.stringify(contacts));
+      const fb = document.getElementById('contactFeedback');
+      const btn = document.getElementById('contactBtn');
+      if (fb) { fb.style.display='block'; fb.textContent='✅ Solicitação enviada! O profissional entrará em contato.'; }
+      if (btn) { btn.textContent='Solicitado ✓'; btn.disabled=true; btn.style.opacity='.65'; }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (!id) { window.location.href='store.html'; return; }
+
+      const professionals = JSON.parse(localStorage.getItem('professionals')||'[]');
+      const prof = professionals.find(p=>p.id==id);
+      if (!prof) { alert('Profissional não encontrado'); window.location.href='store.html'; return; }
+
+      document.title = `AI Store — ${prof.name}`;
+
+      const contacts = JSON.parse(localStorage.getItem('contacts')||'[]');
+      const alreadyContacted = contacts.find(c=>c.profId==prof.id);
+
+      // Avatar: prefer media[0] or saved avatar field
+      const profileAvatar = prof.profile?.avatar || prof.avatar || null;
+      const avatarHtml = profileAvatar
+        ? `<img src="${profileAvatar}" alt="">`
+        : (prof.name?.charAt(0)||'?').toUpperCase();
+
+      const services = prof.services?.length
+        ? prof.services.map(s=>`<span class="svc-chip">${s}</span>`).join('')
+        : '<span style="color:var(--muted);font-size:.9rem;">Nenhum serviço listado</span>';
+
+      const others = professionals.filter(p=>p.id!=prof.id).slice(0,4);
+      const relHtml = others.length ? `
+        <h2 style="font-size:1.3rem;font-weight:700;margin:3rem 0 1rem;">Outros profissionais</h2>
+        <div class="related-row">
+          ${others.map(p=>{
+            const av = p.profile?.avatar||p.avatar||null;
+            const avHtml = av?`<img src="${av}" alt="">`:p.name?.charAt(0)||'?';
+            return `<div class="rel-card" onclick="location.href='professional.html?id=${p.id}'">
+              <div class="rel-av">${avHtml}</div>
+              <h4>${p.name}</h4>
+              <p>${p.specialty||''}</p>
+            </div>`;
+          }).join('')}
+        </div>` : '';
+
+      document.getElementById('pageContent').innerHTML = `
+        <!-- HERO -->
+        <div class="prof-hero">
+          <div class="prof-avatar-lg">${avatarHtml}</div>
+          <div class="prof-hero-info">
+            <h1 class="prof-hero-name">${prof.name}</h1>
+            <div class="prof-specialty">${prof.specialty||''}</div>
+            <div class="prof-hero-meta">
+              <div class="prof-stat">
+                <span class="sv">⭐ ${typeof prof.rating==='number'?prof.rating.toFixed(1):'5.0'}</span>
+                <span class="sl">Avaliação</span>
+              </div>
+              <div class="prof-stat">
+                <span class="sv">${prof.projects||0}</span>
+                <span class="sl">Projetos</span>
+              </div>
+              ${prof.hourlyRate?`<div class="rate-chip">R$ ${prof.hourlyRate}<span style="font-size:.7rem;opacity:.8;">/h</span></div>`:''}
+            </div>
+          </div>
+        </div>
+
+        <!-- BODY GRID -->
+        <div class="prof-body">
+          <!-- LEFT: mídias -->
+          <div>
+            <div id="carouselWrap">${buildCarousel(prof.media)}</div>
+          </div>
+
+          <!-- RIGHT: info -->
+          <div>
+            <div class="section-card">
+              <h2>Sobre</h2>
+              <p class="bio-text">${prof.bio||prof.description||'Sem bio disponível.'}</p>
+            </div>
+
+            <div class="section-card">
+              <h2>Serviços oferecidos</h2>
+              <div class="services-chips">${services}</div>
+            </div>
+
+            ${prof.portfolioLink?`
+            <div class="section-card">
+              <h2>Links</h2>
+              <a class="ext-link" href="${prof.portfolioLink}" target="_blank">🔗 Portfólio / Repositório</a>
+            </div>`:''}
+
+            <div class="action-row">
+              <button class="cta" id="contactBtn" onclick="contactProfessional(${prof.id})"
+                ${alreadyContacted?'disabled style="opacity:.65;"':''}>
+                ${alreadyContacted?'Solicitado ✓':'Solicitar serviço'}
+              </button>
+              <a class="cta outline" href="store.html">← Voltar</a>
+            </div>
+            <div id="contactFeedback" class="contact-feedback"></div>
+          </div>
+        </div>
+
+        ${relHtml}
+      `;
+
+      const car = document.getElementById('mCarousel');
+      if (car) initSwipe(car);
     });
   </script>
 </body>

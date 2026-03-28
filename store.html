@@ -340,13 +340,51 @@
       }
     }
     
+    /* ===== MINI CAROUSEL IN CARDS ===== */
+    .card-media-carousel {
+      position: relative;
+      margin: 0.5rem 1rem;
+      height: 200px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .mini-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.3s ease;
+    }
+    .mini-slide {
+      flex: 0 0 100%;
+      height: 100%;
+    }
+    .mini-slide img, .mini-slide video {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+    .mini-ctrl {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,.5);
+      color: white; border: none;
+      width: 30px; height: 30px; border-radius: 50%;
+      font-size: 1.1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 4; transition: background .15s;
+    }
+    .mini-ctrl:hover { background: rgba(0,0,0,.75); }
+    .mini-ctrl.p { left: 7px; }
+    .mini-ctrl.n { right: 7px; }
+    .mini-count-badge {
+      position: absolute;
+      bottom: 7px; right: 10px;
+      background: rgba(0,0,0,.55);
+      color: white; border-radius: 20px;
+      padding: 2px 8px; font-size: .72rem;
+      z-index: 4;
+    }
     @media (max-width: 480px) {
-      .card-title {
-        font-size: 1.2rem;
-      }
-      .card-media-preview {
-        height: 150px;
-      }
+      .card-title { font-size: 1.2rem; }
     }
   </style>
 </head>
@@ -525,6 +563,37 @@
       filterItems();
     };
     
+    // ===== MINI CAROUSEL STATE (per card by index) =====
+    const miniCarState = {};
+    window.miniSlide = function(cardIdx, dir, mediaCount, ev) {
+      if (ev) ev.stopPropagation();
+      const cur = miniCarState[cardIdx] || 0;
+      const next = (cur + dir + mediaCount) % mediaCount;
+      miniCarState[cardIdx] = next;
+      const track = document.getElementById(`mtrack-${cardIdx}`);
+      if (track) track.style.transform = `translateX(-${next*100}%)`;
+      const badge = document.getElementById(`mbadge-${cardIdx}`);
+      if (badge) badge.textContent = `${next+1}/${mediaCount}`;
+    };
+
+    function buildMiniCarousel(media, cardIdx) {
+      if (!media || media.length === 0) return '';
+      miniCarState[cardIdx] = 0;
+      const slides = media.map(m =>
+        `<div class="mini-slide">${m.type==='video'
+          ? `<video src="${m.data}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>`
+          : `<img src="${m.data}" alt="">`}</div>`
+      ).join('');
+      const arrows = media.length > 1 ? `
+        <button class="mini-ctrl p" onclick="miniSlide(${cardIdx},-1,${media.length},event)">‹</button>
+        <button class="mini-ctrl n" onclick="miniSlide(${cardIdx},1,${media.length},event)">›</button>
+        <div class="mini-count-badge" id="mbadge-${cardIdx}">1/${media.length}</div>` : '';
+      return `<div class="card-media-carousel">
+        <div class="mini-track" id="mtrack-${cardIdx}">${slides}</div>
+        ${arrows}
+      </div>`;
+    }
+
     function renderItems(items) {
       const container = document.getElementById('feedContainer');
       if (!container) return;
@@ -536,17 +605,18 @@
       
       container.innerHTML = '';
       
-      items.forEach(item => {
+      items.forEach((item, idx) => {
         const card = document.createElement('div');
         card.className = 'feed-card';
-        card.onclick = () => {
-          window.location.href = `${item.type}.html?id=${item.id}`;
-        };
+        card.onclick = () => { window.location.href = `${item.type}.html?id=${item.id}`; };
         
-        // USANDO OS DADOS DO PERFIL DO USUÁRIO
         const profileName = item.profileName;
         const profileAvatar = item.profileAvatar;
         const avatarInitial = profileName?.charAt(0).toUpperCase() || '?';
+        
+        // Build media for carousel
+        const mediaArr = item.media || (item.previewMedia ? [{type:'image',data:item.previewMedia}] : []);
+        const mediaSection = buildMiniCarousel(mediaArr, idx);
         
         card.innerHTML = `
           <div class="card-header">
@@ -561,26 +631,19 @@
               </div>
             </div>
           </div>
-          ${item.previewMedia ? `
-            <div class="card-media-preview">
-              ${item.previewMedia.startsWith('data:video') ? 
-                `<video src="${item.previewMedia}" style="width:100%; height:100%; object-fit:cover;"></video>` : 
-                `<img src="${item.previewMedia}" alt="Preview">`}
-            </div>
-          ` : ''}
+          ${mediaSection}
           <div class="card-content">
             <h2 class="card-title">${item.type === 'model' ? item.title : (item.specialty || 'Especialista')}</h2>
-            ${item.specialty ? `<div class="card-subtitle">${item.specialty}</div>` : ''}
+            ${item.specialty && item.type === 'model' ? `<div class="card-subtitle">${item.specialty}</div>` : ''}
+            ${item.type === 'professional' ? `<div class="card-subtitle">${item.name}</div>` : ''}
             <p class="card-description">${(item.description || item.bio || '').substring(0, 120)}${(item.description || item.bio || '').length > 120 ? '...' : ''}</p>
             <div class="card-meta">
-              ${item.price ? `<div class="card-meta-item"> ${item.price}</div>` : ''}
-              ${item.hourlyRate ? `<div class="card-meta-item"> R$ ${item.hourlyRate}/h</div>` : ''}
-              ${item.mediaCount > 0 ? `<div class="card-meta-item"> ${item.mediaCount} mídias</div>` : ''}
-              ${item.portfolioLink ? `<div class="card-meta-item"> Portfólio</div>` : ''}
+              ${item.price ? `<div class="card-meta-item">${item.price}</div>` : ''}
+              ${item.hourlyRate && item.type === 'professional' ? `<div class="card-meta-item">R$ ${item.hourlyRate}/h</div>` : ''}
+              ${item.portfolioLink ? `<div class="card-meta-item">🔗 Portfólio</div>` : ''}
             </div>
             <div class="card-actions">
               <button class="card-btn primary" onclick="event.stopPropagation(); window.location.href='${item.type}.html?id=${item.id}'">Ver detalhes</button>
-              <button class="card-btn outline" onclick="event.stopPropagation(); alert('Contatar')">Contatar</button>
             </div>
           </div>
         `;

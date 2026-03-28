@@ -1320,7 +1320,32 @@ nav a.active {
   color: white;
 }
 
-/* ===== PERFIL DO USUÁRIO ===== */
+/* ===== CAROUSEL MOBILE FIX ===== */
+@media (max-width: 520px) {
+  .carousel-wrapper {
+    padding: 0 46px;
+  }
+  .carousel-btn.left { left: 4px; }
+  .carousel-btn.right { right: 4px; }
+  .carousel-item { flex: 0 0 210px; }
+  /* Garante que o carousel de profissionais sempre mostra as setas */
+  .professionals .carousel-wrapper {
+    display: flex !important;
+  }
+}
+
+/* Garante que carousel-wrapper sempre aparece mesmo com item único */
+.carousel-wrapper {
+  display: flex;
+}
+
+/* ===== ESTILOS PARA LINKS ATIVOS ===== */
+nav a.active,
+.login-link.active,
+.meu-painel-link.active {
+  background-color: var(--accent);
+  color: white;
+}
 .profile-header {
   display: flex;
   align-items: center;

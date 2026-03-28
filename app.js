@@ -174,7 +174,7 @@ function loadHomeProfessionals() {
   carousel.innerHTML = '';
   
   if (professionals.length === 0) {
-    carousel.innerHTML = '<div class="carousel-item professionals" style="text-align: center; padding: 2rem;">Nenhum profissional cadastrado</div>';
+    carousel.innerHTML = '<div class="carousel-item professionals" style="text-align:center;padding:2rem;min-width:280px;width:100%;">Nenhum profissional cadastrado. <a href="inscricao-professionals.html" style="color:var(--accent);font-weight:600;">Cadastrar agora</a></div>';
     return;
   }
   
@@ -424,6 +424,7 @@ function renderProfessionals() {
   });
 }
 
+// Profissionais carousel na store.html
 function nextSlideProfessionals() {
   const container = document.getElementById("professionalsCarousel");
   if (container) container.scrollLeft += 300;
@@ -660,6 +661,7 @@ function prevSlideModels() {
   if (container) container.scrollLeft -= 300;
 }
 
+// Profissionais carousel na store.html (ID: professionalsCarousel)
 function nextSlideProfessionals() {
   const container = document.getElementById("professionalsCarousel");
   if (container) container.scrollLeft += 300;
@@ -670,7 +672,16 @@ function prevSlideProfessionals() {
   if (container) container.scrollLeft -= 300;
 }
 
-// ===== FUNÇÕES DE AUTENTICAÇÃO =====
+// Profissionais carousel na index.html (ID: professionalsCarouselHome)
+function nextSlideProfessionalsHome() {
+  const container = document.getElementById("professionalsCarouselHome");
+  if (container) container.scrollLeft += 300;
+}
+
+function prevSlideProfessionalsHome() {
+  const container = document.getElementById("professionalsCarouselHome");
+  if (container) container.scrollLeft -= 300;
+}
 
 // Verificar se usuário está logado
 function isLoggedIn() {

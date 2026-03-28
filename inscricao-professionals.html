@@ -627,6 +627,32 @@
       renderMediaGrid();
     };
     
+    // ===== COMPRIMIR IMAGEM ANTES DE SALVAR =====
+    function compressImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const MAX = 800;
+            let w = img.width, h = img.height;
+            if (w > MAX || h > MAX) {
+              if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+              else { w = Math.round(w * MAX / h); h = MAX; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.75));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+    
     // ===== ADICIONAR MÍDIA COM RETORNO DE SUCESSO/ERRO =====
     async function addMedia(file) {
       const isImage = file.type.startsWith('image/');
@@ -668,7 +694,9 @@
       
       try {
         console.log(`Processando ${isImage ? 'imagem' : 'vídeo'}: ${file.name} (${(file.size / 1024).toFixed(2)}KB)`);
-        const data = await readFileAsDataURL(file);
+        const data = isImage
+          ? await compressImage(file)
+          : await readFileAsDataURL(file);
         mediaItems.push({
           type: isImage ? 'image' : 'video',
           data: data,
@@ -806,45 +834,25 @@
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      // Validações
+      // Validações antecipadas
       const name = document.getElementById('name').value.trim();
       const specialty = document.getElementById('specialty').value.trim();
       const bio = document.getElementById('bio').value.trim();
       const hourlyRate = document.getElementById('hourlyRate').value;
-      const userProfile = getUserProfileData();
-  
-      // Criar objeto do profissional com dados do perfil
-      const professional = {
-        id: Date.now(),
-        name: name,
-        specialty: specialty,
-        bio: bio,
-        hourlyRate: parseFloat(hourlyRate),
-        services: getSelectedServices(),
-        media: mediaItems,
-        portfolioLink: document.getElementById('portfolioLink').value.trim(),
-        type: 'professional',
-        createdAt: new Date().toISOString(),
-        // Dados do perfil do usuário que está publicando
-        profile: userProfile ? {
-          userId: userProfile.userId,
-          name: userProfile.name,
-          email: userProfile.email,
-          avatar: userProfile.avatar
-        } : null
-      };
       
       if (!name || !specialty || !bio || !hourlyRate) {
         alert('Preencha todos os campos obrigatórios.');
         return;
       }
       
-      // Desabilitar botão e mostrar loading
+      // Desabilitar botão só após validar
       submitBtn.disabled = true;
       const originalText = submitBtn.textContent;
       submitBtn.innerHTML = 'Cadastrando... <span class="loading-spinner"></span>';
       
       try {
+        const userProfile = getUserProfileData();
+        
         // Criar objeto do profissional
         const professional = {
           id: Date.now(),
@@ -852,11 +860,20 @@
           specialty: specialty,
           bio: bio,
           hourlyRate: parseFloat(hourlyRate),
+          rating: 5.0,
+          projects: 0,
           services: getSelectedServices(),
           media: mediaItems,
+          avatar: mediaItems.find(m => m.type === 'image')?.data || '',
           portfolioLink: document.getElementById('portfolioLink').value.trim(),
           type: 'professional',
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          profile: userProfile ? {
+            userId: userProfile.userId,
+            name: userProfile.name,
+            email: userProfile.email,
+            avatar: userProfile.avatar
+          } : null
         };
         
         // Salvar no localStorage
@@ -944,6 +961,15 @@
       const anuncieLink = document.querySelector('nav a[href="anuncie.html"]');
       if (anuncieLink) {
         anuncieLink.classList.add('active');
+      }
+      
+      // Pré-preencher nome com o do perfil logado
+      const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+      if (user && user.name) {
+        const nameInput = document.getElementById('name');
+        if (nameInput && !nameInput.value) {
+          nameInput.value = user.name;
+        }
       }
     });
   </script>

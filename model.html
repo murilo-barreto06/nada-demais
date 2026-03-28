@@ -1,20 +1,198 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>AI Store — Modelo</title>
-  
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark-mode');
-      }
-    })();
-  </script>
-  
-  <link rel="stylesheet" href="style.css" />
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark-mode');})();</script>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ===== MEDIA CAROUSEL ===== */
+    .media-carousel {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      aspect-ratio: 4/3;
+    }
+    .media-slides-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    .media-slide {
+      flex: 0 0 100%;
+      height: 100%;
+    }
+    .media-slide img, .media-slide video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .carousel-ctrl {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      color: white;
+      border: none;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+      z-index: 5;
+    }
+    .carousel-ctrl:hover { background: rgba(0,0,0,0.8); }
+    .carousel-ctrl.prev { left: 10px; }
+    .carousel-ctrl.next { right: 10px; }
+    .carousel-dots-row {
+      position: absolute; bottom: 10px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 6px; z-index: 5;
+    }
+    .cdot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.45);
+      border: none; cursor: pointer; padding: 0;
+      transition: background .2s, transform .2s;
+    }
+    .cdot.active { background: white; transform: scale(1.25); }
+    .no-media-box {
+      aspect-ratio: 4/3;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #1e4d6b, #2d7a4a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem;
+      color: rgba(255,255,255,.4);
+      box-shadow: var(--shadow);
+    }
+    /* ===== MODEL PAGE ===== */
+    .model-page { padding: 2.5rem 0 5rem; }
+    .model-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 780px) {
+      .model-grid { grid-template-columns: 1fr; gap: 2rem; }
+    }
+    .model-title {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: .5rem;
+    }
+    .model-price-big {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+    }
+    .category-tag {
+      display: inline-block;
+      background: rgba(21,115,71,.12);
+      color: var(--accent);
+      border-radius: 20px;
+      padding: .25rem .9rem;
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .seller-strip {
+      display: flex; align-items: center; gap: .9rem;
+      background: var(--panel);
+      border-radius: 16px;
+      padding: .9rem 1.1rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.4rem;
+    }
+    .s-avatar {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #4ade80);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 1.1rem;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .s-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .s-name { font-weight: 600; font-size: .95rem; }
+    .s-role { font-size: .78rem; color: var(--muted); }
+    .model-desc {
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 1.4rem;
+      font-size: .97rem;
+    }
+    .chips-row {
+      display: flex; flex-wrap: wrap; gap: .7rem;
+      margin-bottom: 1.4rem;
+    }
+    .chip {
+      background: var(--panel);
+      border-radius: 12px;
+      padding: .55rem .9rem;
+      box-shadow: var(--shadow);
+      font-size: .85rem;
+    }
+    .chip .lbl { color: var(--muted); font-size: .7rem; display: block; margin-bottom: .15rem; }
+    .chip .val { font-weight: 600; }
+    .ext-link {
+      display: inline-flex; align-items: center; gap: .4rem;
+      color: var(--accent); text-decoration: none;
+      font-size: .88rem; font-weight: 600;
+      border: 1.5px solid var(--accent);
+      border-radius: 10px; padding: .4rem .85rem;
+      transition: all .2s;
+      margin-bottom: 1.4rem;
+    }
+    .ext-link:hover { background: var(--accent); color: white; }
+    .action-row { display: flex; gap: .9rem; flex-wrap: wrap; }
+    .action-row .cta { flex: 1; min-width: 130px; text-align: center; }
+    .buy-feedback {
+      display: none;
+      margin-top: .9rem;
+      padding: .7rem 1rem;
+      background: rgba(21,115,71,.1);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      text-align: center;
+    }
+    /* related */
+    .section-sep { margin: 3rem 0 1.2rem; font-size: 1.3rem; font-weight: 700; }
+    .related-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 1.2rem;
+    }
+    .rel-card {
+      background: var(--card);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .rel-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+    .rel-thumb {
+      height: 90px;
+      background: linear-gradient(135deg, #1e4d6b, #2d7a4a);
+      background-size: cover;
+      background-position: center;
+    }
+    .rel-body { padding: .75rem 1rem .85rem; }
+    .rel-body h4 { font-size: .95rem; font-weight: 700; margin-bottom: .2rem; }
+    .rel-body p { font-size: .8rem; color: var(--muted); }
+    .rel-price { color: var(--accent); font-weight: 700; font-size: .85rem; margin-top: .3rem; }
+  </style>
 </head>
 <body>
   <header>
@@ -23,47 +201,15 @@
       <a href="index.html">Home</a>
       <a href="store.html" class="active">Loja</a>
       <a href="anuncie.html">Anuncie</a>
-      <div id="auth-container" style="display: inline-block;"></div>
+      <div id="auth-container" style="display:inline-block;"></div>
       <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
     </nav>
   </header>
 
-  <main>
-    <section class="product-page">
-      <div class="container">
-        <div class="product-left">
-          <div id="productImage" class="product-img"></div>
-        </div>
-
-        <div class="product-info">
-          <h2 id="productTitle">Carregando...</h2>
-          <p id="productShort" class="desc"></p>
-
-          <div class="meta">
-            <div><strong>Preço:</strong> <span id="productPrice"></span></div>
-            <div><strong>Vendedor:</strong> <span id="productSeller"></span></div>
-          </div>
-
-          <h3>Documentação</h3>
-          <ul id="productDocs">
-            <li>Instalação via Docker</li>
-            <li>API REST - Exemplo</li>
-            <li>Exemplos de integração</li>
-          </ul>
-
-          <div class="buy-section">
-            <a class="buy-btn" href="#" onclick="alert('Funcionalidade de compra será implementada em breve!')">Adquirir agora</a>
-          </div>
-        </div>
-      </div>  
-    </section>
-
-    <section class="related">
-      <div class="container">
-        <h3>Modelos relacionados</h3>
-        <div class="related-grid" id="relatedGrid"></div>
-      </div>
-    </section>
+  <main class="model-page">
+    <div class="container" id="pageContent">
+      <p style="text-align:center;padding:4rem;color:var(--muted);">Carregando...</p>
+    </div>
   </main>
 
   <div id="settingsPanel" class="settings-panel">
@@ -75,67 +221,171 @@
       <label>Tema</label>
       <button onclick="toggleTheme()" class="small-btn">Alternar</button>
     </div>
-    <div class="settings-row account-row">
-      <label>Conta</label>
-    </div>
+    <div class="settings-row account-row"><label>Conta</label></div>
     <button class="small-btn" onclick="toggleSettings()">Fechar</button>
   </div>
 
-  <footer>
-    <p>AI Store — protótipo • © 2025</p>
-  </footer>
+  <footer><p>AI Store — protótipo • © 2025</p></footer>
 
   <script src="app.js"></script>
   <script src="auth.js"></script>
-  
   <script>
-    // ===== FUNÇÃO PARA CARREGAR MODELO =====
-    document.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
-      
-      if (!id) {
-        window.location.href = 'store.html';
+    // ===== CAROUSEL =====
+    let _slides = [], _cur = 0;
+
+    function buildCarousel(media) {
+      if (!media || media.length === 0) return '<div class="no-media-box">🤖</div>';
+      _slides = media; _cur = 0;
+      const slides = media.map((m,i) =>
+        `<div class="media-slide">${m.type==='video'
+          ? `<video src="${m.data}" controls></video>`
+          : `<img src="${m.data}" alt="Imagem ${i+1}">`}</div>`
+      ).join('');
+      const arrows = media.length > 1
+        ? `<button class="carousel-ctrl prev" onclick="slide(-1)">‹</button>
+           <button class="carousel-ctrl next" onclick="slide(1)">›</button>`
+        : '';
+      const dots = media.length > 1
+        ? `<div class="carousel-dots-row">
+             ${media.map((_,i)=>`<button class="cdot${i===0?' active':''}" onclick="goSlide(${i})"></button>`).join('')}
+           </div>`
+        : '';
+      return `<div class="media-carousel" id="mCarousel">
+        <div class="media-slides-track" id="mTrack">${slides}</div>
+        ${arrows}${dots}
+      </div>`;
+    }
+    window.slide = function(d) { goSlide((_cur+d+_slides.length)%_slides.length); };
+    window.goSlide = function(i) {
+      _cur = i;
+      const t = document.getElementById('mTrack');
+      if (t) t.style.transform = `translateX(-${i*100}%)`;
+      document.querySelectorAll('.cdot').forEach((d,j)=>d.classList.toggle('active',j===i));
+    };
+
+    // Touch swipe
+    function initSwipe(el) {
+      let x0 = null;
+      el.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, {passive:true});
+      el.addEventListener('touchend', e => {
+        if (x0 === null) return;
+        const dx = e.changedTouches[0].clientX - x0;
+        if (Math.abs(dx) > 40) slide(dx < 0 ? 1 : -1);
+        x0 = null;
+      }, {passive:true});
+    }
+
+    // ===== CATEGORY LABELS =====
+    const CAT_MAP = {
+      atendimento:'Atendimento / Chatbot', analise:'Análise de Dados',
+      visao:'Visão Computacional', nlp:'Proc. de Linguagem',
+      generativo:'IA Generativa'
+    };
+
+    // ===== BUY =====
+    window.buyModel = function(id) {
+      const models = JSON.parse(localStorage.getItem('models')||'[]');
+      const model = models.find(m=>m.id==id);
+      if (!model) return;
+      const purchases = JSON.parse(localStorage.getItem('purchases')||'[]');
+      if (purchases.find(p=>p.modelId==id && p.type==='model')) {
+        alert('Você já adquiriu este modelo!');
         return;
       }
-      
-      // Buscar modelo do localStorage
-      const models = JSON.parse(localStorage.getItem('models') || '[]');
-      const model = models.find(m => m.id == id);
-      
-      if (model) {
-        // Preencher página
-        document.getElementById('productTitle').textContent = model.title;
-        document.getElementById('productShort').textContent = model.description;
-        document.getElementById('productPrice').textContent = model.price || 'R$ 0,00';
-        document.getElementById('productSeller').textContent = model.seller || 'Vendedor';
-        
-        const img = document.getElementById('productImage');
-        if (model.image) {
-          img.style.backgroundImage = `url('${model.image}')`;
-          img.style.backgroundSize = 'cover';
-        } else {
-          img.style.background = 'linear-gradient(180deg,#cfeeff,#9fd8ff,#7bc35b)';
-        }
-        
-        // Modelos relacionados (outros modelos)
-        const rel = document.getElementById('relatedGrid');
-        rel.innerHTML = '';
-        
-        const outros = models.filter(m => m.id != model.id).slice(0, 3);
-        outros.forEach(m => {
-          const card = document.createElement('div');
-          card.className = 'small-card';
-          card.innerHTML = `<h4>${m.title}</h4><p>${m.seller || ''}</p>`;
-          card.style.cursor = 'pointer';
-          card.onclick = () => window.location.href = `model.html?id=${m.id}`;
-          rel.appendChild(card);
-        });
-        
-      } else {
-        alert('Modelo não encontrado');
-        window.location.href = 'store.html';
-      }
+      purchases.push({
+        modelId: model.id,
+        title: model.title,
+        price: model.price,
+        seller: model.seller,
+        date: new Date().toISOString(),
+        type: 'model'
+      });
+      localStorage.setItem('purchases', JSON.stringify(purchases));
+      const fb = document.getElementById('buyFeedback');
+      const btn = document.getElementById('buyBtn');
+      if (fb) { fb.style.display='block'; fb.textContent='✅ Modelo adquirido com sucesso!'; }
+      if (btn) { btn.textContent='Adquirido ✓'; btn.disabled=true; btn.style.opacity='.65'; }
+    };
+
+    // ===== LOAD PAGE =====
+    document.addEventListener('DOMContentLoaded', function() {
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (!id) { window.location.href='store.html'; return; }
+
+      const models = JSON.parse(localStorage.getItem('models')||'[]');
+      const model = models.find(m=>m.id==id);
+      if (!model) { alert('Modelo não encontrado'); window.location.href='store.html'; return; }
+
+      document.title = `AI Store — ${model.title}`;
+
+      const purchases = JSON.parse(localStorage.getItem('purchases')||'[]');
+      const bought = purchases.find(p=>p.modelId==model.id);
+
+      const profileName = model.profile?.name || model.seller || 'Vendedor';
+      const profileAvatar = model.profile?.avatar || null;
+      const avatarHtml = profileAvatar
+        ? `<img src="${profileAvatar}" alt="">`
+        : profileName.charAt(0).toUpperCase();
+
+      const catLabel = model.category ? (CAT_MAP[model.category]||model.category) : null;
+
+      const others = models.filter(m=>m.id!=model.id).slice(0,4);
+      const relatedHtml = others.length ? `
+        <h2 class="section-sep">Modelos relacionados</h2>
+        <div class="related-row">
+          ${others.map(m=>`
+            <div class="rel-card" onclick="location.href='model.html?id=${m.id}'">
+              <div class="rel-thumb" style="${m.media?.[0]?.data?`background-image:url('${m.media[0].data}');`:''}"></div>
+              <div class="rel-body">
+                <h4>${m.title}</h4>
+                <p>${m.seller||''}</p>
+                <div class="rel-price">${m.price||''}</div>
+              </div>
+            </div>`).join('')}
+        </div>` : '';
+
+      document.getElementById('pageContent').innerHTML = `
+        <div class="model-grid">
+          <div id="carouselWrap">${buildCarousel(model.media)}</div>
+          <div>
+            ${catLabel?`<span class="category-tag">${catLabel}</span>`:''}
+            <h1 class="model-title">${model.title}</h1>
+            <div class="model-price-big">${model.price||'Consultar'}</div>
+
+            <div class="seller-strip">
+              <div class="s-avatar">${avatarHtml}</div>
+              <div>
+                <div class="s-name">${profileName}</div>
+                <div class="s-role">Desenvolvedor de IA</div>
+              </div>
+            </div>
+
+            <p class="model-desc">${model.description||''}</p>
+
+            <div class="chips-row">
+              <div class="chip"><span class="lbl">Preço</span><span class="val">${model.price||'Consultar'}</span></div>
+              ${catLabel?`<div class="chip"><span class="lbl">Categoria</span><span class="val">${catLabel}</span></div>`:''}
+              ${model.media?.length?`<div class="chip"><span class="lbl">Mídias</span><span class="val">${model.media.length} arquivo(s)</span></div>`:''}
+            </div>
+
+            ${model.portfolioLink?`<a class="ext-link" href="${model.portfolioLink}" target="_blank">🔗 Portfólio / Repositório</a>`:''}
+
+            <div class="action-row">
+              <button class="cta" id="buyBtn" onclick="buyModel(${model.id})"
+                ${bought?'disabled style="opacity:.65;"':''}>
+                ${bought?'Adquirido ✓':'Adquirir agora'}
+              </button>
+              <a class="cta outline" href="store.html">← Voltar</a>
+            </div>
+            <div id="buyFeedback" class="buy-feedback"></div>
+          </div>
+        </div>
+        ${relatedHtml}
+      `;
+
+      // Init swipe after render
+      const car = document.getElementById('mCarousel');
+      if (car) initSwipe(car);
     });
   </script>
 </body>
