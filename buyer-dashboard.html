@@ -190,19 +190,17 @@
       transform: scale(1.02);
     }
     
-    .empty-state {
-      background: var(--panel);
-      padding: 3rem;
-      border-radius: var(--border-radius);
+    .empty-feed {
       text-align: center;
-      color: var(--muted);
-      border: 2px dashed rgba(128,128,128,0.2);
+      padding: 40px;
+      color: #666;
     }
-    
-    .empty-state i {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      opacity: 0.5;
+
+    .empty-feed i {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 10px;
+      opacity: 0.7;
     }
     
     .empty-state p {
@@ -325,7 +323,7 @@
       transition: all var(--transition);
       opacity: 0; /* Escondido por padrão */
       position: absolute;
-      right: -30px; /* Posiciona no canto direito */
+      right: 200px; 
       top: 50%;
       transform: translateY(-50%);
     }
@@ -460,6 +458,7 @@
       }
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header>
@@ -482,7 +481,7 @@
             <span id="avatarInitial"></span>
           </div>
           <div class="avatar-overlay">
-            <img src="" alt="">
+            <i data-lucide="download" style="width: 38px; height: 38px;"></i>
           </div>
           <input type="file" id="profileUpload" accept="image/*" style="display: none;" onchange="handleProfileUpload(event)">
         </div>
@@ -491,7 +490,7 @@
           <div class="name-container" id="nameDisplay">
             <h1 id="profileName"></h1>
             <button class="edit-icon" onclick="mostrarEditorNome()">
-              <img src="assets/lapis.png" alt="Editar" style="width: 16px; height: 16px;">
+               <i data-lucide="pencil" alt="Editar" style="width: 16px; height: 16px;"></i> 
             </button>
           </div>
           
@@ -521,6 +520,7 @@
       <div class="dashboard-tabs">
         <button class="tab-btn active" onclick="mudarAba('adquiridos')"> Adquiridos</button>
         <button class="tab-btn" onclick="mudarAba('publicados')"> Meus Modelos</button>
+        <button class="tab-btn" onclick="mudarAba('servicos')"> Meus Serviços</button>
         <button class="tab-btn" onclick="mudarAba('profissional')"> Perfil Profissional</button>
         <button class="tab-btn" onclick="mudarAba('vendas')"> Vendas</button>
       </div>
@@ -574,7 +574,26 @@
         </div>
       </div>
 
-      <!-- ABA 3: PERFIL PROFISSIONAL (EDITÁVEL) -->
+      <!-- ABA 3: SERVIÇOS PUBLICADOS -->
+      <div id="aba-servicos" class="tab-content">
+        <div class="section-header">
+          <h2>Meus serviços publicados</h2>
+          <a href="publicar-servico.html" class="cta small" style="padding:0.5rem 1.5rem;">+ Novo serviço</a>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="totalServicos">0</div>
+            <div class="stat-label">Serviços publicados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="totalContratos">0</div>
+            <div class="stat-label">Contratos realizados</div>
+          </div>
+        </div>
+        <div class="card-grid" id="servicosPublicados"></div>
+      </div>
+
+      <!-- ABA 4: PERFIL PROFISSIONAL (EDITÁVEL) -->
       <div id="aba-profissional" class="tab-content">
         <div class="section-header">
           <h2>Perfil Profissional</h2>
@@ -895,7 +914,60 @@
       carregarPublicados();
     };
     
-    // Carregar perfil profissional (editável)
+    // Carregar serviços publicados pelo usuário
+    function carregarServicos() {
+      const container = document.getElementById('servicosPublicados');
+      if (!container) return;
+      const services = JSON.parse(localStorage.getItem('services') || '[]');
+      const purchases = getPurchases();
+      
+      document.getElementById('totalServicos').textContent = services.length;
+      const contratos = purchases.filter(p => p.type === 'service').length;
+      document.getElementById('totalContratos').textContent = contratos;
+      
+      container.innerHTML = '';
+      if (services.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>Você ainda não publicou nenhum serviço.</p>
+            <a href="publicar-servico.html" class="cta">Publicar agora</a>
+          </div>`;
+        return;
+      }
+      const CAT_SVC = {atendimento:'💬 Atendimento',analise:'📊 Análise',automacao:'⚙️ Automação',marketing:'📣 Marketing',rh:'🧑‍💼 RH',seguranca:'🛡️ Segurança',personalizado:'🛠️ Personalizado',outro:'✨ Outro'};
+      services.forEach(svc => {
+        const card = document.createElement('div');
+        card.className = 'small-card';
+        card.innerHTML = `
+          <h4>${svc.title}</h4>
+          <p style="color:#6366f1;font-size:.8rem;font-weight:600;">${CAT_SVC[svc.category]||svc.category||''}</p>
+          <p style="color:var(--accent);font-weight:bold;">${svc.price||'—'}</p>
+          ${svc.deadline?`<p style="font-size:.8rem;color:var(--muted);">Prazo: ${svc.deadline}</p>`:''}
+          ${svc.acceptsCustom?`<p style="font-size:.8rem;color:#6366f1;">✓ Aceita personalizado</p>`:''}
+          <div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap;">
+            <button class="small-btn" onclick="window.location.href='service.html?id=${svc.id}'">Ver</button>
+            <button class="small-btn" onclick="editarServico(${svc.id})">Editar</button>
+            <button class="small-btn" onclick="excluirServico(${svc.id})" style="border-color:#dc3545;color:#dc3545;">Excluir</button>
+          </div>`;
+        container.appendChild(card);
+      });
+    }
+
+    window.editarServico = function(id) {
+      const services = JSON.parse(localStorage.getItem('services') || '[]');
+      const svc = services.find(s => s.id == id);
+      if (!svc) return;
+      localStorage.setItem('editService', JSON.stringify(svc));
+      window.location.href = 'publicar-servico.html';
+    };
+
+    window.excluirServico = function(id) {
+      if (!confirm('Excluir este serviço?')) return;
+      let services = JSON.parse(localStorage.getItem('services') || '[]');
+      services = services.filter(s => s.id != id);
+      localStorage.setItem('services', JSON.stringify(services));
+      carregarServicos();
+    };
     function carregarPerfilProfissional() {
       const container = document.getElementById('profissionalContainer');
       if (!container) return;
@@ -928,7 +1000,7 @@
               <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                 <h3>${prof.name}</h3>
                 <div>
-                  <button class="small-btn" onclick="editarProfissional(${prof.id})">✏️ Editar</button>
+                  <button class="small-btn" onclick="editarProfissional(${prof.id})"><i data-lucide="search"></i> Editar</button>
                   <button class="small-btn" onclick="excluirProfissional(${prof.id})" style="border-color: #dc3545; color: #dc3545;"> Excluir</button>
                 </div>
               </div>
@@ -964,6 +1036,7 @@
             </div>
           </div>
         `;
+        lucide.createIcons();
       });
       
       container.innerHTML = html;
@@ -1036,6 +1109,7 @@
       carregarDadosUsuario();
       carregarAdquiridos();
       carregarPublicados();
+      carregarServicos();
       carregarPerfilProfissional();
       carregarVendas();
       
@@ -1043,13 +1117,10 @@
       if (purchases.length > 0) {
         document.getElementById('compradorBadge').style.display = 'inline-block';
       }
-      
-      // Verifica se é vendedor (tem modelos publicados)
       const models = JSON.parse(localStorage.getItem('models') || '[]');
       if (models.length > 0) {
         document.getElementById('vendedorBadge').style.display = 'inline-block';
       }
-      
       const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
       if (professionals.length > 0) {
         document.getElementById('profissionalBadge').style.display = 'inline-block';
@@ -1066,6 +1137,9 @@
 
     // Chamar após carregar tudo
     setTimeout(setActiveMenu, 100);
+  </script>
+  <script>
+    lucide.createIcons();
   </script>
   <script src="auth.js"></script>
 </body>

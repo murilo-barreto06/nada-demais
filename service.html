@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AI Store — Serviço</title>
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark-mode');})();</script>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ===== MEDIA CAROUSEL ===== */
+    .media-carousel {
+      position:relative; border-radius:20px; overflow:hidden;
+      background:var(--card); box-shadow:var(--shadow); aspect-ratio:4/3;
+    }
+    .media-slides-track { display:flex; height:100%; transition:transform .35s cubic-bezier(.4,0,.2,1); }
+    .media-slide { flex:0 0 100%; height:100%; }
+    .media-slide img, .media-slide video { width:100%; height:100%; object-fit:cover; display:block; }
+    .carousel-ctrl {
+      position:absolute; top:50%; transform:translateY(-50%);
+      background:rgba(0,0,0,.55); backdrop-filter:blur(4px);
+      color:white; border:none; width:38px; height:38px; border-radius:50%;
+      font-size:1.3rem; cursor:pointer; display:flex; align-items:center;
+      justify-content:center; transition:background .2s; z-index:5;
+    }
+    .carousel-ctrl:hover { background:rgba(0,0,0,.8); }
+    .carousel-ctrl.prev { left:10px; }
+    .carousel-ctrl.next { right:10px; }
+    .carousel-dots-row {
+      position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+      display:flex; gap:6px; z-index:5;
+    }
+    .cdot {
+      width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.45);
+      border:none; cursor:pointer; padding:0; transition:background .2s,transform .2s;
+    }
+    .cdot.active { background:white; transform:scale(1.25); }
+    .no-media-box {
+      aspect-ratio:4/3; border-radius:20px;
+      background:linear-gradient(145deg,#312e81,#4f46e5);
+      display:flex; align-items:center; justify-content:center;
+      font-size:4rem; color:rgba(255,255,255,.3);
+      box-shadow:var(--shadow);
+    }
+
+    /* ===== SERVICE PAGE ===== */
+    .svc-page { padding:2.5rem 0 5rem; }
+    .svc-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:start; }
+    @media (max-width:780px) { .svc-grid { grid-template-columns:1fr; gap:2rem; } }
+
+    .svc-category-tag {
+      display:inline-block;
+      background:rgba(99,102,241,.12); color:#6366f1;
+      border-radius:20px; padding:.25rem .9rem;
+      font-size:.8rem; font-weight:700;
+      letter-spacing:.04em; text-transform:uppercase; margin-bottom:1rem;
+    }
+    .svc-title {
+      font-size:clamp(1.5rem,3vw,2.2rem); font-weight:800;
+      line-height:1.2; margin-bottom:.5rem;
+    }
+    .svc-price-big {
+      font-size:2rem; font-weight:800; color:#6366f1; margin-bottom:1.2rem;
+    }
+
+    .seller-strip {
+      display:flex; align-items:center; gap:.9rem;
+      background:var(--panel); border-radius:16px;
+      padding:.9rem 1.1rem; box-shadow:var(--shadow); margin-bottom:1.4rem;
+    }
+    .s-avatar {
+      width:46px; height:46px; border-radius:50%;
+      background:linear-gradient(135deg,#6366f1,#a78bfa);
+      display:flex; align-items:center; justify-content:center;
+      color:white; font-weight:700; font-size:1.1rem; overflow:hidden; flex-shrink:0;
+    }
+    .s-avatar img { width:100%; height:100%; object-fit:cover; }
+    .s-name { font-weight:600; font-size:.95rem; }
+    .s-role { font-size:.78rem; color:var(--muted); }
+
+    .svc-desc { color:var(--muted); line-height:1.75; margin-bottom:1.4rem; font-size:.97rem; }
+
+    .chips-row { display:flex; flex-wrap:wrap; gap:.7rem; margin-bottom:1.4rem; }
+    .chip {
+      background:var(--panel); border-radius:12px;
+      padding:.55rem .9rem; box-shadow:var(--shadow); font-size:.85rem;
+    }
+    .chip .lbl { color:var(--muted); font-size:.7rem; display:block; margin-bottom:.15rem; }
+    .chip .val { font-weight:600; }
+
+    /* Deliverables */
+    .deliverables-card {
+      background:var(--panel); border-radius:20px;
+      padding:1.5rem; box-shadow:var(--shadow); margin-bottom:1.4rem;
+    }
+    .deliverables-card h3 {
+      font-size:1rem; font-weight:700; margin-bottom:1rem;
+      padding-bottom:.6rem; border-bottom:1px solid rgba(128,128,128,.15);
+    }
+    .deliv-list { list-style:none; display:flex; flex-direction:column; gap:.6rem; }
+    .deliv-list li {
+      display:flex; align-items:flex-start; gap:.7rem;
+      font-size:.9rem; color:var(--text);
+    }
+    .deliv-list li::before {
+      content:'✓'; color:#6366f1; font-weight:800; flex-shrink:0; margin-top:.1rem;
+    }
+
+    .custom-banner {
+      background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(167,139,250,.1));
+      border:1px solid rgba(99,102,241,.25); border-radius:16px;
+      padding:1rem 1.3rem; margin-bottom:1.4rem;
+      display:flex; align-items:center; gap:.8rem; font-size:.9rem;
+    }
+    .custom-banner .icon { font-size:1.5rem; flex-shrink:0; }
+    .custom-banner strong { color:#6366f1; }
+
+    .ext-link {
+      display:inline-flex; align-items:center; gap:.4rem;
+      color:#6366f1; text-decoration:none;
+      font-size:.88rem; font-weight:600;
+      border:1.5px solid #6366f1; border-radius:10px; padding:.4rem .85rem;
+      transition:all .2s; margin-bottom:1.4rem;
+    }
+    .ext-link:hover { background:#6366f1; color:white; }
+
+    .action-row { display:flex; gap:.9rem; flex-wrap:wrap; }
+    .action-row .cta-buy {
+      flex:1; min-width:130px; text-align:center;
+      background:#6366f1; color:white;
+      padding:.8rem 2rem; border-radius:40px; border:none;
+      font-weight:700; font-size:1rem; cursor:pointer; transition:all .2s;
+    }
+    .action-row .cta-buy:hover { background:#4f46e5; transform:translateY(-2px); }
+    .action-row .cta-buy:disabled { opacity:.6; cursor:default; transform:none; }
+    .action-row a.cta-out {
+      flex:1; min-width:130px; text-align:center;
+      background:transparent; color:#6366f1;
+      padding:.8rem 2rem; border-radius:40px;
+      border:2px solid #6366f1; font-weight:700; font-size:1rem;
+      text-decoration:none; transition:all .2s; display:block;
+    }
+    .action-row a.cta-out:hover { background:#6366f1; color:white; }
+
+    .buy-feedback {
+      display:none; margin-top:.9rem; padding:.7rem 1rem;
+      background:rgba(99,102,241,.1); border:1px solid #6366f1;
+      border-radius:12px; color:#6366f1; font-weight:600; text-align:center;
+    }
+
+    /* related */
+    .related-row {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+      gap:1.2rem;
+    }
+    .rel-card {
+      background:var(--card); border-radius:14px; overflow:hidden;
+      box-shadow:var(--shadow); cursor:pointer; transition:transform .2s,box-shadow .2s;
+    }
+    .rel-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-hover); }
+    .rel-thumb {
+      height:90px;
+      background:linear-gradient(135deg,#312e81,#4f46e5);
+      background-size:cover; background-position:center;
+    }
+    .rel-body { padding:.75rem 1rem .85rem; }
+    .rel-body h4 { font-size:.95rem; font-weight:700; margin-bottom:.2rem; }
+    .rel-body p { font-size:.8rem; color:var(--muted); }
+    .rel-price { color:#6366f1; font-weight:700; font-size:.85rem; margin-top:.3rem; }
+    .section-sep { font-size:1.3rem; font-weight:700; margin:3rem 0 1.2rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html" class="active">Loja</a>
+      <a href="anuncie.html">Anuncie</a>
+      <div id="auth-container" style="display:inline-block;"></div>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main class="svc-page">
+    <div class="container" id="pageContent">
+      <p style="text-align:center;padding:4rem;color:var(--muted);">Carregando...</p>
+    </div>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label><button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row account-row"><label>Conta</label></div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer><p>AI Store — protótipo • © 2025</p></footer>
+
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    const CAT_LABELS = {
+      atendimento:'💬 Atendimento IA', analise:'📊 Análise de Dados',
+      automacao:'⚙️ Automação', marketing:'📣 Marketing IA',
+      rh:'🧑‍💼 RH & Recrutamento', seguranca:'🛡️ Segurança / Fraude',
+      personalizado:'🛠️ Solução Personalizada', outro:'✨ Outro'
+    };
+
+    // ===== CAROUSEL =====
+    let _slides = [], _cur = 0;
+    function buildCarousel(media) {
+      if (!media?.length) return '<div class="no-media-box">🤖</div>';
+      _slides = media; _cur = 0;
+      const slides = media.map((m,i) =>
+        `<div class="media-slide">${m.type==='video'
+          ?`<video src="${m.data}" controls></video>`
+          :`<img src="${m.data}" alt="Imagem ${i+1}">`}</div>`
+      ).join('');
+      const arrows = media.length > 1
+        ? `<button class="carousel-ctrl prev" onclick="slide(-1)">‹</button>
+           <button class="carousel-ctrl next" onclick="slide(1)">›</button>` : '';
+      const dots = media.length > 1
+        ? `<div class="carousel-dots-row">${media.map((_,i)=>`<button class="cdot${i===0?' active':''}" onclick="goSlide(${i})"></button>`).join('')}</div>` : '';
+      return `<div class="media-carousel" id="mCarousel">
+        <div class="media-slides-track" id="mTrack">${slides}</div>${arrows}${dots}</div>`;
+    }
+    window.slide = d => goSlide((_cur+d+_slides.length)%_slides.length);
+    window.goSlide = function(i) {
+      _cur = i;
+      const t = document.getElementById('mTrack');
+      if (t) t.style.transform = `translateX(-${i*100}%)`;
+      document.querySelectorAll('.cdot').forEach((d,j)=>d.classList.toggle('active',j===i));
+    };
+    function initSwipe(el) {
+      let x0=null;
+      el.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;},{passive:true});
+      el.addEventListener('touchend',e=>{
+        if(x0===null)return;
+        const dx=e.changedTouches[0].clientX-x0;
+        if(Math.abs(dx)>40) slide(dx<0?1:-1);
+        x0=null;
+      },{passive:true});
+    }
+
+    // ===== BUY =====
+    window.buyService = function(id) {
+      const services = JSON.parse(localStorage.getItem('services')||'[]');
+      const svc = services.find(s=>s.id==id);
+      if (!svc) return;
+      const purchases = JSON.parse(localStorage.getItem('purchases')||'[]');
+      if (purchases.find(p=>p.modelId==id && p.type==='service')) {
+        alert('Você já adquiriu este serviço!'); return;
+      }
+      purchases.push({
+        modelId: svc.id, title: svc.title, price: svc.price,
+        seller: svc.seller, date: new Date().toISOString(), type: 'service'
+      });
+      localStorage.setItem('purchases', JSON.stringify(purchases));
+      const fb = document.getElementById('buyFeedback');
+      const btn = document.getElementById('buyBtn');
+      if (fb) { fb.style.display='block'; fb.textContent='✅ Serviço adquirido! O vendedor entrará em contato.'; }
+      if (btn) { btn.textContent='Adquirido ✓'; btn.disabled=true; }
+    };
+
+    // ===== LOAD PAGE =====
+    document.addEventListener('DOMContentLoaded', function() {
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (!id) { window.location.href='store.html'; return; }
+
+      const services = JSON.parse(localStorage.getItem('services')||'[]');
+      const svc = services.find(s=>s.id==id);
+      if (!svc) { alert('Serviço não encontrado'); window.location.href='store.html'; return; }
+
+      document.title = `AI Store — ${svc.title}`;
+
+      const purchases = JSON.parse(localStorage.getItem('purchases')||'[]');
+      const bought = purchases.find(p=>p.modelId==svc.id && p.type==='service');
+
+      const profileName = svc.profile?.name || svc.seller || 'Vendedor';
+      const profileAvatar = svc.profile?.avatar || null;
+      const avatarHtml = profileAvatar ? `<img src="${profileAvatar}" alt="">` : profileName.charAt(0).toUpperCase();
+      const catLabel = CAT_LABELS[svc.category] || svc.category || '';
+
+      const delivHtml = svc.deliverables?.filter(Boolean).length
+        ? `<div class="deliverables-card">
+            <h3>O que está incluso</h3>
+            <ul class="deliv-list">${svc.deliverables.filter(Boolean).map(d=>`<li>${d}</li>`).join('')}</ul>
+          </div>` : '';
+
+      const customBanner = svc.acceptsCustom
+        ? `<div class="custom-banner">
+            <span class="icon">🛠️</span>
+            <div><strong>Aceita soluções personalizadas.</strong> Entre em contato para discutir uma solução sob medida para sua empresa.</div>
+          </div>` : '';
+
+      const others = services.filter(s=>s.id!=svc.id).slice(0,4);
+      const relHtml = others.length
+        ? `<h2 class="section-sep">Serviços relacionados</h2>
+           <div class="related-row">
+             ${others.map(s=>`<div class="rel-card" onclick="location.href='service.html?id=${s.id}'">
+               <div class="rel-thumb" style="${s.media?.[0]?.data?`background-image:url('${s.media[0].data}');`:''}"></div>
+               <div class="rel-body">
+                 <h4>${s.title}</h4>
+                 <p>${s.seller||''}</p>
+                 <div class="rel-price">${s.price||''}</div>
+               </div></div>`).join('')}
+           </div>` : '';
+
+      document.getElementById('pageContent').innerHTML = `
+        <div class="svc-grid">
+          <div id="carouselWrap">${buildCarousel(svc.media)}</div>
+          <div>
+            ${catLabel?`<span class="svc-category-tag">${catLabel}</span>`:''}
+            <h1 class="svc-title">${svc.title}</h1>
+            <div class="svc-price-big">${svc.price||'Consultar'}</div>
+
+            <div class="seller-strip">
+              <div class="s-avatar">${avatarHtml}</div>
+              <div><div class="s-name">${profileName}</div><div class="s-role">Especialista em IA</div></div>
+            </div>
+
+            <p class="svc-desc">${svc.description||''}</p>
+
+            <div class="chips-row">
+              <div class="chip"><span class="lbl">Preço</span><span class="val">${svc.price||'Consultar'}</span></div>
+              ${svc.deadline?`<div class="chip"><span class="lbl">Prazo</span><span class="val">${svc.deadline}</span></div>`:''}
+              ${svc.media?.length?`<div class="chip"><span class="lbl">Mídias</span><span class="val">${svc.media.length} arquivo(s)</span></div>`:''}
+            </div>
+
+            ${delivHtml}
+            ${customBanner}
+            ${svc.portfolioLink?`<a class="ext-link" href="${svc.portfolioLink}" target="_blank">🔗 Portfólio / Site</a>`:''}
+
+            <div class="action-row">
+              <button class="cta-buy" id="buyBtn" onclick="buyService(${svc.id})"
+                ${bought?'disabled':''}>
+                ${bought?'Adquirido ✓':'Contratar serviço'}
+              </button>
+              <a class="cta-out" href="store.html">← Voltar</a>
+            </div>
+            <div id="buyFeedback" class="buy-feedback"></div>
+          </div>
+        </div>
+        ${relHtml}
+      `;
+
+      const car = document.getElementById('mCarousel');
+      if (car) initSwipe(car);
+    });
+  </script>
+</body>
+</html>

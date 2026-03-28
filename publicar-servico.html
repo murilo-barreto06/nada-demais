@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AI Store — Publicar Serviço</title>
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark-mode');})();</script>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .publish-wrapper { max-width:1000px; margin:2rem auto; padding:0 1.5rem; }
+    .publish-header { text-align:center; margin-bottom:2rem; }
+    .publish-header h1 {
+      font-size:2rem; font-weight:700;
+      background:linear-gradient(135deg,#6366f1,#a78bfa);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text; margin-bottom:.5rem;
+    }
+    .publish-header p { color:var(--muted); font-size:1rem; }
+    .publish-card {
+      background:var(--panel); border-radius:24px;
+      box-shadow:var(--shadow); overflow:hidden;
+    }
+    .publish-form { padding:2rem; }
+    .form-group-modern { margin-bottom:1.5rem; }
+    .form-group-modern label {
+      display:block; font-weight:600; margin-bottom:.5rem;
+      color:var(--text); font-size:.9rem;
+    }
+    .form-group-modern label span { color:#dc3545; margin-left:.2rem; }
+    .form-group-modern input,
+    .form-group-modern textarea,
+    .form-group-modern select {
+      width:100%; padding:.85rem 1rem;
+      background:var(--bg); border:2px solid rgba(128,128,128,.15);
+      border-radius:16px; color:var(--text);
+      font-size:.95rem; transition:all .2s;
+    }
+    .form-group-modern input:focus,
+    .form-group-modern textarea:focus,
+    .form-group-modern select:focus {
+      outline:none; border-color:#6366f1;
+      box-shadow:0 0 0 3px rgba(99,102,241,.1);
+    }
+    .form-group-modern textarea { resize:vertical; min-height:120px; }
+    .form-row-modern { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    @media (max-width:640px) { .form-row-modern { grid-template-columns:1fr; gap:1rem; } }
+
+    /* Category selector visual */
+    .category-cards {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+      gap:.8rem; margin-top:.5rem;
+    }
+    .cat-card {
+      background:var(--bg);
+      border:2px solid rgba(128,128,128,.15);
+      border-radius:16px; padding:1rem .8rem;
+      text-align:center; cursor:pointer;
+      transition:all .2s;
+    }
+    .cat-card:hover { border-color:#6366f1; }
+    .cat-card.selected {
+      border-color:#6366f1;
+      background:rgba(99,102,241,.08);
+    }
+    .cat-card .cat-icon { font-size:1.8rem; margin-bottom:.4rem; }
+    .cat-card .cat-name { font-size:.8rem; font-weight:600; color:var(--text); }
+    .cat-card.selected .cat-name { color:#6366f1; }
+    input[name="serviceCategory"] { display:none; }
+
+    /* Deliverables */
+    .deliverables-list {
+      display:flex; flex-direction:column; gap:.6rem; margin-top:.5rem;
+    }
+    .deliv-row { display:flex; gap:.6rem; align-items:center; }
+    .deliv-row input {
+      flex:1; padding:.65rem 1rem;
+      background:var(--bg); border:2px solid rgba(128,128,128,.15);
+      border-radius:12px; color:var(--text); font-size:.9rem;
+    }
+    .deliv-row input:focus { outline:none; border-color:#6366f1; }
+    .rm-deliv {
+      background:transparent; border:none; color:var(--muted);
+      font-size:1.2rem; cursor:pointer; padding:.3rem;
+      border-radius:8px; transition:color .2s;
+      flex-shrink:0;
+    }
+    .rm-deliv:hover { color:#dc3545; }
+    .add-deliv-btn {
+      background:transparent; border:2px dashed rgba(128,128,128,.25);
+      border-radius:12px; padding:.6rem 1rem; cursor:pointer;
+      color:var(--muted); font-size:.88rem; transition:all .2s;
+      text-align:center; margin-top:.4rem;
+    }
+    .add-deliv-btn:hover { border-color:#6366f1; color:#6366f1; }
+
+    /* Portfolio */
+    .portfolio-section {
+      background:var(--bg); border-radius:20px;
+      padding:1.5rem; margin-bottom:1.5rem;
+    }
+    .portfolio-section h3 { font-size:1.1rem; margin-bottom:.5rem; color:var(--text); }
+    .upload-box {
+      background:var(--bg); border:2px dashed rgba(128,128,128,.3);
+      border-radius:20px; padding:1.5rem; text-align:center;
+      cursor:pointer; transition:all .2s; margin-top:.5rem;
+    }
+    .upload-box:hover, .upload-box.dragover {
+      border-color:#6366f1; background:rgba(99,102,241,.05);
+    }
+    .upload-text { font-weight:500; color:var(--text); margin-bottom:.3rem; }
+    .upload-hint { font-size:.75rem; color:var(--muted); }
+    .media-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+      gap:1rem; margin-top:1rem;
+    }
+    .media-item {
+      position:relative; border-radius:12px; overflow:hidden;
+      background:var(--card); border:1px solid rgba(128,128,128,.1); aspect-ratio:1;
+    }
+    .media-item img, .media-item video { width:100%; height:100%; object-fit:cover; }
+    .media-item .remove-media {
+      position:absolute; top:8px; right:8px;
+      background:rgba(0,0,0,.7); color:white; border:none;
+      border-radius:50%; width:28px; height:28px;
+      font-size:14px; cursor:pointer; transition:all .2s;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .media-item .remove-media:hover { background:#dc3545; }
+    .media-type-badge {
+      position:absolute; bottom:8px; left:8px;
+      background:rgba(0,0,0,.6); color:white;
+      padding:4px 8px; border-radius:20px; font-size:11px;
+    }
+    .media-counter { font-size:.8rem; color:var(--muted); margin-top:.8rem; text-align:right; }
+
+    /* Buttons */
+    .form-actions-modern {
+      display:flex; gap:1rem; margin-top:2rem;
+      padding-top:1rem; border-top:1px solid rgba(128,128,128,.1);
+      flex-wrap:wrap;
+    }
+    .btn-primary {
+      flex:1; background:#6366f1; color:white; border:none;
+      padding:.9rem; border-radius:40px; font-weight:600;
+      font-size:1rem; cursor:pointer; transition:all .2s;
+    }
+    .btn-primary:hover { background:#4f46e5; transform:translateY(-2px); }
+    .btn-outline {
+      flex:1; background:transparent; border:2px solid #6366f1;
+      color:#6366f1; padding:.9rem; border-radius:40px;
+      font-weight:600; font-size:1rem; cursor:pointer; transition:all .2s;
+    }
+    .btn-outline:hover { background:#6366f1; color:white; }
+    .btn-clear {
+      flex:.5; background:transparent; border:2px solid var(--muted);
+      color:var(--muted); padding:.9rem; border-radius:40px;
+      font-weight:600; font-size:1rem; cursor:pointer; transition:all .2s;
+    }
+    .btn-clear:hover { background:var(--muted); color:white; }
+    .loading-spinner {
+      display:inline-block; width:20px; height:20px;
+      border:2px solid rgba(255,255,255,.3); border-radius:50%;
+      border-top-color:white; animation:spin .6s linear infinite; margin-left:.5rem;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .help-text { font-size:.75rem; color:var(--muted); margin-top:.3rem; }
+    .char-counter { text-align:right; font-size:.75rem; color:var(--muted); margin-top:.3rem; }
+    @media (max-width:480px) {
+      .publish-form { padding:1rem; }
+      .btn-clear { flex:1; }
+      .category-cards { grid-template-columns:repeat(2,1fr); }
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <header>
+    <div class="brand" onclick="goHome()">AI Store</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html">Loja</a>
+      <a href="anuncie.html" class="active">Anuncie</a>
+      <div id="auth-container" style="display:inline-block;"></div>
+      <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="publish-wrapper">
+      <div class="publish-header">
+        <h1>Publicar Serviço de IA Empresarial</h1>
+        <p>Ofereça sua solução para empresas que querem implementar inteligência artificial</p>
+      </div>
+
+      <div class="publish-card">
+        <form id="serviceForm" class="publish-form">
+
+          <!-- Título -->
+          <div class="form-group-modern">
+            <label>Título do serviço <span>*</span></label>
+            <input type="text" id="serviceTitle" placeholder="Ex: Chatbot de Atendimento IA para WhatsApp">
+          </div>
+
+          <!-- Categoria visual -->
+          <div class="form-group-modern">
+            <label>Categoria <span>*</span></label>
+            <div class="category-cards" id="catCards">
+              <div class="cat-card" data-val="atendimento" onclick="selectCat(this)">
+                <div class="cat-icon">💬</div><div class="cat-name">Atendimento IA</div>
+              </div>
+              <div class="cat-card" data-val="analise" onclick="selectCat(this)">
+                <div class="cat-icon">📊</div><div class="cat-name">Análise de Dados</div>
+              </div>
+              <div class="cat-card" data-val="automacao" onclick="selectCat(this)">
+                <div class="cat-icon">⚙️</div><div class="cat-name">Automação</div>
+              </div>
+              <div class="cat-card" data-val="marketing" onclick="selectCat(this)">
+                <div class="cat-icon">📣</div><div class="cat-name">Marketing IA</div>
+              </div>
+              <div class="cat-card" data-val="rh" onclick="selectCat(this)">
+                <div class="cat-icon">🧑‍💼</div><div class="cat-name">RH & Recrutamento</div>
+              </div>
+              <div class="cat-card" data-val="seguranca" onclick="selectCat(this)">
+                <div class="cat-icon">🛡️</div><div class="cat-name">Segurança / Fraude</div>
+              </div>
+              <div class="cat-card" data-val="personalizado" onclick="selectCat(this)">
+                <div class="cat-icon">🛠️</div><div class="cat-name">Solução Personalizada</div>
+              </div>
+              <div class="cat-card" data-val="outro" onclick="selectCat(this)">
+                <div class="cat-icon">✨</div><div class="cat-name">Outro</div>
+              </div>
+            </div>
+            <input type="hidden" id="serviceCategory">
+          </div>
+
+          <!-- Preço e prazo -->
+          <div class="form-row-modern">
+            <div class="form-group-modern">
+              <label>Preço (R$) <span>*</span></label>
+              <input type="number" id="servicePrice" step="50" min="0" placeholder="1500">
+              <div class="help-text">Valor fixo do serviço completo</div>
+            </div>
+            <div class="form-group-modern">
+              <label>Prazo de entrega</label>
+              <select id="serviceDeadline">
+                <option value="">Selecionar prazo</option>
+                <option value="1 semana">1 semana</option>
+                <option value="2 semanas">2 semanas</option>
+                <option value="1 mês">1 mês</option>
+                <option value="2 meses">2 meses</option>
+                <option value="3 meses">3 meses</option>
+                <option value="A combinar">A combinar</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Descrição -->
+          <div class="form-group-modern">
+            <label>Descrição completa <span>*</span></label>
+            <textarea id="serviceDescription" maxlength="2000" rows="7"
+              placeholder="Descreva o que o serviço resolve, como funciona, o que está incluso, tecnologias utilizadas, requisitos para a empresa..."></textarea>
+            <div class="char-counter" id="charCounter">0 / 2000 caracteres</div>
+          </div>
+
+          <!-- O que está incluso -->
+          <div class="form-group-modern">
+            <label>O que está incluso</label>
+            <div class="deliverables-list" id="deliverablesList">
+              <div class="deliv-row">
+                <input type="text" placeholder="Ex: Configuração e instalação completa" class="deliverable-input">
+                <button type="button" class="rm-deliv" onclick="removeDeliv(this)">✕</button>
+              </div>
+              <div class="deliv-row">
+                <input type="text" placeholder="Ex: Treinamento da equipe (2h)" class="deliverable-input">
+                <button type="button" class="rm-deliv" onclick="removeDeliv(this)">✕</button>
+              </div>
+              <div class="deliv-row">
+                <input type="text" placeholder="Ex: Suporte por 30 dias" class="deliverable-input">
+                <button type="button" class="rm-deliv" onclick="removeDeliv(this)">✕</button>
+              </div>
+            </div>
+            <button type="button" class="add-deliv-btn" onclick="addDeliv()">+ Adicionar item</button>
+          </div>
+
+          <!-- Portfólio de Mídias -->
+          <div class="portfolio-section">
+            <h3>Portfólio / Demonstração</h3>
+            <p class="help-text">Adicione imagens e vídeos demonstrando o serviço ou casos anteriores</p>
+            <div class="upload-box" id="mediaUploadBox">
+              <div class="upload-text">Clique ou arraste arquivos</div>
+              <div class="upload-hint">Imagens (JPG, PNG) até 2MB | Vídeos (MP4) até 10MB</div>
+            </div>
+            <input type="file" id="mediaFileInput" accept="image/jpeg,image/png,image/jpg,video/mp4" multiple style="display:none;">
+            <div class="media-counter" id="mediaCounter">0 imagens | 0 vídeos</div>
+            <div class="media-grid" id="mediaGrid"></div>
+          </div>
+
+          <!-- Portfólio externo -->
+          <div class="form-group-modern">
+            <label>Link externo</label>
+            <input type="url" id="portfolioLink" placeholder="https://seusite.com ou https://linkedin.com/in/voce">
+            <div class="help-text">Site, portfólio, LinkedIn ou repositório (opcional)</div>
+          </div>
+
+          <!-- Aceita personalizado -->
+          <div class="form-group-modern">
+            <label style="display:flex;align-items:center;gap:.7rem;cursor:pointer;font-weight:normal;">
+              <input type="checkbox" id="acceptsCustom" style="width:18px;height:18px;">
+              <span><strong>Aceito pedidos personalizados</strong> — a empresa pode me contatar para uma solução feita sob medida</span>
+            </label>
+          </div>
+
+          <!-- Botões -->
+          <div class="form-actions-modern">
+            <button type="submit" class="btn-primary" id="btnSalvar">Publicar serviço</button>
+            <button type="button" class="btn-outline" onclick="window.location.href='anuncie.html'">Cancelar</button>
+            <button type="button" class="btn-clear" onclick="clearAll()">Limpar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <div id="settingsPanel" class="settings-panel">
+    <div class="settings-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="toggleSettings()">⚙</button>
+    </div>
+    <div class="settings-row">
+      <label>Tema</label><button onclick="toggleTheme()" class="small-btn">Alternar</button>
+    </div>
+    <div class="settings-row account-row"><label>Conta</label></div>
+    <button class="small-btn" onclick="toggleSettings()">Fechar</button>
+  </div>
+
+  <footer><p>AI Store — protótipo • © 2025</p></footer>
+
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    // ===== CATEGORIA =====
+    window.selectCat = function(el) {
+      document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('serviceCategory').value = el.dataset.val;
+    };
+
+    // ===== DELIVERABLES =====
+    window.addDeliv = function() {
+      const row = document.createElement('div');
+      row.className = 'deliv-row';
+      row.innerHTML = `<input type="text" placeholder="Item incluso..." class="deliverable-input">
+        <button type="button" class="rm-deliv" onclick="removeDeliv(this)">✕</button>`;
+      document.getElementById('deliverablesList').appendChild(row);
+    };
+    window.removeDeliv = function(btn) {
+      const list = document.getElementById('deliverablesList');
+      if (list.children.length > 1) btn.closest('.deliv-row').remove();
+    };
+
+    // ===== CHAR COUNTER =====
+    document.getElementById('serviceDescription').addEventListener('input', function() {
+      const n = this.value.length;
+      const el = document.getElementById('charCounter');
+      el.textContent = `${n} / 2000 caracteres`;
+      el.style.color = n > 1900 ? '#ffc107' : 'var(--muted)';
+    });
+
+    // ===== COMPRESS IMAGE =====
+    function compressImage(file) {
+      return new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            const MAX = 800;
+            let w = img.width, h = img.height;
+            if (w > MAX || h > MAX) {
+              if (w > h) { h = Math.round(h*MAX/w); w = MAX; }
+              else { w = Math.round(w*MAX/h); h = MAX; }
+            }
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            res(c.toDataURL('image/jpeg', 0.75));
+          };
+          img.onerror = rej;
+          img.src = e.target.result;
+        };
+        r.onerror = rej;
+        r.readAsDataURL(file);
+      });
+    }
+    function readFileAsDataURL(file) {
+      return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+    }
+
+    // ===== MEDIA UPLOAD =====
+    let mediaItems = [];
+    const MAX_IMAGES = 6, MAX_VIDEOS = 4;
+    const uploadBox = document.getElementById('mediaUploadBox');
+    const fileInput = document.getElementById('mediaFileInput');
+    const mediaGrid = document.getElementById('mediaGrid');
+    const mediaCounter = document.getElementById('mediaCounter');
+
+    function updateCounter() {
+      const ic = mediaItems.filter(m=>m.type==='image').length;
+      const vc = mediaItems.filter(m=>m.type==='video').length;
+      mediaCounter.textContent = `${ic} imagens | ${vc} vídeos`;
+      const full = ic >= MAX_IMAGES || vc >= MAX_VIDEOS;
+      uploadBox.style.opacity = full ? '.5' : '1';
+      uploadBox.style.pointerEvents = full ? 'none' : 'auto';
+    }
+    function renderGrid() {
+      mediaGrid.innerHTML = '';
+      mediaItems.forEach((item,i) => {
+        const d = document.createElement('div');
+        d.className = 'media-item';
+        d.innerHTML = item.type==='image'
+          ? `<img src="${item.data}" alt=""><span class="media-type-badge">Imagem</span><button class="remove-media" onclick="removeMedia(${i})">✕</button>`
+          : `<video src="${item.data}"></video><span class="media-type-badge">Vídeo</span><button class="remove-media" onclick="removeMedia(${i})">✕</button>`;
+        mediaGrid.appendChild(d);
+      });
+      updateCounter();
+    }
+    window.removeMedia = i => { mediaItems.splice(i,1); renderGrid(); };
+
+    async function addMedia(file) {
+      const isImage = file.type.startsWith('image/');
+      const isVideo = file.type.startsWith('video/');
+      if (!isImage && !isVideo) return { success:false, message:`"${file.name}" — formato não suportado.` };
+      const ic = mediaItems.filter(m=>m.type==='image').length;
+      const vc = mediaItems.filter(m=>m.type==='video').length;
+      if (isImage && ic >= MAX_IMAGES) return { success:false, message:`Limite de ${MAX_IMAGES} imagens atingido.` };
+      if (isVideo && vc >= MAX_VIDEOS) return { success:false, message:`Limite de ${MAX_VIDEOS} vídeos atingido.` };
+      const maxSize = isImage ? 2*1024*1024 : 10*1024*1024;
+      if (file.size > maxSize) return { success:false, message:`"${file.name}" — arquivo muito grande.` };
+      try {
+        const data = isImage ? await compressImage(file) : await readFileAsDataURL(file);
+        mediaItems.push({ type: isImage?'image':'video', data, name:file.name });
+        renderGrid();
+        return { success:true };
+      } catch(e) { return { success:false, message:`"${file.name}" — erro ao processar.` }; }
+    }
+
+    async function processFiles(files) {
+      const errors = [];
+      for (const f of files) {
+        const r = await addMedia(f);
+        if (!r.success && r.message) errors.push(r.message);
+      }
+      if (errors.length) alert(`⚠️ Arquivo(s) ignorados:\n${errors.join('\n')}`);
+    }
+
+    uploadBox.addEventListener('click', () => fileInput.click());
+    uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('dragover'); });
+    uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragover'));
+    uploadBox.addEventListener('drop', async e => { e.preventDefault(); uploadBox.classList.remove('dragover'); await processFiles(Array.from(e.dataTransfer.files)); });
+    fileInput.addEventListener('change', async e => { await processFiles(Array.from(e.target.files)); fileInput.value=''; });
+
+    // ===== USER PROFILE =====
+    function getUserProfile() {
+      const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+      if (!user) return null;
+      let avatar = localStorage.getItem(`avatar_${user.id}`);
+      if (!avatar) {
+        const users = JSON.parse(localStorage.getItem('ai_store_users')||'[]');
+        const u = users.find(x=>x.id===user.id);
+        if (u?.avatar) avatar = u.avatar;
+      }
+      return { userId:user.id, name:user.name, email:user.email, avatar:avatar||null };
+    }
+
+    // ===== SUBMIT =====
+    document.getElementById('serviceForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const title = document.getElementById('serviceTitle').value.trim();
+      const category = document.getElementById('serviceCategory').value;
+      const price = document.getElementById('servicePrice').value;
+      const description = document.getElementById('serviceDescription').value.trim();
+
+      if (!title || !category) { alert('Preencha o título e selecione uma categoria.'); return; }
+      if (!price) { alert('Informe o preço do serviço.'); return; }
+      if (!description) { alert('Preencha a descrição do serviço.'); return; }
+
+      const btn = document.getElementById('btnSalvar');
+      btn.disabled = true;
+      btn.innerHTML = 'Publicando... <span class="loading-spinner"></span>';
+
+      try {
+        const deliverables = Array.from(document.querySelectorAll('.deliverable-input'))
+          .map(i => i.value.trim()).filter(Boolean);
+
+        const profile = getUserProfile();
+        const service = {
+          id: Date.now(),
+          title,
+          category,
+          price: `R$ ${parseFloat(price).toFixed(2)}`,
+          priceNum: parseFloat(price),
+          deadline: document.getElementById('serviceDeadline').value,
+          description,
+          deliverables,
+          media: mediaItems,
+          image: mediaItems.find(m=>m.type==='image')?.data || '',
+          portfolioLink: document.getElementById('portfolioLink').value.trim(),
+          acceptsCustom: document.getElementById('acceptsCustom').checked,
+          type: 'service',
+          createdAt: new Date().toISOString(),
+          seller: profile?.name || 'Vendedor',
+          profile: profile
+        };
+
+        const services = JSON.parse(localStorage.getItem('services')||'[]');
+        services.push(service);
+        localStorage.setItem('services', JSON.stringify(services));
+
+        alert('✅ Serviço publicado com sucesso!');
+        window.location.href = 'store.html';
+      } catch(err) {
+        console.error(err);
+        alert('Erro ao publicar. Tente novamente.');
+        btn.disabled = false;
+        btn.innerHTML = 'Publicar serviço';
+      }
+    });
+
+    // ===== CLEAR =====
+    window.clearAll = function() {
+      if (!confirm('Limpar todos os campos?')) return;
+      document.getElementById('serviceForm').reset();
+      document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('selected'));
+      document.getElementById('serviceCategory').value = '';
+      mediaItems = [];
+      renderGrid();
+      document.getElementById('charCounter').textContent = '0 / 2000 caracteres';
+    };
+
+    // ===== PRE-FILL NAME =====
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelector('nav a[href="anuncie.html"]')?.classList.add('active');
+    });
+
+    // ===== EDIT MODE =====
+    const editData = localStorage.getItem('editService');
+    if (editData) {
+      try {
+        const svc = JSON.parse(editData);
+        document.getElementById('serviceTitle').value = svc.title || '';
+        document.getElementById('servicePrice').value = svc.priceNum || '';
+        document.getElementById('serviceDeadline').value = svc.deadline || '';
+        document.getElementById('serviceDescription').value = svc.description || '';
+        document.getElementById('portfolioLink').value = svc.portfolioLink || '';
+        document.getElementById('acceptsCustom').checked = svc.acceptsCustom || false;
+        if (svc.category) {
+          const cc = document.querySelector(`.cat-card[data-val="${svc.category}"]`);
+          if (cc) selectCat(cc);
+        }
+        if (svc.deliverables?.length) {
+          const list = document.getElementById('deliverablesList');
+          list.innerHTML = '';
+          svc.deliverables.forEach(d => {
+            const row = document.createElement('div');
+            row.className = 'deliv-row';
+            row.innerHTML = `<input type="text" value="${d}" class="deliverable-input">
+              <button type="button" class="rm-deliv" onclick="removeDeliv(this)">✕</button>`;
+            list.appendChild(row);
+          });
+        }
+        if (svc.media) { mediaItems = [...svc.media]; renderGrid(); }
+        document.getElementById('charCounter').textContent = `${svc.description?.length||0} / 2000 caracteres`;
+        document.getElementById('btnSalvar').textContent = 'Atualizar serviço';
+        // Store editing ID for update
+        document.getElementById('serviceForm').dataset.editId = svc.id;
+      } catch(e) { console.error(e); }
+      localStorage.removeItem('editService');
+    }
+  </script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

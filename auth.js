@@ -127,7 +127,8 @@ function protectPage() {
     'buyer-dashboard.html',
     'anuncie.html',
     'publicar-modelo.html',
-    'inscricao-professionals.html'
+    'inscricao-professionals.html',
+    'publicar-servico.html'
   ];
   
   const currentPage = window.location.pathname.split('/').pop();
@@ -169,9 +170,8 @@ function updateActiveLink() {
   const navLinks = document.querySelectorAll('nav a');
   
   // Mapeamento de páginas que devem manter o link "Anuncie" ativo
-  const anunciePages = ['anuncie.html', 'publicar-modelo.html', 'inscricao-professionals.html'];
-  // Páginas que pertencem à seção "Loja"
-  const storePages = ['store.html', 'model.html', 'professional.html'];
+  const anunciePages = ['anuncie.html', 'publicar-modelo.html', 'inscricao-professionals.html', 'publicar-servico.html'];
+  const storePages = ['store.html', 'model.html', 'professional.html', 'service.html'];
   
   navLinks.forEach(link => {
     const href = link.getAttribute('href');

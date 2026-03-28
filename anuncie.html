@@ -1,18 +1,218 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI Store — Home</title>
-  <script>
-    (function() {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark-mode');
-      }
-    })();
-  </script>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AI Store — Anuncie</title>
+  <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark-mode');})();</script>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ===== HERO ANUNCIE ===== */
+    .anuncie-hero {
+      text-align: center;
+      padding: 4rem 1rem 3rem;
+      background: linear-gradient(160deg, transparent, rgba(21,115,71,.07));
+    }
+    .anuncie-hero h1 {
+      font-size: clamp(2rem,5vw,3rem);
+      font-weight: 800;
+      margin-bottom: .8rem;
+      line-height: 1.2;
+    }
+    .anuncie-hero h1 span {
+      background: linear-gradient(135deg, var(--accent), #4ade80);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .anuncie-hero p {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto 2.5rem;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-size: 1.8rem; font-weight: 800; color: var(--accent); }
+    .hero-stat .lbl { font-size: .8rem; color: var(--muted); }
+
+    /* ===== CARDS GRID ===== */
+    .options-section { padding: 2rem 0 5rem; }
+    .options-section h2 {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      font-size: .9rem;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.8rem;
+    }
+    @media (max-width: 900px) { .options-grid { grid-template-columns: 1fr; } }
+
+    .option-card {
+      background: var(--panel);
+      border-radius: 24px;
+      padding: 2.2rem 2rem 2rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      border: 2px solid transparent;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .option-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--card-accent, var(--accent));
+      border-radius: 24px 24px 0 0;
+    }
+    .option-card:hover {
+      border-color: var(--card-accent, var(--accent));
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+    }
+    .option-card.service { --card-accent: #6366f1; }
+    .option-card.professional { --card-accent: #f59e0b; }
+    .option-card.model { --card-accent: var(--accent); }
+
+    .card-badge {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: .25rem .75rem;
+      border-radius: 20px;
+      margin-bottom: 1.2rem;
+      width: fit-content;
+    }
+    .option-card.service .card-badge { background: rgba(99,102,241,.12); color: #6366f1; }
+    .option-card.professional .card-badge { background: rgba(245,158,11,.12); color: #d97706; }
+    .option-card.model .card-badge { background: rgba(21,115,71,.1); color: var(--accent); }
+
+    .card-icon { font-size: 2.6rem; margin-bottom: .9rem; display: block; }
+    .option-card h3 { font-size: 1.35rem; font-weight: 800; margin-bottom: .6rem; }
+    .option-card p { color: var(--muted); font-size: .92rem; line-height: 1.65; flex: 1; margin-bottom: 1.5rem; }
+
+    .feature-list {
+      list-style: none;
+      margin-bottom: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+    .feature-list li {
+      font-size: .88rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .feature-list li::before {
+      content: '✓';
+      color: var(--card-accent, var(--accent));
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .option-btn {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      padding: .85rem;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: .95rem;
+      transition: all .2s;
+      border: 2px solid var(--card-accent, var(--accent));
+      color: var(--card-accent, var(--accent));
+      background: transparent;
+      cursor: pointer;
+    }
+    .option-btn:hover {
+      background: var(--card-accent, var(--accent));
+      color: white;
+    }
+    .option-btn.primary {
+      background: var(--card-accent, var(--accent));
+      color: white;
+    }
+    .option-btn.primary:hover { opacity: .9; }
+
+    /* ===== HOW IT WORKS ===== */
+    .how-section {
+      padding: 3rem 0;
+      background: linear-gradient(180deg, transparent, rgba(21,115,71,.04));
+    }
+    .how-section h2 {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 2.5rem;
+    }
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+      gap: 1.5rem;
+    }
+    .how-step {
+      text-align: center;
+      padding: 1.8rem 1.2rem;
+      background: var(--panel);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+    .how-num {
+      width: 44px; height: 44px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.1rem;
+      margin: 0 auto 1rem;
+    }
+    .how-step h4 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; }
+    .how-step p { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ===== FAQ ===== */
+    .faq-section { padding: 3rem 0 5rem; }
+    .faq-section h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 2rem; }
+    .faq-item {
+      border-bottom: 1px solid rgba(128,128,128,.15);
+      padding: 1.2rem 0;
+    }
+    .faq-q {
+      font-weight: 600; font-size: 1rem;
+      cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 1rem;
+    }
+    .faq-q .arr { transition: transform .2s; flex-shrink: 0; color: var(--muted); }
+    .faq-item.open .faq-q .arr { transform: rotate(180deg); }
+    .faq-a {
+      color: var(--muted); font-size: .92rem;
+      line-height: 1.7;
+      max-height: 0; overflow: hidden;
+      transition: max-height .3s ease, padding .3s;
+    }
+    .faq-item.open .faq-a { max-height: 300px; padding-top: .8rem; }
+  </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header>
@@ -21,23 +221,155 @@
       <a href="index.html">Home</a>
       <a href="store.html">Loja</a>
       <a href="anuncie.html" class="active">Anuncie</a>
-      <div id="auth-container" style="display: inline-block;"></div>
+      <div id="auth-container" style="display:inline-block;"></div>
       <button id="settingsBtn" class="icon-btn" onclick="toggleSettings()">⚙</button>
     </nav>
-  </header>  
+  </header>
 
-  <main class="dashboard">
-    <h1>Painel do Vendedor</h1>
-    <p class="dashboard-subtitle">Aqui você gerencia seus modelos, preços e documentação.</p>
+  <main>
+    <!-- HERO -->
+    <section class="anuncie-hero">
+      <div class="container">
+        <h1>Monetize seu conhecimento em <span>IA</span></h1>
+        <p>Venda modelos, ofereça serviços de IA para empresas ou mostre seu perfil profissional — tudo em um só lugar.</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="num" id="statModels">0</div><div class="lbl">Modelos publicados</div></div>
+          <div class="hero-stat"><div class="num" id="statServices">0</div><div class="lbl">Serviços disponíveis</div></div>
+          <div class="hero-stat"><div class="num" id="statProfessionals">0</div><div class="lbl">Profissionais</div></div>
+        </div>
+      </div>
+    </section>
 
-    <div class="dashboard-actions">
-        <button class="hero-btn" onclick="window.location.href='publicar-modelo.html'">
-          Publicar modelo
-        </button>
-        <button class="hero-btn" onclick="window.location.href='inscricao-professionals.html'">
-          Cadastrar como profissional
-        </button>
-    </div>
+    <!-- OPTIONS -->
+    <section class="options-section">
+      <div class="container">
+        <h2>Escolha como quer anunciar</h2>
+        <div class="options-grid">
+
+          <!-- SERVIÇO EMPRESARIAL -->
+          <div class="option-card service">
+            <span class="card-badge">Recomendado</span>
+            <i data-lucide="building" style="width: 58px; height: 58px;"></i>
+            <h3>Serviço de IA Empresarial</h3>
+            <p>Ofereça soluções completas de IA para empresas: chatbots de atendimento, automação de processos, análise de dados, marketing automatizado e muito mais.</p>
+            <ul class="feature-list">
+              <li>Alcance empresas que buscam soluções de IA</li>
+              <li>Defina escopo, prazo e forma de entrega</li>
+              <li>Aceite pedidos de soluções personalizadas</li>
+              <li>Construa portfólio com casos de sucesso</li>
+            </ul>
+            <a href="publicar-servico.html" class="option-btn primary">Oferecer serviço</a>
+          </div>
+
+          <!-- PROFISSIONAL -->
+          <div class="option-card professional">
+            <span class="card-badge">Popular</span>
+            <i data-lucide="user" style="width: 58px; height: 58px;"></i>
+            <h3>Perfil Profissional</h3>
+            <p>Cadastre-se como especialista em IA e apareça no marketplace. Empresas e desenvolvedores buscam profissionais para instalação, treinamento e customização.</p>
+            <ul class="feature-list">
+              <li>Perfil com portfólio de projetos</li>
+              <li>Defina suas especialidades e valor/hora</li>
+              <li>Receba solicitações diretamente</li>
+              <li>Mostre avaliações e projetos concluídos</li>
+            </ul>
+            <a href="inscricao-professionals.html" class="option-btn">Criar perfil</a>
+          </div>
+
+          <!-- MODELO -->
+          <div class="option-card model">
+            <span class="card-badge">Clássico</span>
+            <i data-lucide="cpu" style="width: 58px; height: 58px;"></i>
+            <h3>Publicar Modelo de IA</h3>
+            <p>Publique um modelo treinado para venda direta. Ideal para modelos reutilizáveis — desde assistentes pessoais até ferramentas especializadas prontas para uso.</p>
+            <ul class="feature-list">
+              <li>Venda modelos prontos para uso</li>
+              <li>Defina preço e documentação</li>
+              <li>Compartilhe mídias demonstrativas</li>
+              <li>Ideal para modelos de uso geral</li>
+            </ul>
+            <a href="publicar-modelo.html" class="option-btn">Publicar modelo</a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-section">
+      <div class="container">
+        <h2>Como funciona para vendedores</h2>
+        <div class="how-grid">
+          <div class="how-step">
+            <div class="how-num">1</div>
+            <h4>Crie sua conta</h4>
+            <p>Registre-se gratuitamente e complete seu perfil com foto e informações.</p>
+          </div>
+          <div class="how-step">
+            <div class="how-num">2</div>
+            <h4>Publique sua oferta</h4>
+            <p>Modelo, serviço ou perfil profissional — escolha o formato certo para o que você oferece.</p>
+          </div>
+          <div class="how-step">
+            <div class="how-num">3</div>
+            <h4>Apareça na loja</h4>
+            <p>Sua oferta vai para a vitrine e pode ser encontrada por empresas e desenvolvedores.</p>
+          </div>
+          <div class="how-step">
+            <div class="how-num">4</div>
+            <h4>Receba e entregue</h4>
+            <p>O comprador adquire, você implementa ou entrega — simples assim.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section">
+      <div class="container" style="max-width:760px;">
+        <h2>Perguntas frequentes</h2>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Qual a diferença entre Serviço Empresarial e Modelo?
+            <span class="arr">▾</span>
+          </div>
+          <div class="faq-a">
+            <strong>Serviço Empresarial</strong> é uma solução entregue sob demanda — você implementa, configura e acompanha o cliente. Envolve trabalho personalizado. <strong>Modelo</strong> é um produto pronto, comprado uma vez e usado pelo comprador sem necessidade de implementação por você.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Posso oferecer os três tipos ao mesmo tempo?
+            <span class="arr">▾</span>
+          </div>
+          <div class="faq-a">
+            Sim. Você pode ter um perfil profissional, publicar modelos <em>e</em> oferecer serviços empresariais simultaneamente. Cada tipo tem sua própria seção no painel.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            O que é "Solução Personalizada"?
+            <span class="arr">▾</span>
+          </div>
+          <div class="faq-a">
+            Na página de publicação de serviços, há uma categoria "Solução Personalizada" — ideal para quem quer se oferecer para desenvolver algo do zero conforme a necessidade da empresa, sem um escopo fixo.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Como funciona o processo de pagamento?
+            <span class="arr">▾</span>
+          </div>
+          <div class="faq-a">
+            O sistema de pagamento está em desenvolvimento. Por enquanto, o contato entre vendedor e comprador é direto, e a negociação acontece fora da plataforma.
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <div id="settingsPanel" class="settings-panel">
@@ -49,18 +381,31 @@
       <label>Tema</label>
       <button onclick="toggleTheme()" class="small-btn">Alternar</button>
     </div>
-    <div class="settings-row account-row"> <!-- ADICIONE ESTA CLASSE -->
-      <label>Conta</label>
-      <!-- O conteúdo será preenchido dinamicamente pelo auth.js -->
-    </div>
+    <div class="settings-row account-row"><label>Conta</label></div>
     <button class="small-btn" onclick="toggleSettings()">Fechar</button>
   </div>
 
-  <footer>
-    <p>AI Store — protótipo • © 2025</p>
-  </footer>
+  <footer><p>AI Store — protótipo • © 2025</p></footer>
 
   <script src="app.js"></script>
   <script src="auth.js"></script>
+  <script>
+    // Stats dinâmicos
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('statModels').textContent =
+        JSON.parse(localStorage.getItem('models')||'[]').length;
+      document.getElementById('statServices').textContent =
+        JSON.parse(localStorage.getItem('services')||'[]').length;
+      document.getElementById('statProfessionals').textContent =
+        JSON.parse(localStorage.getItem('professionals')||'[]').length;
+    });
+
+    function toggleFaq(el) {
+      el.closest('.faq-item').classList.toggle('open');
+    }
+  </script>
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
 </html>
