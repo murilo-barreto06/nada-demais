@@ -187,7 +187,6 @@
     .rel-card h4 { font-size: .9rem; font-weight: 700; }
     .rel-card p { font-size: .8rem; color: var(--accent); }
   </style>
-  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header>
@@ -230,7 +229,7 @@
     let _slides = [], _cur = 0;
 
     function buildCarousel(media) {
-      if (!media || media.length === 0) return '<div class="no-media-box"><i data-lucide="user" style="width:28px;height:28px;"></i></div>';
+      if (!media || media.length === 0) return '<div class="no-media-box">👤</div>';
       _slides = media; _cur = 0;
       const slides = media.map((m,i) =>
         `<div class="media-slide">${m.type==='video'
@@ -279,10 +278,10 @@
       const prof = profs.find(p=>p.id==id);
       if (!prof) return;
       contacts.push({ profId: id, name: prof.name, specialty: prof.specialty, date: new Date().toISOString() });
-      localStorage.setItem('contacts', JSON.stringify(contacts));
+      localStorage.setItem('contacts', JSON.stringify(contacts)); // contacts are local-only for now
       const fb = document.getElementById('contactFeedback');
       const btn = document.getElementById('contactBtn');
-      if (fb) { fb.style.display='block'; fb.textContent='<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> Solicitação enviada! O profissional entrará em contato.'; }
+      if (fb) { fb.style.display='block'; fb.textContent='✅ Solicitação enviada! O profissional entrará em contato.'; }
       if (btn) { btn.textContent='Solicitado ✓'; btn.disabled=true; btn.style.opacity='.65'; }
     };
 
@@ -290,9 +289,14 @@
       const id = new URLSearchParams(window.location.search).get('id');
       if (!id) { window.location.href='store.html'; return; }
 
-      const professionals = JSON.parse(localStorage.getItem('professionals')||'[]');
-      const prof = professionals.find(p=>p.id==id);
+      let prof;
+      try { prof = await SupaDB.Professionals.get(id); } catch(e) { alert('Profissional não encontrado'); window.location.href='store.html'; return; }
       if (!prof) { alert('Profissional não encontrado'); window.location.href='store.html'; return; }
+      prof.media = (prof.media||[]).map(m=>({type:m.type,data:m.url}));
+      prof.avatar = prof.profiles?.avatar_url || prof.media?.[0]?.url || null;
+      prof.hourlyRate = prof.hourly_rate;
+      prof.portfolioLink = prof.portfolio_link;
+      prof.profile = { name: prof.profiles?.name, avatar: prof.profiles?.avatar_url || null };
 
       document.title = `AI Store — ${prof.name}`;
 
@@ -309,7 +313,8 @@
         ? prof.services.map(s=>`<span class="svc-chip">${s}</span>`).join('')
         : '<span style="color:var(--muted);font-size:.9rem;">Nenhum serviço listado</span>';
 
-      const others = professionals.filter(p=>p.id!=prof.id).slice(0,4);
+      const allProfs = await SupaDB.Professionals.list();
+      const others = allProfs.filter(p=>p.id!=prof.id).slice(0,4).map(p=>({...p, avatar:p.profiles?.avatar_url||p.media?.[0]?.url||null}));
       const relHtml = others.length ? `
         <h2 style="font-size:1.3rem;font-weight:700;margin:3rem 0 1rem;">Outros profissionais</h2>
         <div class="related-row">
@@ -333,7 +338,7 @@
             <div class="prof-specialty">${prof.specialty||''}</div>
             <div class="prof-hero-meta">
               <div class="prof-stat">
-                <span class="sv"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${typeof prof.rating==='number'?prof.rating.toFixed(1):'5.0'}</span>
+                <span class="sv">⭐ ${typeof prof.rating==='number'?prof.rating.toFixed(1):'5.0'}</span>
                 <span class="sl">Avaliação</span>
               </div>
               <div class="prof-stat">
@@ -367,7 +372,7 @@
             ${prof.portfolioLink?`
             <div class="section-card">
               <h2>Links</h2>
-              <a class="ext-link" href="${prof.portfolioLink}" target="_blank"><i data-lucide="external-link" style="width:14px;height:14px;vertical-align:middle;"></i> Portfólio / Repositório</a>
+              <a class="ext-link" href="${prof.portfolioLink}" target="_blank">🔗 Portfólio / Repositório</a>
             </div>`:''}
 
             <div class="action-row">
@@ -388,6 +393,5 @@
       if (car) initSwipe(car);
     });
   </script>
-  <script>if(window.lucide)lucide.createIcons();</script>
 </body>
 </html>

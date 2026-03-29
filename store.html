@@ -469,63 +469,58 @@
     let currentFilter = 'all';
     let currentSearch = '';
 
-    function getUserAvatar(userId) {
-      if (!userId) return null;
-      
-      // Tenta pegar do localStorage específico
-      let avatar = localStorage.getItem(`avatar_${userId}`);
-      if (avatar) return avatar;
-      
-      // Tenta pegar do array de usuários
-      const users = JSON.parse(localStorage.getItem('ai_store_users') || '[]');
-      const user = users.find(u => u.id == userId);
-      if (user && user.avatar) return user.avatar;
-      
-      return null;
-    }
+    function getUserAvatar(userId) { return null; }
     
     async function loadAllItems() {
       showSkeleton();
-      
       try {
-        const models = JSON.parse(localStorage.getItem('models') || '[]');
-        const services = JSON.parse(localStorage.getItem('services') || '[]');
-        const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
-        
-        const CAT_SVC = {atendimento:'<i data-lucide="message-circle" style="width:16px;height:16px;vertical-align:middle;"></i> Atendimento IA',analise:'<i data-lucide="bar-chart-2" style="width:16px;height:16px;vertical-align:middle;"></i> Análise de Dados',automacao:'<i data-lucide="settings" style="width:16px;height:16px;vertical-align:middle;"></i> Automação',marketing:'<i data-lucide="megaphone" style="width:16px;height:16px;vertical-align:middle;"></i> Marketing IA',rh:'<i data-lucide="briefcase" style="width:16px;height:16px;vertical-align:middle;"></i> RH & Recrutamento',seguranca:'<i data-lucide="shield" style="width:16px;height:16px;vertical-align:middle;"></i> Segurança',personalizado:'<i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i> Personalizado',outro:'<i data-lucide="sparkles" style="width:16px;height:16px;vertical-align:middle;"></i> Outro'};
+        let models = [], services = [], professionals = [];
+        if (window.SupaDB) {
+          [models, services, professionals] = await Promise.all([
+            SupaDB.Models.list(),
+            SupaDB.Services.list(),
+            SupaDB.Professionals.list()
+          ]);
+        }
+
+        const CAT_SVC = {atendimento:'Atendimento IA',analise:'Análise de Dados',automacao:'Automação',marketing:'Marketing IA',rh:'RH & Recrutamento',seguranca:'Segurança',personalizado:'Personalizado',outro:'Outro'};
 
         const modelItems = models.map(m => ({
           ...m, type:'model',
-          profileName: m.profile?.name || m.seller || 'Vendedor',
-          profileAvatar: m.profile?.avatar || getUserAvatar(m.profile?.userId),
-          previewMedia: m.media?.[0]?.data || m.image,
-          mediaArr: m.media || []
+          profileName:   m.profiles?.name || m.seller || 'Vendedor',
+          profileAvatar: m.profiles?.avatar_url || null,
+          mediaArr:      (m.media||[]).map(x => ({type: x.type, data: x.url})),
+          previewMedia:  m.media?.[0]?.url || ''
         }));
 
         const serviceItems = services.map(s => ({
           ...s, type:'service',
-          profileName: s.profile?.name || s.seller || 'Vendedor',
-          profileAvatar: s.profile?.avatar || getUserAvatar(s.profile?.userId),
-          previewMedia: s.media?.[0]?.data || s.image,
-          mediaArr: s.media || [],
-          catLabel: CAT_SVC[s.category] || s.category || ''
+          price:         s.price,
+          deadline:      s.deadline,
+          acceptsCustom: s.accepts_custom,
+          profileName:   s.profiles?.name || s.seller || 'Vendedor',
+          profileAvatar: s.profiles?.avatar_url || null,
+          mediaArr:      (s.media||[]).map(x => ({type: x.type, data: x.url})),
+          catLabel:      CAT_SVC[s.category] || s.category || '',
+          portfolioLink: s.portfolio_link
         }));
 
         const professionalItems = professionals.map(p => ({
           ...p, type:'professional',
-          profileName: p.profile?.name || p.name,
-          profileAvatar: p.profile?.avatar || getUserAvatar(p.profile?.userId),
-          previewMedia: p.media?.[0]?.data || p.avatar,
-          mediaArr: p.media || [],
-          price: p.hourlyRate ? `R$ ${p.hourlyRate}/h` : null
+          hourlyRate:    p.hourly_rate,
+          profileName:   p.profiles?.name || p.name,
+          profileAvatar: p.profiles?.avatar_url || p.media?.[0]?.url || null,
+          mediaArr:      (p.media||[]).map(x => ({type: x.type, data: x.url})),
+          price:         p.hourly_rate ? `R$ ${p.hourly_rate}/h` : null,
+          portfolioLink: p.portfolio_link
         }));
-        
+
         allItems = [...modelItems, ...serviceItems, ...professionalItems]
-          .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
+          .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
         updateCounts();
         filterItems();
-      } catch (err) {
+      } catch(err) {
         console.error(err);
         showEmptyState('Erro ao carregar dados');
       }
@@ -669,8 +664,8 @@
               ${item.price ? `<div class="card-meta-item" style="color:${TYPE_COLOR[item.type]};font-weight:700;">${item.price}</div>` : ''}
               ${item.hourlyRate && item.type==='professional' ? `<div class="card-meta-item">R$ ${item.hourlyRate}/h</div>` : ''}
               ${item.deadline ? `<div class="card-meta-item">⏱ ${item.deadline}</div>` : ''}
-              ${item.acceptsCustom ? `<div class="card-meta-item"><i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i> Aceita personalizado</div>` : ''}
-              ${item.portfolioLink ? `<div class="card-meta-item"><i data-lucide="external-link" style="width:14px;height:14px;vertical-align:middle;"></i> Portfólio</div>` : ''}
+              ${item.acceptsCustom ? `<div class="card-meta-item">🛠️ Aceita personalizado</div>` : ''}
+              ${item.portfolioLink ? `<div class="card-meta-item">🔗 Portfólio</div>` : ''}
             </div>
             <div class="card-actions">
               <button class="card-btn primary" style="background:${TYPE_COLOR[item.type]};border-color:${TYPE_COLOR[item.type]};"

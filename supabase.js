@@ -5,8 +5,8 @@
 // ── CONFIGURAÇÃO ──────────────────────────────────────────────────────────────
 // Preencha estas variáveis com os valores do seu projeto Supabase.
 // Elas ficam expostas no browser — isso é seguro para a chave "anon".
-const SUPABASE_URL  = window.__SUPABASE_URL__  || 'https://ylyixbvlofluhgpcouil.supabase.co';
-const SUPABASE_ANON = window.__SUPABASE_ANON__ || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlseWl4YnZsb2ZsdWhncGNvdWlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDIxMjYsImV4cCI6MjA5MDM3ODEyNn0.AXjRGcntgezjFgNv4lzr84Z6RcuAf_szsFckWrTMFcg';
+const SUPABASE_URL  = window.__SUPABASE_URL__  || 'https://SEU_PROJECT_ID.supabase.co';
+const SUPABASE_ANON = window.__SUPABASE_ANON__ || 'SUA_ANON_KEY';
 
 const { createClient } = supabase;   // from CDN <script>
 const db = createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -207,6 +207,16 @@ const Services = {
   async remove(id) {
     const { error } = await db.from('services').delete().eq('id', id);
     if (error) throw error;
+  },
+
+  async uploadMedia(serviceId, file, index) {
+    const ext  = file.type.startsWith('video') ? 'mp4' : 'jpg';
+    const path = `services/${serviceId}/${index}.${ext}`;
+    const blob = file.type.startsWith('image') ? await compressToBlob(file, 800, 0.75) : file;
+    const { error } = await db.storage.from('media').upload(path, blob, { upsert: true });
+    if (error) throw error;
+    const { data } = db.storage.from('media').getPublicUrl(path);
+    return { url: data.publicUrl, type: file.type.startsWith('video') ? 'video' : 'image' };
   }
 };
 
@@ -257,6 +267,16 @@ const Professionals = {
   async remove(id) {
     const { error } = await db.from('professionals').delete().eq('id', id);
     if (error) throw error;
+  },
+
+  async uploadMedia(profId, file, index) {
+    const ext  = file.type.startsWith('video') ? 'mp4' : 'jpg';
+    const path = `professionals/${profId}/${index}.${ext}`;
+    const blob = file.type.startsWith('image') ? await compressToBlob(file, 800, 0.75) : file;
+    const { error } = await db.storage.from('media').upload(path, blob, { upsert: true });
+    if (error) throw error;
+    const { data } = db.storage.from('media').getPublicUrl(path);
+    return { url: data.publicUrl, type: file.type.startsWith('video') ? 'video' : 'image' };
   }
 };
 

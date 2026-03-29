@@ -193,7 +193,6 @@
     .rel-body p { font-size: .8rem; color: var(--muted); }
     .rel-price { color: var(--accent); font-weight: 700; font-size: .85rem; margin-top: .3rem; }
   </style>
-  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header>
@@ -237,7 +236,7 @@
     let _slides = [], _cur = 0;
 
     function buildCarousel(media) {
-      if (!media || media.length === 0) return '<div class="no-media-box"><i data-lucide="bot" style="width:28px;height:28px;"></i></div>';
+      if (!media || media.length === 0) return '<div class="no-media-box">🤖</div>';
       _slides = media; _cur = 0;
       const slides = media.map((m,i) =>
         `<div class="media-slide">${m.type==='video'
@@ -295,18 +294,16 @@
         alert('Você já adquiriu este modelo!');
         return;
       }
-      purchases.push({
-        modelId: model.id,
-        title: model.title,
-        price: model.price,
-        seller: model.seller,
-        date: new Date().toISOString(),
-        type: 'model'
+      await SupaDB.Purchases.create({
+        item_id: model.id,
+        title:   model.title,
+        price:   model.price,
+        seller:  model.seller,
+        type:    'model'
       });
-      localStorage.setItem('purchases', JSON.stringify(purchases));
       const fb = document.getElementById('buyFeedback');
       const btn = document.getElementById('buyBtn');
-      if (fb) { fb.style.display='block'; fb.textContent='<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> Modelo adquirido com sucesso!'; }
+      if (fb) { fb.style.display='block'; fb.textContent='✅ Modelo adquirido com sucesso!'; }
       if (btn) { btn.textContent='Adquirido ✓'; btn.disabled=true; btn.style.opacity='.65'; }
     };
 
@@ -315,14 +312,19 @@
       const id = new URLSearchParams(window.location.search).get('id');
       if (!id) { window.location.href='store.html'; return; }
 
-      const models = JSON.parse(localStorage.getItem('models')||'[]');
-      const model = models.find(m=>m.id==id);
+      let model;
+      try {
+        model = await SupaDB.Models.get(id);
+      } catch(e) { alert('Modelo não encontrado'); window.location.href='store.html'; return; }
       if (!model) { alert('Modelo não encontrado'); window.location.href='store.html'; return; }
+      // normalize
+      model.media = (model.media||[]).map(m => ({type: m.type, data: m.url}));
+      model.seller = model.seller || model.profiles?.name || 'Vendedor';
+      model.profile = { name: model.profiles?.name || model.seller, avatar: model.profiles?.avatar_url || null };
 
       document.title = `AI Store — ${model.title}`;
 
-      const purchases = JSON.parse(localStorage.getItem('purchases')||'[]');
-      const bought = purchases.find(p=>p.modelId==model.id);
+      const bought = await SupaDB.Purchases.exists(model.id, 'model');
 
       const profileName = model.profile?.name || model.seller || 'Vendedor';
       const profileAvatar = model.profile?.avatar || null;
@@ -332,7 +334,8 @@
 
       const catLabel = model.category ? (CAT_MAP[model.category]||model.category) : null;
 
-      const others = models.filter(m=>m.id!=model.id).slice(0,4);
+      const allModels = await SupaDB.Models.list();
+      const others = allModels.filter(m=>m.id!=model.id).slice(0,4).map(m=>({...m, media:(m.media||[]).map(x=>({type:x.type,data:x.url}))}));
       const relatedHtml = others.length ? `
         <h2 class="section-sep">Modelos relacionados</h2>
         <div class="related-row">
@@ -371,7 +374,7 @@
               ${model.media?.length?`<div class="chip"><span class="lbl">Mídias</span><span class="val">${model.media.length} arquivo(s)</span></div>`:''}
             </div>
 
-            ${model.portfolioLink?`<a class="ext-link" href="${model.portfolioLink}" target="_blank"><i data-lucide="external-link" style="width:14px;height:14px;vertical-align:middle;"></i> Portfólio / Repositório</a>`:''}
+            ${model.portfolioLink?`<a class="ext-link" href="${model.portfolioLink}" target="_blank">🔗 Portfólio / Repositório</a>`:''}
 
             <div class="action-row">
               <button class="cta" id="buyBtn" onclick="buyModel(${model.id})"
@@ -391,6 +394,5 @@
       if (car) initSwipe(car);
     });
   </script>
-  <script>if(window.lucide)lucide.createIcons();</script>
 </body>
 </html>

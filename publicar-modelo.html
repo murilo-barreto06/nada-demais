@@ -389,7 +389,6 @@
       }
     }
   </style>
-  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header>
@@ -699,7 +698,7 @@
           size: file.size
         });
         renderMediaGrid();
-        console.log(`<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> ${file.name} adicionado! Total: ${mediaItems.length} mídias`);
+        console.log(`✅ ${file.name} adicionado! Total: ${mediaItems.length} mídias`);
         return { success: true, message: `"${file.name}" adicionado com sucesso!` };
       } catch (err) {
         console.error(`Erro ao processar ${file.name}:`, err);
@@ -725,12 +724,12 @@
       if (errors.length > 0) {
         const errorMessage = errors.join('\n');
         if (successCount > 0) {
-          alert(`<i data-lucide="triangle-alert" style="width:16px;height:16px;vertical-align:middle;color:#f59e0b;"></i> ${successCount} arquivo(s) adicionado(s) com sucesso!\n\n${errors.length} arquivo(s) ignorados:\n${errorMessage}`);
+          alert(`⚠️ ${successCount} arquivo(s) adicionado(s) com sucesso!\n\n${errors.length} arquivo(s) ignorados:\n${errorMessage}`);
         } else {
-          alert(`<i data-lucide="circle-x" style="width:16px;height:16px;vertical-align:middle;color:#dc3545;"></i> Nenhum arquivo foi adicionado:\n${errorMessage}`);
+          alert(`❌ Nenhum arquivo foi adicionado:\n${errorMessage}`);
         }
       } else if (successCount > 0) {
-        console.log(`<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> ${successCount} arquivo(s) adicionado(s) com sucesso!`);
+        console.log(`✅ ${successCount} arquivo(s) adicionado(s) com sucesso!`);
       }
     }
     
@@ -800,35 +799,12 @@
 
     function getUserProfileData() {
       const user = getCurrentUser();
-      if (!user) {
-        console.warn('Nenhum usuário logado');
-        return null;
-      }
-      
-      // Tenta pegar o avatar de várias formas
-      let avatarUrl = localStorage.getItem(`avatar_${user.id}`);
-      
-      // Se não encontrar, tenta pegar do perfil salvo no localStorage do usuário
-      if (!avatarUrl) {
-        const users = JSON.parse(localStorage.getItem('ai_store_users') || '[]');
-        const userData = users.find(u => u.id === user.id);
-        if (userData && userData.avatar) {
-          avatarUrl = userData.avatar;
-        }
-      }
-      
-      console.log('Dados do perfil:', {
-        userId: user.id,
-        name: user.name,
-        email: user.email,
-        avatar: avatarUrl ? 'Avatar encontrado' : 'Sem avatar'
-      });
-      
+      if (!user) return null;
       return {
         userId: user.id,
         name: user.name,
         email: user.email,
-        avatar: avatarUrl || null
+        avatar: user.avatar_url || null
       };
     }
 
@@ -908,17 +884,44 @@
           videos: model.media.filter(m => m.type === 'video').length
         });
         
-        // Salvar no localStorage
-        let models = JSON.parse(localStorage.getItem('models') || '[]');
-        models.push(model);
-        localStorage.setItem('models', JSON.stringify(models));
-        
-        console.log('<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> Modelo salvo com sucesso! Total de modelos:', models.length);
+        // Upload de mídias para Supabase Storage
+        const tempId = Date.now();
+        const uploadedMedia = [];
+        for (let i = 0; i < mediaItems.length; i++) {
+          const item = mediaItems[i];
+          try {
+            // Converter base64 para File
+            const res = await fetch(item.data);
+            const blob = await res.blob();
+            const file = new File([blob], `media_${i}.${item.type==='video'?'mp4':'jpg'}`, {type: blob.type});
+            const uploaded = await SupaDB.Models.uploadMedia(tempId, file, i);
+            uploadedMedia.push(uploaded);
+          } catch(uploadErr) {
+            console.warn('Upload de mídia falhou, usando base64:', uploadErr);
+            uploadedMedia.push({ url: item.data, type: item.type });
+          }
+        }
+        model.media = uploadedMedia;
+        model.image = uploadedMedia.find(m => m.type === 'image')?.url || '';
+        delete model.id; // deixa o Supabase gerar o ID
+
+        // Salvar no Supabase
+        await SupaDB.Models.create({
+          title:          model.title,
+          price:          model.price,
+          price_num:      parseFloat(price),
+          seller:         model.seller,
+          description:    model.description,
+          category:       category,
+          media:          model.media,
+          portfolio_link: model.portfolioLink,
+        });
+
         alert('Modelo publicado com sucesso!');
         window.location.href = 'store.html';
         
       } catch (err) {
-        console.error('<i data-lucide="circle-x" style="width:16px;height:16px;vertical-align:middle;color:#dc3545;"></i> Erro ao publicar:', err);
+        console.error('❌ Erro ao publicar:', err);
         alert('Erro ao publicar. Tente novamente.');
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
@@ -937,44 +940,35 @@
     // ===== EDIÇÃO =====
     const editData = localStorage.getItem('editItem');
     if (editData) {
-      try {
-        const item = JSON.parse(editData);
-        if (item.type === 'model') {
-          const models = JSON.parse(localStorage.getItem('models') || '[]');
-          const model = models.find(m => m.id == item.id);
-          if (model) {
-            document.getElementById('modelTitle').value = model.title;
-            document.getElementById('modelPrice').value = parseFloat(model.price.replace('R$', ''));
-            document.getElementById('modelSeller').value = model.seller;
-            document.getElementById('modelDescription').value = model.description;
-            document.getElementById('portfolioLink').value = model.portfolioLink || '';
-            
-            if (model.media) {
-              mediaItems = [...model.media];
-              renderMediaGrid();
-            }
-            
-            if (model.category) {
-              const optionExists = Array.from(categorySelect.options).some(opt => opt.value === model.category);
-              if (optionExists) {
-                categorySelect.value = model.category;
-              } else {
-                categorySelect.value = 'outro';
-                newCategoryInput.value = model.category;
-                newCategoryInput.classList.add('active');
+      (async () => {
+        try {
+          const item = JSON.parse(editData);
+          localStorage.removeItem('editItem');
+          if (item.type === 'model') {
+            const model = await SupaDB.Models.get(item.id);
+            if (model) {
+              document.getElementById('modelTitle').value = model.title;
+              document.getElementById('modelPrice').value = model.price_num || parseFloat((model.price||'0').replace('R$',''));
+              document.getElementById('modelSeller').value = model.seller || '';
+              document.getElementById('modelDescription').value = model.description || '';
+              document.getElementById('portfolioLink').value = model.portfolio_link || '';
+              if (model.media?.length) {
+                mediaItems = model.media.map(m => ({ type: m.type, data: m.url, name: 'uploaded' }));
+                renderMediaGrid();
               }
+              if (model.category) {
+                const optionExists = Array.from(categorySelect.options).some(opt => opt.value === model.category);
+                if (optionExists) { categorySelect.value = model.category; }
+                else { categorySelect.value = 'outro'; newCategoryInput.value = model.category; newCategoryInput.classList.add('active'); }
+              }
+              if (charCounter) charCounter.textContent = `${(model.description||'').length} / 2000 caracteres`;
+              submitBtn.innerHTML = 'Atualizar modelo';
+              // store id for update
+              form.dataset.editId = item.id;
             }
-            
-            if (charCounter) {
-              charCounter.textContent = `${model.description.length} / 2000 caracteres`;
-            }
-            submitBtn.innerHTML = 'Atualizar modelo';
           }
-        }
-      } catch (e) {
-        console.error('Erro ao carregar dados de edição:', e);
-      }
-      localStorage.removeItem('editItem');
+        } catch(e) { console.error('Erro ao carregar edição:', e); }
+      })();
     }
     
     // Garantir que o link "Anuncie" fique ativo
@@ -985,6 +979,5 @@
       }
     });
   </script>
-  <script>if(window.lucide)lucide.createIcons();</script>
 </body>
 </html>

@@ -415,7 +415,6 @@
       }
     }
   </style>
-  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header>
@@ -707,7 +706,7 @@
           size: file.size
         });
         renderMediaGrid();
-        console.log(`<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> ${file.name} adicionado! Total: ${mediaItems.length} mídias`);
+        console.log(`✅ ${file.name} adicionado! Total: ${mediaItems.length} mídias`);
         return { success: true, message: `"${file.name}" adicionado com sucesso!` };
       } catch (err) {
         console.error(`Erro ao processar ${file.name}:`, err);
@@ -733,12 +732,12 @@
       if (errors.length > 0) {
         const errorMessage = errors.join('\n');
         if (successCount > 0) {
-          alert(`<i data-lucide="triangle-alert" style="width:16px;height:16px;vertical-align:middle;color:#f59e0b;"></i> ${successCount} arquivo(s) adicionado(s) com sucesso!\n\n${errors.length} arquivo(s) ignorados:\n${errorMessage}`);
+          alert(`⚠️ ${successCount} arquivo(s) adicionado(s) com sucesso!\n\n${errors.length} arquivo(s) ignorados:\n${errorMessage}`);
         } else {
-          alert(`<i data-lucide="circle-x" style="width:16px;height:16px;vertical-align:middle;color:#dc3545;"></i> Nenhum arquivo foi adicionado:\n${errorMessage}`);
+          alert(`❌ Nenhum arquivo foi adicionado:\n${errorMessage}`);
         }
       } else if (successCount > 0) {
-        console.log(`<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> ${successCount} arquivo(s) adicionado(s) com sucesso!`);
+        console.log(`✅ ${successCount} arquivo(s) adicionado(s) com sucesso!`);
       }
     }
     
@@ -800,36 +799,8 @@
 
     function getUserProfileData() {
       const user = getCurrentUser();
-      if (!user) {
-        console.warn('Nenhum usuário logado');
-        return null;
-      }
-      
-      // Tenta pegar o avatar de várias formas
-      let avatarUrl = localStorage.getItem(`avatar_${user.id}`);
-      
-      // Se não encontrar, tenta pegar do perfil salvo no localStorage do usuário
-      if (!avatarUrl) {
-        const users = JSON.parse(localStorage.getItem('ai_store_users') || '[]');
-        const userData = users.find(u => u.id === user.id);
-        if (userData && userData.avatar) {
-          avatarUrl = userData.avatar;
-        }
-      }
-      
-      console.log('Dados do perfil:', {
-        userId: user.id,
-        name: user.name,
-        email: user.email,
-        avatar: avatarUrl ? 'Avatar encontrado' : 'Sem avatar'
-      });
-      
-      return {
-        userId: user.id,
-        name: user.name,
-        email: user.email,
-        avatar: avatarUrl || null
-      };
+      if (!user) return null;
+      return { userId: user.id, name: user.name, email: user.email, avatar: user.avatar_url || null };
     }
 
     
@@ -879,26 +850,43 @@
           } : null
         };
         
-        // Salvar no localStorage
-        let professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
-        
-        // Verificar se é edição
-        const editingId = sessionStorage.getItem('editingProfessionalId');
-        if (editingId) {
-          const index = professionals.findIndex(p => p.id == editingId);
-          if (index >= 0) {
-            professional.id = parseInt(editingId);
-            professionals[index] = professional;
-          }
-          sessionStorage.removeItem('editingProfessionalId');
-        } else {
-          professionals.push(professional);
+        // Upload de mídias para Supabase Storage
+        const tempId = Date.now();
+        const uploadedMedia = [];
+        for (let i = 0; i < mediaItems.length; i++) {
+          const item = mediaItems[i];
+          try {
+            const res = await fetch(item.data);
+            const blob = await res.blob();
+            const file = new File([blob], `media_${i}.${item.type==='video'?'mp4':'jpg'}`, {type: blob.type});
+            const up = await SupaDB.Professionals.uploadMedia
+              ? await SupaDB.Professionals.uploadMedia(tempId, file, i)
+              : { url: item.data, type: item.type };
+            uploadedMedia.push(up);
+          } catch { uploadedMedia.push({ url: item.data, type: item.type }); }
         }
-        
-        localStorage.setItem('professionals', JSON.stringify(professionals));
-        
-        // Sucesso
-        alert('Profissional cadastrado com sucesso!');
+
+        const editingId = sessionStorage.getItem('editingProfessionalId');
+        const payload = {
+          name,
+          specialty,
+          bio,
+          hourly_rate:    parseFloat(hourlyRate),
+          rating:         5.0,
+          projects:       0,
+          services:       getSelectedServices(),
+          media:          uploadedMedia,
+          portfolio_link: document.getElementById('portfolioLink').value.trim(),
+        };
+
+        if (editingId) {
+          await SupaDB.Professionals.update(editingId, payload);
+          sessionStorage.removeItem('editingProfessionalId');
+          alert('Perfil atualizado com sucesso!');
+        } else {
+          await SupaDB.Professionals.create(payload);
+          alert('Profissional cadastrado com sucesso!');
+        }
         window.location.href = 'store.html';
         
       } catch (err) {
@@ -921,44 +909,35 @@
     // ===== EDIÇÃO =====
     const editData = localStorage.getItem('editItem');
     if (editData) {
-      const item = JSON.parse(editData);
-      if (item.type === 'professional') {
-        const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
-        const prof = professionals.find(p => p.id == item.id);
-        if (prof) {
-          document.getElementById('name').value = prof.name;
-          document.getElementById('specialty').value = prof.specialty;
-          document.getElementById('bio').value = prof.bio || '';
-          document.getElementById('hourlyRate').value = prof.hourlyRate || '';
-          document.getElementById('portfolioLink').value = prof.portfolioLink || '';
-          
-          if (prof.media) {
-            mediaItems = [...prof.media];
-            renderMediaGrid();
+      (async () => {
+        try {
+          const item = JSON.parse(editData);
+          localStorage.removeItem('editItem');
+          if (item.type === 'professional') {
+            const prof = await SupaDB.Professionals.get(item.id);
+            if (!prof) return;
+            document.getElementById('name').value = prof.name || '';
+            document.getElementById('specialty').value = prof.specialty || '';
+            document.getElementById('bio').value = prof.bio || '';
+            document.getElementById('hourlyRate').value = prof.hourly_rate || '';
+            document.getElementById('portfolioLink').value = prof.portfolio_link || '';
+            if (prof.services?.length) {
+              prof.services.forEach(svc => {
+                const cb = document.querySelector(`input[name="services"][value="${svc}"]`);
+                if (cb) cb.checked = true;
+              });
+            }
+            if (prof.media?.length) {
+              mediaItems = prof.media.map(m => ({type: m.type, data: m.url, name: 'uploaded'}));
+              renderMediaGrid();
+            }
+            charCounter.textContent = `${(prof.bio||'').length} / 2000 caracteres`;
+            submitBtn.innerHTML = 'Atualizar profissional';
+            sessionStorage.setItem('editingProfessionalId', item.id);
           }
-          
-          if (prof.services) {
-            prof.services.forEach(service => {
-              const checkbox = document.querySelector(`input[name="services"][value="${service}"]`);
-              if (checkbox) checkbox.checked = true;
-              else {
-                const otherInput = document.getElementById('otherServices');
-                const current = otherInput.value;
-                if (!current.includes(service)) {
-                  otherInput.value = current ? `${current}, ${service}` : service;
-                }
-              }
-            });
-          }
-          
-          charCounter.textContent = `${(prof.bio || '').length} / 2000 caracteres`;
-          submitBtn.innerHTML = 'Atualizar profissional';
-          sessionStorage.setItem('editingProfessionalId', item.id);
-        }
-      }
-      localStorage.removeItem('editItem');
-    }
-    
+        } catch(e) { console.error(e); }
+      })();
+    } 
     // Garantir que o link "Anuncie" fique ativo
     document.addEventListener('DOMContentLoaded', function() {
       const anuncieLink = document.querySelector('nav a[href="anuncie.html"]');
@@ -976,6 +955,5 @@
       }
     });
   </script>
-  <script>if(window.lucide)lucide.createIcons();</script>
 </body>
 </html>

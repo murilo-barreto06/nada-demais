@@ -132,32 +132,33 @@ function toggleSearch(){
 
 async function loadFeatured() {
   try {
-    // Carrega APENAS modelos criados pelo usuário (sem pré-definidos)
-    const userModels = JSON.parse(localStorage.getItem('models') || '[]');
-    
+    let userModels = [];
+    if (window.SupaDB) {
+      userModels = await SupaDB.Models.list();
+      // normalize field names
+      userModels = userModels.map(m => ({
+        ...m,
+        image: m.media?.[0]?.url || '',
+        description: m.description || ''
+      }));
+    }
     const carousel = document.getElementById("carouselContainer");
     if (!carousel) return;
-    
     carousel.innerHTML = "";
-    
     if (userModels.length === 0) {
-      carousel.innerHTML = '<div class="carousel-item" style="text-align: center; padding: 2rem; min-width: 260px;">Nenhum modelo disponível</div>';
+      carousel.innerHTML = '<div class="carousel-item" style="text-align:center;padding:2rem;min-width:260px;">Nenhum modelo disponível</div>';
       return;
     }
-    
     userModels.forEach(model => {
       const card = document.createElement("a");
       card.href = `model.html?id=${model.id}`;
       card.className = "carousel-item";
-      
-      const imageUrl = model.image || 'assets/placeholder.jpg';
-      
+      const imageUrl = model.image || model.media?.[0]?.url || '';
       card.innerHTML = `
-        <div class="carousel-thumb" style="background-image:url('${imageUrl}')"></div>
+        <div class="carousel-thumb" style="${imageUrl ? `background-image:url('${imageUrl}')` : 'background:#2d5a7a'}"></div>
         <h3>${model.title}</h3>
-        <p>${model.description || model.short || ''}</p>
+        <p>${(model.description||'').substring(0,70)}...</p>
       `;
-      
       carousel.appendChild(card);
     });
   } catch (error) {
@@ -166,34 +167,31 @@ async function loadFeatured() {
 }
 
 // Função para carregar profissionais na home
-function loadHomeProfessionals() {
-  const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+async function loadHomeProfessionals() {
+  let professionals = [];
+  if (window.SupaDB) {
+    professionals = await SupaDB.Professionals.list();
+    professionals = professionals.map(p => ({
+      ...p,
+      hourlyRate: p.hourly_rate,
+      avatar: p.media?.[0]?.url || p.profiles?.avatar_url || ''
+    }));
+  }
   const carousel = document.getElementById('professionalsCarouselHome');
   if (!carousel) return;
-  
   carousel.innerHTML = '';
-  
   if (professionals.length === 0) {
     carousel.innerHTML = '<div class="carousel-item professionals" style="text-align:center;padding:2rem;min-width:280px;width:100%;">Nenhum profissional cadastrado. <a href="inscricao-professionals.html" style="color:var(--accent);font-weight:600;">Cadastrar agora</a></div>';
     return;
   }
-  
-  professionals.slice(0, 8).forEach(prof => {
+  professionals.slice(0,8).forEach(prof => {
     const card = document.createElement('a');
     card.href = `professional.html?id=${prof.id}`;
     card.className = 'carousel-item professionals';
-    
     const avatarHTML = prof.avatar
-      ? `<div class="avatar" style="background-image: url('${prof.avatar}')"></div>`
-      : `<div class="avatar-placeholder">${prof.name.charAt(0)}</div>`;
-    
-    card.innerHTML = `
-      ${avatarHTML}
-      <h3>${prof.name}</h3>
-      <p class="specialty">${prof.specialty}</p>
-      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
-    `;
-    
+      ? `<div class="avatar" style="background-image:url('${prof.avatar}')"></div>`
+      : `<div class="avatar-placeholder">${(prof.name||'?').charAt(0)}</div>`;
+    card.innerHTML = `${avatarHTML}<h3>${prof.name}</h3><p class="specialty">${prof.specialty||''}</p>`;
     carousel.appendChild(card);
   });
 }
@@ -247,55 +245,33 @@ function loadProfessional() {
 let professionals = [];
 
 // Carregar profissionais na página store.html (APENAS criados)
-function loadStoreProfessionals() {
-  console.log('Carregando profissionais para a loja...');
-  
-  // Carrega profissionais do localStorage
+async function loadStoreProfessionals() {
   let professionals = [];
-  try {
-    const saved = localStorage.getItem('professionals');
-    professionals = saved ? JSON.parse(saved) : [];
-    console.log('Profissionais encontrados:', professionals.length);
-  } catch (error) {
-    console.error('Erro ao parsear profissionais:', error);
+  if (window.SupaDB) {
+    professionals = await SupaDB.Professionals.list();
+    professionals = professionals.map(p => ({
+      ...p,
+      hourlyRate: p.hourly_rate,
+      avatar: p.media?.[0]?.url || p.profiles?.avatar_url || ''
+    }));
   }
-  
   const carousel = document.getElementById("professionalsCarousel");
-  if (!carousel) {
-    console.log('Elemento professionalsCarousel não encontrado');
-    return;
-  }
-  
+  if (!carousel) return;
   carousel.innerHTML = "";
-  
   if (professionals.length === 0) {
-    console.log('Nenhum profissional cadastrado');
-    carousel.innerHTML = '<div class="carousel-item professionals" style="text-align: center; padding: 2rem;">Nenhum profissional cadastrado ainda. <a href="inscricao-professionals.html" style="color: var(--accent);">Cadastrar agora</a></div>';
+    carousel.innerHTML = '<div class="carousel-item professionals" style="text-align:center;padding:2rem;">Nenhum profissional cadastrado. <a href="inscricao-professionals.html" style="color:var(--accent);">Cadastrar agora</a></div>';
     return;
   }
-  
-  // Mostra cada profissional
-  professionals.forEach((prof, index) => {
-    console.log(`Renderizando profissional ${index}:`, prof.name);
-    
-    const card = document.createElement("a");
+  professionals.forEach(prof => {
+    const card = document.createElement('a');
     card.href = `professional.html?id=${prof.id}`;
     card.className = 'carousel-item professionals';
-    
     const avatarHTML = prof.avatar
-      ? `<div class="avatar" style="background-image: url('${prof.avatar}'); background-size: cover; background-position: center;"></div>`
-      : `<div class="avatar-placeholder">${prof.name.charAt(0).toUpperCase()}</div>`;
-    
-    card.innerHTML = `
-      ${avatarHTML}
-      <h3>${prof.name}</h3>
-      <p class="specialty">${prof.specialty}</p>
-      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
-    `;
-    
+      ? `<div class="avatar" style="background-image:url('${prof.avatar}')"></div>`
+      : `<div class="avatar-placeholder">${(prof.name||'?').charAt(0)}</div>`;
+    card.innerHTML = `${avatarHTML}<h3>${prof.name}</h3><p class="specialty">${prof.specialty||''}</p>`;
     carousel.appendChild(card);
   });
-
 }
 
 function renderModel() {
@@ -459,7 +435,7 @@ function renderProfessional(prof) {
   
   // Rating
   const ratingEl = document.getElementById('professionalRating');
-  if (ratingEl) ratingEl.innerHTML = `<i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}`;
+  if (ratingEl) ratingEl.innerHTML = `⭐ ${prof.rating.toFixed(1)}`;
   
   // Bio
   const bioEl = document.getElementById('professionalBio');
@@ -584,33 +560,30 @@ async function loadProfessional() {
 // ===== FUNÇÕES ESPECÍFICAS PARA store.html =====
 
 // Carregar modelos na página store.html
-function loadStoreModels() {
-  // Carrega APENAS modelos criados pelo usuário
-  const models = JSON.parse(localStorage.getItem('models') || '[]');
+async function loadStoreModels() {
+  let models = [];
+  if (window.SupaDB) {
+    models = await SupaDB.Models.list();
+    models = models.map(m => ({...m, image: m.media?.[0]?.url || ''}));
+  }
   const carousel = document.getElementById("modelsCarousel");
   if (!carousel) return;
-  
   carousel.innerHTML = "";
-  
   if (models.length === 0) {
-    carousel.innerHTML = '<div class="carousel-item" style="text-align: center; padding: 2rem;">Nenhum modelo publicado ainda. <a href="publicar-modelo.html" style="color: var(--accent);">Publicar agora</a></div>';
+    carousel.innerHTML = '<div class="carousel-item" style="text-align:center;padding:2rem;">Nenhum modelo publicado ainda. <a href="publicar-modelo.html" style="color:var(--accent);">Publicar agora</a></div>';
     return;
   }
-  
   models.forEach(model => {
     const card = document.createElement("a");
     card.href = `model.html?id=${model.id}`;
     card.className = "carousel-item";
-    
-    const imageUrl = model.image || 'assets/placeholder.jpg';
-    
+    const imageUrl = model.image || '';
     card.innerHTML = `
-      <div class="carousel-thumb" style="background-image:url('${imageUrl}')"></div>
+      <div class="carousel-thumb" style="${imageUrl ? `background-image:url('${imageUrl}')` : 'background:#2d5a7a'}"></div>
       <h3>${model.title}</h3>
-      <p>${model.description || model.short || ''}</p>
-      <p style="color: var(--accent); font-weight: bold; margin-top: 0.5rem;">${model.price || 'Consultar'}</p>
+      <p>${(model.description||'').substring(0,70)}...</p>
+      <p style="color:var(--accent);font-weight:bold;margin-top:.5rem;">${model.price||'Consultar'}</p>
     `;
-    
     carousel.appendChild(card);
   });
 }
@@ -642,7 +615,7 @@ function loadStoreProfessionals() {
       ${avatarHTML}
       <h3>${prof.name}</h3>
       <p class="specialty">${prof.specialty}</p>
-      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
+      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
       <p class="projects">${prof.projects || 0} projetos</p>
     `;
     
@@ -694,8 +667,11 @@ function prevSlideServices() {
 }
 
 // Load services on home page
-function loadHomeServices() {
-  const services = JSON.parse(localStorage.getItem('services') || '[]');
+async function loadHomeServices() {
+  let services = [];
+  if (window.SupaDB) {
+    services = await SupaDB.Services.list();
+  }
   const carousel = document.getElementById('servicesCarouselHome');
   if (!carousel) return;
   carousel.innerHTML = '';
@@ -703,19 +679,15 @@ function loadHomeServices() {
     carousel.innerHTML = '<div class="carousel-item" style="text-align:center;padding:2rem;min-width:280px;width:100%;">Nenhum serviço disponível. <a href="publicar-servico.html" style="color:#6366f1;font-weight:600;">Publicar agora</a></div>';
     return;
   }
-  const CAT_SVC = {atendimento:'<i data-lucide="message-circle" style="width:16px;height:16px;vertical-align:middle;"></i>',analise:'<i data-lucide="bar-chart-2" style="width:16px;height:16px;vertical-align:middle;"></i>',automacao:'<i data-lucide="settings" style="width:16px;height:16px;vertical-align:middle;"></i>',marketing:'<i data-lucide="megaphone" style="width:16px;height:16px;vertical-align:middle;"></i>',rh:'<i data-lucide="briefcase" style="width:16px;height:16px;vertical-align:middle;"></i>',seguranca:'<i data-lucide="shield" style="width:16px;height:16px;vertical-align:middle;"></i>',personalizado:'<i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i>',outro:'<i data-lucide="sparkles" style="width:16px;height:16px;vertical-align:middle;"></i>'};
   services.slice(0,8).forEach(svc => {
     const card = document.createElement('a');
     card.href = `service.html?id=${svc.id}`;
     card.className = 'carousel-item';
-    const icon = CAT_SVC[svc.category] || '<i data-lucide="bot" style="width:28px;height:28px;"></i>';
-    const imageUrl = svc.media?.[0]?.data || svc.image || '';
+    const imageUrl = svc.media?.[0]?.url || '';
     card.innerHTML = `
-      <div class="carousel-thumb" style="${imageUrl?`background-image:url('${imageUrl}');`:`background:linear-gradient(135deg,#312e81,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:2.5rem;`}">
-        ${imageUrl?'':icon}
-      </div>
+      <div class="carousel-thumb" style="${imageUrl ? `background-image:url('${imageUrl}')` : 'background:linear-gradient(135deg,#312e81,#4f46e5)'}"></div>
       <h3>${svc.title}</h3>
-      <p>${(svc.description||'').substring(0,70)}${(svc.description||'').length>70?'...':''}</p>
+      <p>${(svc.description||'').substring(0,70)}...</p>
       <p style="color:#6366f1;font-weight:700;padding:0 1rem .8rem;">${svc.price||'Consultar'}</p>
     `;
     carousel.appendChild(card);
@@ -759,7 +731,7 @@ function updateUserDisplay() {
     // Adiciona link de dashboard com nome
     const dashboardLink = document.createElement('a');
     dashboardLink.href = 'buyer-dashboard.html';
-    dashboardLink.textContent = `<i data-lucide="user" style="width:28px;height:28px;"></i> ${user.name.split(' ')[0]}`;
+    dashboardLink.textContent = `👤 ${user.name.split(' ')[0]}`;
     nav.insertBefore(dashboardLink, nav.querySelector('button'));
   }
 }
@@ -981,7 +953,7 @@ function loadHomeProfessionals() {
       ${avatarHTML}
       <h3>${prof.name}</h3>
       <p class="specialty">${prof.specialty}</p>
-      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
+      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
     `;
     
     carousel.appendChild(card);
@@ -1080,7 +1052,7 @@ function loadStoreProfessionals() {
       ${avatarHTML}
       <h3>${prof.name}</h3>
       <p class="specialty">${prof.specialty}</p>
-      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
+      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
     `;
     
     carousel.appendChild(card);
@@ -1249,7 +1221,7 @@ function renderProfessional(prof) {
   
   // Rating
   const ratingEl = document.getElementById('professionalRating');
-  if (ratingEl) ratingEl.innerHTML = `<i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}`;
+  if (ratingEl) ratingEl.innerHTML = `⭐ ${prof.rating.toFixed(1)}`;
   
   // Bio
   const bioEl = document.getElementById('professionalBio');
@@ -1432,7 +1404,7 @@ function loadStoreProfessionals() {
       ${avatarHTML}
       <h3>${prof.name}</h3>
       <p class="specialty">${prof.specialty}</p>
-      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
+      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
       <p class="projects">${prof.projects || 0} projetos</p>
     `;
     
@@ -1493,12 +1465,12 @@ function loadHomeServices() {
     carousel.innerHTML = '<div class="carousel-item" style="text-align:center;padding:2rem;min-width:280px;width:100%;">Nenhum serviço disponível. <a href="publicar-servico.html" style="color:#6366f1;font-weight:600;">Publicar agora</a></div>';
     return;
   }
-  const CAT_SVC = {atendimento:'<i data-lucide="message-circle" style="width:16px;height:16px;vertical-align:middle;"></i>',analise:'<i data-lucide="bar-chart-2" style="width:16px;height:16px;vertical-align:middle;"></i>',automacao:'<i data-lucide="settings" style="width:16px;height:16px;vertical-align:middle;"></i>',marketing:'<i data-lucide="megaphone" style="width:16px;height:16px;vertical-align:middle;"></i>',rh:'<i data-lucide="briefcase" style="width:16px;height:16px;vertical-align:middle;"></i>',seguranca:'<i data-lucide="shield" style="width:16px;height:16px;vertical-align:middle;"></i>',personalizado:'<i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i>',outro:'<i data-lucide="sparkles" style="width:16px;height:16px;vertical-align:middle;"></i>'};
+  const CAT_SVC = {atendimento:'💬',analise:'📊',automacao:'⚙️',marketing:'📣',rh:'🧑‍💼',seguranca:'🛡️',personalizado:'🛠️',outro:'✨'};
   services.slice(0,8).forEach(svc => {
     const card = document.createElement('a');
     card.href = `service.html?id=${svc.id}`;
     card.className = 'carousel-item';
-    const icon = CAT_SVC[svc.category] || '<i data-lucide="bot" style="width:28px;height:28px;"></i>';
+    const icon = CAT_SVC[svc.category] || '🤖';
     const imageUrl = svc.media?.[0]?.data || svc.image || '';
     card.innerHTML = `
       <div class="carousel-thumb" style="${imageUrl?`background-image:url('${imageUrl}');`:`background:linear-gradient(135deg,#312e81,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:2.5rem;`}">
@@ -1549,7 +1521,7 @@ function updateUserDisplay() {
     // Adiciona link de dashboard com nome
     const dashboardLink = document.createElement('a');
     dashboardLink.href = 'buyer-dashboard.html';
-    dashboardLink.textContent = `<i data-lucide="user" style="width:28px;height:28px;"></i> ${user.name.split(' ')[0]}`;
+    dashboardLink.textContent = `👤 ${user.name.split(' ')[0]}`;
     nav.insertBefore(dashboardLink, nav.querySelector('button'));
   }
 }

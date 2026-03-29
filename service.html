@@ -168,7 +168,6 @@
     .rel-price { color:#6366f1; font-weight:700; font-size:.85rem; margin-top:.3rem; }
     .section-sep { font-size:1.3rem; font-weight:700; margin:3rem 0 1.2rem; }
   </style>
-  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header>
@@ -208,16 +207,16 @@
   <script src="auth.js"></script>
   <script>
     const CAT_LABELS = {
-      atendimento:'<i data-lucide="message-circle" style="width:16px;height:16px;vertical-align:middle;"></i> Atendimento IA', analise:'<i data-lucide="bar-chart-2" style="width:16px;height:16px;vertical-align:middle;"></i> Análise de Dados',
-      automacao:'<i data-lucide="settings" style="width:16px;height:16px;vertical-align:middle;"></i> Automação', marketing:'<i data-lucide="megaphone" style="width:16px;height:16px;vertical-align:middle;"></i> Marketing IA',
-      rh:'<i data-lucide="briefcase" style="width:16px;height:16px;vertical-align:middle;"></i> RH & Recrutamento', seguranca:'<i data-lucide="shield" style="width:16px;height:16px;vertical-align:middle;"></i> Segurança / Fraude',
-      personalizado:'<i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i> Solução Personalizada', outro:'<i data-lucide="sparkles" style="width:16px;height:16px;vertical-align:middle;"></i> Outro'
+      atendimento:'💬 Atendimento IA', analise:'📊 Análise de Dados',
+      automacao:'⚙️ Automação', marketing:'📣 Marketing IA',
+      rh:'🧑‍💼 RH & Recrutamento', seguranca:'🛡️ Segurança / Fraude',
+      personalizado:'🛠️ Solução Personalizada', outro:'✨ Outro'
     };
 
     // ===== CAROUSEL =====
     let _slides = [], _cur = 0;
     function buildCarousel(media) {
-      if (!media?.length) return '<div class="no-media-box"><i data-lucide="bot" style="width:28px;height:28px;"></i></div>';
+      if (!media?.length) return '<div class="no-media-box">🤖</div>';
       _slides = media; _cur = 0;
       const slides = media.map((m,i) =>
         `<div class="media-slide">${m.type==='video'
@@ -259,14 +258,10 @@
       if (purchases.find(p=>p.modelId==id && p.type==='service')) {
         alert('Você já adquiriu este serviço!'); return;
       }
-      purchases.push({
-        modelId: svc.id, title: svc.title, price: svc.price,
-        seller: svc.seller, date: new Date().toISOString(), type: 'service'
-      });
-      localStorage.setItem('purchases', JSON.stringify(purchases));
+      await SupaDB.Purchases.create({ item_id: svc.id, title: svc.title, price: svc.price, seller: svc.seller, type: 'service' });
       const fb = document.getElementById('buyFeedback');
       const btn = document.getElementById('buyBtn');
-      if (fb) { fb.style.display='block'; fb.textContent='<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> Serviço adquirido! O vendedor entrará em contato.'; }
+      if (fb) { fb.style.display='block'; fb.textContent='✅ Serviço adquirido! O vendedor entrará em contato.'; }
       if (btn) { btn.textContent='Adquirido ✓'; btn.disabled=true; }
     };
 
@@ -275,14 +270,19 @@
       const id = new URLSearchParams(window.location.search).get('id');
       if (!id) { window.location.href='store.html'; return; }
 
-      const services = JSON.parse(localStorage.getItem('services')||'[]');
-      const svc = services.find(s=>s.id==id);
+      let svc;
+      try { svc = await SupaDB.Services.get(id); } catch(e) { alert('Serviço não encontrado'); window.location.href='store.html'; return; }
       if (!svc) { alert('Serviço não encontrado'); window.location.href='store.html'; return; }
+      svc.media = (svc.media||[]).map(m=>({type:m.type,data:m.url}));
+      svc.seller = svc.seller || svc.profiles?.name || 'Vendedor';
+      svc.profile = { name: svc.profiles?.name || svc.seller, avatar: svc.profiles?.avatar_url || null };
+      svc.deliverables = svc.deliverables || [];
+      svc.acceptsCustom = svc.accepts_custom;
+      svc.portfolioLink = svc.portfolio_link;
 
       document.title = `AI Store — ${svc.title}`;
 
-      const purchases = JSON.parse(localStorage.getItem('purchases')||'[]');
-      const bought = purchases.find(p=>p.modelId==svc.id && p.type==='service');
+      const bought = await SupaDB.Purchases.exists(svc.id, 'service');
 
       const profileName = svc.profile?.name || svc.seller || 'Vendedor';
       const profileAvatar = svc.profile?.avatar || null;
@@ -297,11 +297,12 @@
 
       const customBanner = svc.acceptsCustom
         ? `<div class="custom-banner">
-            <span class="icon"><i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i></span>
+            <span class="icon">🛠️</span>
             <div><strong>Aceita soluções personalizadas.</strong> Entre em contato para discutir uma solução sob medida para sua empresa.</div>
           </div>` : '';
 
-      const others = services.filter(s=>s.id!=svc.id).slice(0,4);
+      const allServices = await SupaDB.Services.list();
+      const others = allServices.filter(s=>s.id!=svc.id).slice(0,4).map(s=>({...s, media:(s.media||[]).map(x=>({type:x.type,data:x.url}))}));
       const relHtml = others.length
         ? `<h2 class="section-sep">Serviços relacionados</h2>
            <div class="related-row">
@@ -337,7 +338,7 @@
 
             ${delivHtml}
             ${customBanner}
-            ${svc.portfolioLink?`<a class="ext-link" href="${svc.portfolioLink}" target="_blank"><i data-lucide="external-link" style="width:14px;height:14px;vertical-align:middle;"></i> Portfólio / Site</a>`:''}
+            ${svc.portfolioLink?`<a class="ext-link" href="${svc.portfolioLink}" target="_blank">🔗 Portfólio / Site</a>`:''}
 
             <div class="action-row">
               <button class="cta-buy" id="buyBtn" onclick="buyService(${svc.id})"
@@ -356,6 +357,5 @@
       if (car) initSwipe(car);
     });
   </script>
-  <script>if(window.lucide)lucide.createIcons();</script>
 </body>
 </html>

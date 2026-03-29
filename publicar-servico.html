@@ -336,6 +336,8 @@
 
   <footer><p>AI Store — protótipo • © 2025</p></footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <script src="app.js"></script>
   <script src="auth.js"></script>
   <script>
@@ -463,13 +465,7 @@
     function getUserProfile() {
       const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
       if (!user) return null;
-      let avatar = localStorage.getItem(`avatar_${user.id}`);
-      if (!avatar) {
-        const users = JSON.parse(localStorage.getItem('ai_store_users')||'[]');
-        const u = users.find(x=>x.id===user.id);
-        if (u?.avatar) avatar = u.avatar;
-      }
-      return { userId:user.id, name:user.name, email:user.email, avatar:avatar||null };
+      return { userId: user.id, name: user.name, email: user.email, avatar: user.avatar_url || null };
     }
 
     // ===== SUBMIT =====
@@ -512,11 +508,44 @@
           profile: profile
         };
 
-        const services = JSON.parse(localStorage.getItem('services')||'[]');
-        services.push(service);
-        localStorage.setItem('services', JSON.stringify(services));
+        // Upload de mídias para Supabase Storage
+        const tempId = Date.now();
+        const uploadedMedia = [];
+        for (let i = 0; i < mediaItems.length; i++) {
+          const item = mediaItems[i];
+          try {
+            const res = await fetch(item.data);
+            const blob = await res.blob();
+            const file = new File([blob], `media_${i}.${item.type==='video'?'mp4':'jpg'}`, {type: blob.type});
+            const uploaded = await SupaDB.Services.uploadMedia
+              ? await SupaDB.Services.uploadMedia(tempId, file, i)
+              : { url: item.data, type: item.type };
+            uploadedMedia.push(uploaded);
+          } catch { uploadedMedia.push({ url: item.data, type: item.type }); }
+        }
 
-        alert('✅ Serviço publicado com sucesso!');
+        const editId = document.getElementById('serviceForm').dataset.editId;
+        const payload = {
+          title,
+          category,
+          price:          `R$ ${parseFloat(price).toFixed(2)}`,
+          price_num:      parseFloat(price),
+          deadline:       document.getElementById('serviceDeadline').value,
+          description,
+          deliverables:   Array.from(document.querySelectorAll('.deliverable-input')).map(i=>i.value.trim()).filter(Boolean),
+          media:          uploadedMedia,
+          portfolio_link: document.getElementById('portfolioLink').value.trim(),
+          accepts_custom: document.getElementById('acceptsCustom').checked,
+          seller:         profile?.name || 'Vendedor',
+        };
+
+        if (editId) {
+          await SupaDB.Services.update(editId, payload);
+          alert('Serviço atualizado com sucesso!');
+        } else {
+          await SupaDB.Services.create(payload);
+          alert('Serviço publicado com sucesso!');
+        }
         window.location.href = 'store.html';
       } catch(err) {
         console.error(err);
@@ -545,36 +574,38 @@
     // ===== EDIT MODE =====
     const editData = localStorage.getItem('editService');
     if (editData) {
-      try {
-        const svc = JSON.parse(editData);
-        document.getElementById('serviceTitle').value = svc.title || '';
-        document.getElementById('servicePrice').value = svc.priceNum || '';
-        document.getElementById('serviceDeadline').value = svc.deadline || '';
-        document.getElementById('serviceDescription').value = svc.description || '';
-        document.getElementById('portfolioLink').value = svc.portfolioLink || '';
-        document.getElementById('acceptsCustom').checked = svc.acceptsCustom || false;
-        if (svc.category) {
-          const cc = document.querySelector(`.cat-card[data-val="${svc.category}"]`);
-          if (cc) selectCat(cc);
-        }
-        if (svc.deliverables?.length) {
-          const list = document.getElementById('deliverablesList');
-          list.innerHTML = '';
-          svc.deliverables.forEach(d => {
-            const row = document.createElement('div');
-            row.className = 'deliv-row';
-            row.innerHTML = `<input type="text" value="${d}" class="deliverable-input">
-              <button type="button" class="rm-deliv" onclick="removeDeliv(this)">✕</button>`;
-            list.appendChild(row);
-          });
-        }
-        if (svc.media) { mediaItems = [...svc.media]; renderGrid(); }
-        document.getElementById('charCounter').textContent = `${svc.description?.length||0} / 2000 caracteres`;
-        document.getElementById('btnSalvar').textContent = 'Atualizar serviço';
-        // Store editing ID for update
-        document.getElementById('serviceForm').dataset.editId = svc.id;
-      } catch(e) { console.error(e); }
-      localStorage.removeItem('editService');
+      (async () => {
+        try {
+          const item = JSON.parse(editData);
+          localStorage.removeItem('editService');
+          const svc = await SupaDB.Services.get(item.id);
+          if (!svc) return;
+          document.getElementById('serviceTitle').value = svc.title || '';
+          document.getElementById('servicePrice').value = svc.price_num || '';
+          document.getElementById('serviceDeadline').value = svc.deadline || '';
+          document.getElementById('serviceDescription').value = svc.description || '';
+          document.getElementById('portfolioLink').value = svc.portfolio_link || '';
+          document.getElementById('acceptsCustom').checked = svc.accepts_custom || false;
+          if (svc.category) {
+            const cc = document.querySelector(`.cat-card[data-val="${svc.category}"]`);
+            if (cc) selectCat(cc);
+          }
+          if (svc.deliverables?.length) {
+            const list = document.getElementById('deliverablesList');
+            list.innerHTML = '';
+            svc.deliverables.forEach(d => {
+              const row = document.createElement('div');
+              row.className = 'deliv-row';
+              row.innerHTML = `<input type="text" value="${d}" class="deliverable-input"><button type="button" class="rm-deliv" onclick="removeDeliv(this)">✕</button>`;
+              list.appendChild(row);
+            });
+          }
+          if (svc.media?.length) { mediaItems = svc.media.map(m=>({type:m.type,data:m.url,name:'uploaded'})); renderGrid(); }
+          document.getElementById('charCounter').textContent = `${(svc.description||'').length} / 2000 caracteres`;
+          document.getElementById('btnSalvar').textContent = 'Atualizar serviço';
+          document.getElementById('serviceForm').dataset.editId = svc.id;
+        } catch(e) { console.error(e); }
+      })();
     }
   </script>
   <script>
