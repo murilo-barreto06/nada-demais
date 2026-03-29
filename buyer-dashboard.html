@@ -503,7 +503,6 @@
           
           <p id="profileEmail" class="profile-email"></p>
           <div class="profile-actions">
-            <button class="small-btn" onclick="document.getElementById('profileUpload').click()"> Trocar foto</button>
             <button class="small-btn" onclick="removerFoto()"> Remover foto</button>
           </div>
         </div>
@@ -1059,7 +1058,6 @@
       alert('Perfil excluído com sucesso!');
       carregarPerfilProfissional();
     };
-    
     // Carregar vendas realizadas (= compras reais, pois buyer=seller no protótipo)
     function carregarVendas() {
       const container = document.getElementById('vendasContainer');
