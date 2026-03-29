@@ -191,7 +191,7 @@ function loadHomeProfessionals() {
       ${avatarHTML}
       <h3>${prof.name}</h3>
       <p class="specialty">${prof.specialty}</p>
-      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
+      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
     `;
     
     carousel.appendChild(card);
@@ -290,7 +290,7 @@ function loadStoreProfessionals() {
       ${avatarHTML}
       <h3>${prof.name}</h3>
       <p class="specialty">${prof.specialty}</p>
-      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
+      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
     `;
     
     carousel.appendChild(card);
@@ -459,7 +459,7 @@ function renderProfessional(prof) {
   
   // Rating
   const ratingEl = document.getElementById('professionalRating');
-  if (ratingEl) ratingEl.innerHTML = `⭐ ${prof.rating.toFixed(1)}`;
+  if (ratingEl) ratingEl.innerHTML = `<i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}`;
   
   // Bio
   const bioEl = document.getElementById('professionalBio');
@@ -642,7 +642,7 @@ function loadStoreProfessionals() {
       ${avatarHTML}
       <h3>${prof.name}</h3>
       <p class="specialty">${prof.specialty}</p>
-      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
+      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
       <p class="projects">${prof.projects || 0} projetos</p>
     `;
     
@@ -703,12 +703,12 @@ function loadHomeServices() {
     carousel.innerHTML = '<div class="carousel-item" style="text-align:center;padding:2rem;min-width:280px;width:100%;">Nenhum serviço disponível. <a href="publicar-servico.html" style="color:#6366f1;font-weight:600;">Publicar agora</a></div>';
     return;
   }
-  const CAT_SVC = {atendimento:'💬',analise:'📊',automacao:'⚙️',marketing:'📣',rh:'🧑‍💼',seguranca:'🛡️',personalizado:'🛠️',outro:'✨'};
+  const CAT_SVC = {atendimento:'<i data-lucide="message-circle" style="width:16px;height:16px;vertical-align:middle;"></i>',analise:'<i data-lucide="bar-chart-2" style="width:16px;height:16px;vertical-align:middle;"></i>',automacao:'<i data-lucide="settings" style="width:16px;height:16px;vertical-align:middle;"></i>',marketing:'<i data-lucide="megaphone" style="width:16px;height:16px;vertical-align:middle;"></i>',rh:'<i data-lucide="briefcase" style="width:16px;height:16px;vertical-align:middle;"></i>',seguranca:'<i data-lucide="shield" style="width:16px;height:16px;vertical-align:middle;"></i>',personalizado:'<i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i>',outro:'<i data-lucide="sparkles" style="width:16px;height:16px;vertical-align:middle;"></i>'};
   services.slice(0,8).forEach(svc => {
     const card = document.createElement('a');
     card.href = `service.html?id=${svc.id}`;
     card.className = 'carousel-item';
-    const icon = CAT_SVC[svc.category] || '🤖';
+    const icon = CAT_SVC[svc.category] || '<i data-lucide="bot" style="width:28px;height:28px;"></i>';
     const imageUrl = svc.media?.[0]?.data || svc.image || '';
     card.innerHTML = `
       <div class="carousel-thumb" style="${imageUrl?`background-image:url('${imageUrl}');`:`background:linear-gradient(135deg,#312e81,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:2.5rem;`}">
@@ -759,7 +759,7 @@ function updateUserDisplay() {
     // Adiciona link de dashboard com nome
     const dashboardLink = document.createElement('a');
     dashboardLink.href = 'buyer-dashboard.html';
-    dashboardLink.textContent = `👤 ${user.name.split(' ')[0]}`;
+    dashboardLink.textContent = `<i data-lucide="user" style="width:28px;height:28px;"></i> ${user.name.split(' ')[0]}`;
     nav.insertBefore(dashboardLink, nav.querySelector('button'));
   }
 }
@@ -981,7 +981,7 @@ function loadHomeProfessionals() {
       ${avatarHTML}
       <h3>${prof.name}</h3>
       <p class="specialty">${prof.specialty}</p>
-      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
+      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
     `;
     
     carousel.appendChild(card);
@@ -1080,7 +1080,7 @@ function loadStoreProfessionals() {
       ${avatarHTML}
       <h3>${prof.name}</h3>
       <p class="specialty">${prof.specialty}</p>
-      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
+      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
     `;
     
     carousel.appendChild(card);
@@ -1249,7 +1249,7 @@ function renderProfessional(prof) {
   
   // Rating
   const ratingEl = document.getElementById('professionalRating');
-  if (ratingEl) ratingEl.innerHTML = `⭐ ${prof.rating.toFixed(1)}`;
+  if (ratingEl) ratingEl.innerHTML = `<i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}`;
   
   // Bio
   const bioEl = document.getElementById('professionalBio');
@@ -1432,7 +1432,7 @@ function loadStoreProfessionals() {
       ${avatarHTML}
       <h3>${prof.name}</h3>
       <p class="specialty">${prof.specialty}</p>
-      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
+      <div class="rating"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${prof.rating.toFixed(1)}</div>
       <p class="projects">${prof.projects || 0} projetos</p>
     `;
     
@@ -1493,12 +1493,12 @@ function loadHomeServices() {
     carousel.innerHTML = '<div class="carousel-item" style="text-align:center;padding:2rem;min-width:280px;width:100%;">Nenhum serviço disponível. <a href="publicar-servico.html" style="color:#6366f1;font-weight:600;">Publicar agora</a></div>';
     return;
   }
-  const CAT_SVC = {atendimento:'💬',analise:'📊',automacao:'⚙️',marketing:'📣',rh:'🧑‍💼',seguranca:'🛡️',personalizado:'🛠️',outro:'✨'};
+  const CAT_SVC = {atendimento:'<i data-lucide="message-circle" style="width:16px;height:16px;vertical-align:middle;"></i>',analise:'<i data-lucide="bar-chart-2" style="width:16px;height:16px;vertical-align:middle;"></i>',automacao:'<i data-lucide="settings" style="width:16px;height:16px;vertical-align:middle;"></i>',marketing:'<i data-lucide="megaphone" style="width:16px;height:16px;vertical-align:middle;"></i>',rh:'<i data-lucide="briefcase" style="width:16px;height:16px;vertical-align:middle;"></i>',seguranca:'<i data-lucide="shield" style="width:16px;height:16px;vertical-align:middle;"></i>',personalizado:'<i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i>',outro:'<i data-lucide="sparkles" style="width:16px;height:16px;vertical-align:middle;"></i>'};
   services.slice(0,8).forEach(svc => {
     const card = document.createElement('a');
     card.href = `service.html?id=${svc.id}`;
     card.className = 'carousel-item';
-    const icon = CAT_SVC[svc.category] || '🤖';
+    const icon = CAT_SVC[svc.category] || '<i data-lucide="bot" style="width:28px;height:28px;"></i>';
     const imageUrl = svc.media?.[0]?.data || svc.image || '';
     card.innerHTML = `
       <div class="carousel-thumb" style="${imageUrl?`background-image:url('${imageUrl}');`:`background:linear-gradient(135deg,#312e81,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:2.5rem;`}">
@@ -1549,7 +1549,7 @@ function updateUserDisplay() {
     // Adiciona link de dashboard com nome
     const dashboardLink = document.createElement('a');
     dashboardLink.href = 'buyer-dashboard.html';
-    dashboardLink.textContent = `👤 ${user.name.split(' ')[0]}`;
+    dashboardLink.textContent = `<i data-lucide="user" style="width:28px;height:28px;"></i> ${user.name.split(' ')[0]}`;
     nav.insertBefore(dashboardLink, nav.querySelector('button'));
   }
 }

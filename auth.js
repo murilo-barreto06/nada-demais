@@ -1,195 +1,118 @@
-// auth.js - Funções de autenticação compartilhadas
+// auth.js — Autenticação via Supabase
+// Depende de supabase.js carregado antes.
 
-// ===== FUNÇÕES DE AUTENTICAÇÃO =====
+// ── ESTADO ─────────────────────────────────────────────────────────────────────
+let _currentUser = null;
 
-// Verificar se usuário está logado
-function isLoggedIn() {
-  return localStorage.getItem('currentUser') !== null;
-}
-
-// Obter usuário atual
-function getCurrentUser() {
-  const user = localStorage.getItem('currentUser');
-  return user ? JSON.parse(user) : null;
-}
-
-// Fazer logout
-function logout() {
-  if (confirm('Tem certeza que deseja sair?')) {
-    localStorage.removeItem('currentUser');
-    // Fecha o painel de configurações se estiver aberto
-    const settingsPanel = document.getElementById('settingsPanel');
-    if (settingsPanel) {
-      settingsPanel.classList.remove('open');
-    }
-    window.location.href = 'index.html';
+async function _loadUser() {
+  try {
+    const { data: { user } } = await SupaDB.db.auth.getUser();
+    if (!user) { _currentUser = null; return null; }
+    const profile = await SupaDB.Profiles.get(user.id);
+    _currentUser = {
+      id:         user.id,
+      name:       profile?.name || user.user_metadata?.name || user.email.split('@')[0],
+      email:      user.email,
+      avatar_url: profile?.avatar_url || null
+    };
+    return _currentUser;
+  } catch {
+    _currentUser = null;
+    return null;
   }
 }
 
-// Redirecionar se não estiver logado (para páginas protegidas)
-function requireAuth() {
-  if (!isLoggedIn()) {
-    alert('Você precisa fazer login para acessar esta página');
+function isLoggedIn()    { return _currentUser !== null; }
+function getCurrentUser(){ return _currentUser; }
+
+async function logout() {
+  if (!confirm('Tem certeza que deseja sair?')) return;
+  await SupaDB.Auth.signOut();
+}
+
+async function requireAuth() {
+  await _loadUser();
+  if (!_currentUser) {
+    alert('Você precisa fazer login para acessar esta página.');
     window.location.href = 'login.html';
     return false;
   }
   return true;
 }
 
-// Atualizar o painel de configurações
 function updateSettingsPanel() {
-  const settingsPanel = document.getElementById('settingsPanel');
-  if (!settingsPanel) return;
-  
-  const user = getCurrentUser();
-  const accountRow = settingsPanel.querySelector('.settings-row.account-row');
-  
-  if (accountRow) {
-    if (user) {
-      // Usuário logado - mostra Sair
-      accountRow.innerHTML = `
-        <label>Conta</label>
-        <button onclick="logout()" class="small-btn">Sair</button>
-      `;
-    } else {
-      // Usuário não logado - mostra Entrar / Cadastrar
-      accountRow.innerHTML = `
-        <label>Conta</label>
-        <a href="login.html" class="small-btn">Entrar / Cadastrar</a>
-      `;
-    }
+  const panel = document.getElementById('settingsPanel');
+  if (!panel) return;
+  const row = panel.querySelector('.settings-row.account-row');
+  if (!row) return;
+  if (_currentUser) {
+    row.innerHTML = '<label>Conta</label><button onclick="logout()" class="small-btn">Sair</button>';
+  } else {
+    row.innerHTML = '<label>Conta</label><a href="login.html" class="small-btn">Entrar / Cadastrar</a>';
   }
 }
 
-// Renderizar o header baseado no estado de login
 function renderAuthSection() {
-  const authContainer = document.getElementById('auth-container');
-  if (!authContainer) return;
-  
-  const user = getCurrentUser();
+  const container = document.getElementById('auth-container');
+  if (!container) return;
   const currentPage = window.location.pathname.split('/').pop();
-  
-  if (user) {
-    // Usuário logado - mostrar link Meu Painel
-    authContainer.innerHTML = `
-      <div style="position: relative; display: inline-block;" class="user-menu-container">
-        <a href="buyer-dashboard.html" class="meu-painel-link ${currentPage === 'buyer-dashboard.html' ? 'active' : ''}">Meu painel</a>
-        <div class="user-dropdown" style="display: none;">
-          <a href="buyer-dashboard.html"> Meu Painel</a>
-          <a href="#" onclick="logout(); return false;"> Sair</a>
-        </div>
-      </div>
-    `;
-    
-    // Adicionar eventos ao dropdown
+  if (_currentUser) {
+    container.innerHTML = '<div style="position:relative;display:inline-block;" class="user-menu-container">' +
+      '<a href="buyer-dashboard.html" class="meu-painel-link ' + (currentPage==='buyer-dashboard.html'?'active':'') + '">Meu painel</a>' +
+      '<div class="user-dropdown" style="display:none;">' +
+        '<a href="buyer-dashboard.html">Meu Painel</a>' +
+        '<a href="#" onclick="logout();return false;">Sair</a>' +
+      '</div></div>';
     setTimeout(() => {
       const link = document.querySelector('.meu-painel-link');
       const dropdown = document.querySelector('.user-dropdown');
-      const container = document.querySelector('.user-menu-container');
-      
-      if (link && dropdown && container) {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          
-          // Fecha outros dropdowns
-          document.querySelectorAll('.user-dropdown').forEach(d => {
-            if (d !== dropdown) d.style.display = 'none';
-          });
-          
-          // Toggle deste dropdown
-          dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-        });
-        
-        // Fecha ao clicar fora
-        document.addEventListener('click', function(e) {
-          if (!container.contains(e.target)) {
-            dropdown.style.display = 'none';
-          }
-        });
-      }
+      const cont = document.querySelector('.user-menu-container');
+      if (!link||!dropdown||!cont) return;
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        dropdown.style.display = dropdown.style.display==='none'?'block':'none';
+      });
+      document.addEventListener('click', e => { if(!cont.contains(e.target)) dropdown.style.display='none'; });
     }, 0);
-    
   } else {
-    // Usuário não logado - mostrar link Entrar
-    authContainer.innerHTML = '<a href="login.html" class="login-link">Entrar</a>';
+    container.innerHTML = '<a href="login.html" class="login-link">Entrar</a>';
   }
-  
-  // Atualiza o link ativo no header
   updateActiveLink();
-  
-  // Atualiza o painel de configurações
   updateSettingsPanel();
 }
 
-// Proteger páginas que exigem login
-function protectPage() {
-  const protectedPages = [
-    'buyer-dashboard.html',
-    'anuncie.html',
-    'publicar-modelo.html',
-    'inscricao-professionals.html',
-    'publicar-servico.html'
-  ];
-  
+async function protectPage() {
+  const protectedPages = ['buyer-dashboard.html','anuncie.html','publicar-modelo.html','inscricao-professionals.html','publicar-servico.html'];
   const currentPage = window.location.pathname.split('/').pop();
-  console.log('Página atual:', currentPage);
-  
-  if (protectedPages.includes(currentPage)) {
-    return requireAuth();
-  }
+  if (protectedPages.includes(currentPage)) return await requireAuth();
   return true;
 }
 
-// Inicializar autenticação na página
-function initAuth() {
-  console.log('Inicializando auth...');
-  
-  // Primeiro protege a página (redireciona se necessário)
-  const allowed = protectPage();
+async function initAuth() {
+  await _loadUser();
+  const allowed = await protectPage();
   if (!allowed) return false;
-  
-  // Renderiza a seção de autenticação
   renderAuthSection();
-  
   return true;
 }
 
-// Executar quando a página carregar
-document.addEventListener('DOMContentLoaded', function() {
-  initAuth();
-});
+document.addEventListener('DOMContentLoaded', () => { initAuth(); });
+window.addEventListener('popstate', () => { renderAuthSection(); });
 
-// Também executar quando a página mudar (para SPA-like)
-window.addEventListener('popstate', function() {
+SupaDB.Auth.onAuthChange(async user => {
+  if (user) await _loadUser(); else _currentUser = null;
   renderAuthSection();
 });
 
-// Atualizar o link ativo no header
 function updateActiveLink() {
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  const navLinks = document.querySelectorAll('nav a');
-  
-  // Mapeamento de páginas que devem manter o link "Anuncie" ativo
-  const anunciePages = ['anuncie.html', 'publicar-modelo.html', 'inscricao-professionals.html', 'publicar-servico.html'];
-  const storePages = ['store.html', 'model.html', 'professional.html', 'service.html'];
-  
-  navLinks.forEach(link => {
+  const anunciePages = ['anuncie.html','publicar-modelo.html','inscricao-professionals.html','publicar-servico.html'];
+  const storePages   = ['store.html','model.html','professional.html','service.html'];
+  document.querySelectorAll('nav a').forEach(link => {
     const href = link.getAttribute('href');
-    
-    // Se for a página atual exata
-    if (href === currentPage) {
-      link.classList.add('active');
-    }
-    // Se estiver em uma página que pertence à seção "Anuncie"
-    else if (anunciePages.includes(currentPage) && href === 'anuncie.html') {
-      link.classList.add('active');
-    }
-    // Se estiver em uma página que pertence à seção "Loja"
-    else if (storePages.includes(currentPage) && href === 'store.html') {
-      link.classList.add('active');
-    }
-    else {
-      link.classList.remove('active');
-    }
+    if (href===currentPage) link.classList.add('active');
+    else if (anunciePages.includes(currentPage) && href==='anuncie.html') link.classList.add('active');
+    else if (storePages.includes(currentPage)   && href==='store.html')   link.classList.add('active');
+    else link.classList.remove('active');
   });
 }

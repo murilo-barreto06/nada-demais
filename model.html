@@ -193,6 +193,7 @@
     .rel-body p { font-size: .8rem; color: var(--muted); }
     .rel-price { color: var(--accent); font-weight: 700; font-size: .85rem; margin-top: .3rem; }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header>
@@ -227,6 +228,8 @@
 
   <footer><p>AI Store — protótipo • © 2025</p></footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <script src="app.js"></script>
   <script src="auth.js"></script>
   <script>
@@ -234,7 +237,7 @@
     let _slides = [], _cur = 0;
 
     function buildCarousel(media) {
-      if (!media || media.length === 0) return '<div class="no-media-box">🤖</div>';
+      if (!media || media.length === 0) return '<div class="no-media-box"><i data-lucide="bot" style="width:28px;height:28px;"></i></div>';
       _slides = media; _cur = 0;
       const slides = media.map((m,i) =>
         `<div class="media-slide">${m.type==='video'
@@ -303,7 +306,7 @@
       localStorage.setItem('purchases', JSON.stringify(purchases));
       const fb = document.getElementById('buyFeedback');
       const btn = document.getElementById('buyBtn');
-      if (fb) { fb.style.display='block'; fb.textContent='✅ Modelo adquirido com sucesso!'; }
+      if (fb) { fb.style.display='block'; fb.textContent='<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> Modelo adquirido com sucesso!'; }
       if (btn) { btn.textContent='Adquirido ✓'; btn.disabled=true; btn.style.opacity='.65'; }
     };
 
@@ -368,7 +371,7 @@
               ${model.media?.length?`<div class="chip"><span class="lbl">Mídias</span><span class="val">${model.media.length} arquivo(s)</span></div>`:''}
             </div>
 
-            ${model.portfolioLink?`<a class="ext-link" href="${model.portfolioLink}" target="_blank">🔗 Portfólio / Repositório</a>`:''}
+            ${model.portfolioLink?`<a class="ext-link" href="${model.portfolioLink}" target="_blank"><i data-lucide="external-link" style="width:14px;height:14px;vertical-align:middle;"></i> Portfólio / Repositório</a>`:''}
 
             <div class="action-row">
               <button class="cta" id="buyBtn" onclick="buyModel(${model.id})"
@@ -388,5 +391,6 @@
       if (car) initSwipe(car);
     });
   </script>
+  <script>if(window.lucide)lucide.createIcons();</script>
 </body>
 </html>

@@ -168,6 +168,7 @@
     .rel-price { color:#6366f1; font-weight:700; font-size:.85rem; margin-top:.3rem; }
     .section-sep { font-size:1.3rem; font-weight:700; margin:3rem 0 1.2rem; }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header>
@@ -201,20 +202,22 @@
 
   <footer><p>AI Store — protótipo • © 2025</p></footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <script src="app.js"></script>
   <script src="auth.js"></script>
   <script>
     const CAT_LABELS = {
-      atendimento:'💬 Atendimento IA', analise:'📊 Análise de Dados',
-      automacao:'⚙️ Automação', marketing:'📣 Marketing IA',
-      rh:'🧑‍💼 RH & Recrutamento', seguranca:'🛡️ Segurança / Fraude',
-      personalizado:'🛠️ Solução Personalizada', outro:'✨ Outro'
+      atendimento:'<i data-lucide="message-circle" style="width:16px;height:16px;vertical-align:middle;"></i> Atendimento IA', analise:'<i data-lucide="bar-chart-2" style="width:16px;height:16px;vertical-align:middle;"></i> Análise de Dados',
+      automacao:'<i data-lucide="settings" style="width:16px;height:16px;vertical-align:middle;"></i> Automação', marketing:'<i data-lucide="megaphone" style="width:16px;height:16px;vertical-align:middle;"></i> Marketing IA',
+      rh:'<i data-lucide="briefcase" style="width:16px;height:16px;vertical-align:middle;"></i> RH & Recrutamento', seguranca:'<i data-lucide="shield" style="width:16px;height:16px;vertical-align:middle;"></i> Segurança / Fraude',
+      personalizado:'<i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i> Solução Personalizada', outro:'<i data-lucide="sparkles" style="width:16px;height:16px;vertical-align:middle;"></i> Outro'
     };
 
     // ===== CAROUSEL =====
     let _slides = [], _cur = 0;
     function buildCarousel(media) {
-      if (!media?.length) return '<div class="no-media-box">🤖</div>';
+      if (!media?.length) return '<div class="no-media-box"><i data-lucide="bot" style="width:28px;height:28px;"></i></div>';
       _slides = media; _cur = 0;
       const slides = media.map((m,i) =>
         `<div class="media-slide">${m.type==='video'
@@ -263,7 +266,7 @@
       localStorage.setItem('purchases', JSON.stringify(purchases));
       const fb = document.getElementById('buyFeedback');
       const btn = document.getElementById('buyBtn');
-      if (fb) { fb.style.display='block'; fb.textContent='✅ Serviço adquirido! O vendedor entrará em contato.'; }
+      if (fb) { fb.style.display='block'; fb.textContent='<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> Serviço adquirido! O vendedor entrará em contato.'; }
       if (btn) { btn.textContent='Adquirido ✓'; btn.disabled=true; }
     };
 
@@ -294,7 +297,7 @@
 
       const customBanner = svc.acceptsCustom
         ? `<div class="custom-banner">
-            <span class="icon">🛠️</span>
+            <span class="icon"><i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i></span>
             <div><strong>Aceita soluções personalizadas.</strong> Entre em contato para discutir uma solução sob medida para sua empresa.</div>
           </div>` : '';
 
@@ -334,7 +337,7 @@
 
             ${delivHtml}
             ${customBanner}
-            ${svc.portfolioLink?`<a class="ext-link" href="${svc.portfolioLink}" target="_blank">🔗 Portfólio / Site</a>`:''}
+            ${svc.portfolioLink?`<a class="ext-link" href="${svc.portfolioLink}" target="_blank"><i data-lucide="external-link" style="width:14px;height:14px;vertical-align:middle;"></i> Portfólio / Site</a>`:''}
 
             <div class="action-row">
               <button class="cta-buy" id="buyBtn" onclick="buyService(${svc.id})"
@@ -353,5 +356,6 @@
       if (car) initSwipe(car);
     });
   </script>
+  <script>if(window.lucide)lucide.createIcons();</script>
 </body>
 </html>

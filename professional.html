@@ -187,6 +187,7 @@
     .rel-card h4 { font-size: .9rem; font-weight: 700; }
     .rel-card p { font-size: .8rem; color: var(--accent); }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header>
@@ -221,13 +222,15 @@
 
   <footer><p>AI Store — protótipo • © 2025</p></footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <script src="app.js"></script>
   <script src="auth.js"></script>
   <script>
     let _slides = [], _cur = 0;
 
     function buildCarousel(media) {
-      if (!media || media.length === 0) return '<div class="no-media-box">👤</div>';
+      if (!media || media.length === 0) return '<div class="no-media-box"><i data-lucide="user" style="width:28px;height:28px;"></i></div>';
       _slides = media; _cur = 0;
       const slides = media.map((m,i) =>
         `<div class="media-slide">${m.type==='video'
@@ -279,7 +282,7 @@
       localStorage.setItem('contacts', JSON.stringify(contacts));
       const fb = document.getElementById('contactFeedback');
       const btn = document.getElementById('contactBtn');
-      if (fb) { fb.style.display='block'; fb.textContent='✅ Solicitação enviada! O profissional entrará em contato.'; }
+      if (fb) { fb.style.display='block'; fb.textContent='<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> Solicitação enviada! O profissional entrará em contato.'; }
       if (btn) { btn.textContent='Solicitado ✓'; btn.disabled=true; btn.style.opacity='.65'; }
     };
 
@@ -330,7 +333,7 @@
             <div class="prof-specialty">${prof.specialty||''}</div>
             <div class="prof-hero-meta">
               <div class="prof-stat">
-                <span class="sv">⭐ ${typeof prof.rating==='number'?prof.rating.toFixed(1):'5.0'}</span>
+                <span class="sv"><i data-lucide="star" style="width:14px;height:14px;vertical-align:middle;color:#f59e0b;fill:#f59e0b;"></i> ${typeof prof.rating==='number'?prof.rating.toFixed(1):'5.0'}</span>
                 <span class="sl">Avaliação</span>
               </div>
               <div class="prof-stat">
@@ -364,7 +367,7 @@
             ${prof.portfolioLink?`
             <div class="section-card">
               <h2>Links</h2>
-              <a class="ext-link" href="${prof.portfolioLink}" target="_blank">🔗 Portfólio / Repositório</a>
+              <a class="ext-link" href="${prof.portfolioLink}" target="_blank"><i data-lucide="external-link" style="width:14px;height:14px;vertical-align:middle;"></i> Portfólio / Repositório</a>
             </div>`:''}
 
             <div class="action-row">
@@ -385,5 +388,6 @@
       if (car) initSwipe(car);
     });
   </script>
+  <script>if(window.lucide)lucide.createIcons();</script>
 </body>
 </html>

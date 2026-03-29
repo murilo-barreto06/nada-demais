@@ -415,6 +415,7 @@
       }
     }
   </style>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <header>
@@ -552,6 +553,8 @@
     <p>AI Store — protótipo • © 2025</p>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <script src="app.js"></script>
   <script src="auth.js"></script>
   
@@ -704,7 +707,7 @@
           size: file.size
         });
         renderMediaGrid();
-        console.log(`✅ ${file.name} adicionado! Total: ${mediaItems.length} mídias`);
+        console.log(`<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> ${file.name} adicionado! Total: ${mediaItems.length} mídias`);
         return { success: true, message: `"${file.name}" adicionado com sucesso!` };
       } catch (err) {
         console.error(`Erro ao processar ${file.name}:`, err);
@@ -730,12 +733,12 @@
       if (errors.length > 0) {
         const errorMessage = errors.join('\n');
         if (successCount > 0) {
-          alert(`⚠️ ${successCount} arquivo(s) adicionado(s) com sucesso!\n\n${errors.length} arquivo(s) ignorados:\n${errorMessage}`);
+          alert(`<i data-lucide="triangle-alert" style="width:16px;height:16px;vertical-align:middle;color:#f59e0b;"></i> ${successCount} arquivo(s) adicionado(s) com sucesso!\n\n${errors.length} arquivo(s) ignorados:\n${errorMessage}`);
         } else {
-          alert(`❌ Nenhum arquivo foi adicionado:\n${errorMessage}`);
+          alert(`<i data-lucide="circle-x" style="width:16px;height:16px;vertical-align:middle;color:#dc3545;"></i> Nenhum arquivo foi adicionado:\n${errorMessage}`);
         }
       } else if (successCount > 0) {
-        console.log(`✅ ${successCount} arquivo(s) adicionado(s) com sucesso!`);
+        console.log(`<i data-lucide="circle-check" style="width:16px;height:16px;vertical-align:middle;color:var(--accent);"></i> ${successCount} arquivo(s) adicionado(s) com sucesso!`);
       }
     }
     
@@ -973,5 +976,6 @@
       }
     });
   </script>
+  <script>if(window.lucide)lucide.createIcons();</script>
 </body>
 </html>

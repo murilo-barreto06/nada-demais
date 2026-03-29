@@ -459,6 +459,8 @@
     <p>AI Store — protótipo • © 2025</p>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <script src="app.js"></script>
   <script src="auth.js"></script>
   
@@ -490,7 +492,7 @@
         const services = JSON.parse(localStorage.getItem('services') || '[]');
         const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
         
-        const CAT_SVC = {atendimento:'💬 Atendimento IA',analise:'📊 Análise de Dados',automacao:'⚙️ Automação',marketing:'📣 Marketing IA',rh:'🧑‍💼 RH & Recrutamento',seguranca:'🛡️ Segurança',personalizado:'🛠️ Personalizado',outro:'✨ Outro'};
+        const CAT_SVC = {atendimento:'<i data-lucide="message-circle" style="width:16px;height:16px;vertical-align:middle;"></i> Atendimento IA',analise:'<i data-lucide="bar-chart-2" style="width:16px;height:16px;vertical-align:middle;"></i> Análise de Dados',automacao:'<i data-lucide="settings" style="width:16px;height:16px;vertical-align:middle;"></i> Automação',marketing:'<i data-lucide="megaphone" style="width:16px;height:16px;vertical-align:middle;"></i> Marketing IA',rh:'<i data-lucide="briefcase" style="width:16px;height:16px;vertical-align:middle;"></i> RH & Recrutamento',seguranca:'<i data-lucide="shield" style="width:16px;height:16px;vertical-align:middle;"></i> Segurança',personalizado:'<i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i> Personalizado',outro:'<i data-lucide="sparkles" style="width:16px;height:16px;vertical-align:middle;"></i> Outro'};
 
         const modelItems = models.map(m => ({
           ...m, type:'model',
@@ -667,8 +669,8 @@
               ${item.price ? `<div class="card-meta-item" style="color:${TYPE_COLOR[item.type]};font-weight:700;">${item.price}</div>` : ''}
               ${item.hourlyRate && item.type==='professional' ? `<div class="card-meta-item">R$ ${item.hourlyRate}/h</div>` : ''}
               ${item.deadline ? `<div class="card-meta-item">⏱ ${item.deadline}</div>` : ''}
-              ${item.acceptsCustom ? `<div class="card-meta-item">🛠️ Aceita personalizado</div>` : ''}
-              ${item.portfolioLink ? `<div class="card-meta-item">🔗 Portfólio</div>` : ''}
+              ${item.acceptsCustom ? `<div class="card-meta-item"><i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i> Aceita personalizado</div>` : ''}
+              ${item.portfolioLink ? `<div class="card-meta-item"><i data-lucide="external-link" style="width:14px;height:14px;vertical-align:middle;"></i> Portfólio</div>` : ''}
             </div>
             <div class="card-actions">
               <button class="card-btn primary" style="background:${TYPE_COLOR[item.type]};border-color:${TYPE_COLOR[item.type]};"

@@ -457,6 +457,69 @@
         height: 14px;
       }
     }
+  
+    /* ===== PHOTO CROP MODAL ===== */
+    .crop-modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.75); z-index: 9999;
+      align-items: center; justify-content: center;
+    }
+    .crop-modal-overlay.open { display: flex; }
+    .crop-modal {
+      background: var(--panel); border-radius: 24px;
+      padding: 1.8rem; width: min(480px, 95vw);
+      box-shadow: 0 24px 60px rgba(0,0,0,.4);
+    }
+    .crop-modal h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.2rem; }
+    .crop-stage {
+      position: relative; width: 100%; aspect-ratio: 1;
+      background: var(--bg); border-radius: 16px;
+      overflow: hidden; cursor: grab; user-select: none; touch-action: none;
+    }
+    .crop-stage:active { cursor: grabbing; }
+    .crop-img { position: absolute; transform-origin: center center; pointer-events: none; }
+    .crop-circle-outline {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 84%; aspect-ratio: 1;
+      border: 2px solid rgba(255,255,255,.6); border-radius: 50%; pointer-events: none;
+    }
+    .crop-controls { display: flex; align-items: center; gap: .8rem; margin: 1rem 0; }
+    .crop-controls label { font-size: .8rem; color: var(--muted); white-space: nowrap; }
+    .crop-controls input[type="range"] { flex: 1; accent-color: var(--accent); }
+    .crop-zoom-val { font-size: .8rem; font-weight: 600; color: var(--accent); min-width: 36px; text-align: right; }
+    .crop-actions { display: flex; gap: .8rem; margin-top: 1.2rem; }
+    .crop-actions button { flex: 1; padding: .75rem; border-radius: 40px; font-weight: 700; font-size: .95rem; cursor: pointer; transition: all .2s; }
+    .crop-btn-apply { background: var(--accent); color: white; border: none; }
+    .crop-btn-apply:hover { background: var(--accent-hover); }
+    .crop-btn-cancel { background: transparent; border: 2px solid var(--muted); color: var(--muted); }
+    .crop-btn-cancel:hover { background: var(--muted); color: white; }
+
+    /* ===== PROFESSIONAL CARD REDESIGN ===== */
+    .prof-dash-card { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); overflow: hidden; margin-bottom: 1.5rem; border: 1px solid rgba(128,128,128,.08); transition: box-shadow .2s; }
+    .prof-dash-card:hover { box-shadow: var(--shadow-hover); }
+    .prof-dash-top { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); padding: 1.4rem 1.6rem 1rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    .prof-dash-identity { display: flex; align-items: center; gap: 1rem; }
+    .prof-dash-av { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700; overflow: hidden; flex-shrink: 0; border: 2px solid rgba(255,255,255,.4); }
+    .prof-dash-av img { width: 100%; height: 100%; object-fit: cover; }
+    .prof-dash-name { color: white; }
+    .prof-dash-name h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: .2rem; }
+    .prof-dash-name span { font-size: .85rem; opacity: .85; }
+    .prof-dash-actions { display: flex; gap: .5rem; flex-shrink: 0; }
+    .prof-dash-btn { background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.3); color: white; border-radius: 10px; padding: .35rem .7rem; font-size: .8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: .3rem; transition: background .2s; }
+    .prof-dash-btn:hover { background: rgba(255,255,255,.35); }
+    .prof-dash-btn.danger { background: rgba(220,53,69,.25); border-color: rgba(220,53,69,.4); }
+    .prof-dash-btn.danger:hover { background: rgba(220,53,69,.45); }
+    .prof-dash-stats { display: flex; background: rgba(0,0,0,.15); border-radius: 0 0 12px 12px; overflow: hidden; }
+    .prof-dash-stat { flex: 1; padding: .7rem .5rem; text-align: center; color: white; border-right: 1px solid rgba(255,255,255,.1); }
+    .prof-dash-stat:last-child { border-right: none; }
+    .prof-dash-stat .sv { font-size: 1.1rem; font-weight: 800; display: block; }
+    .prof-dash-stat .sl { font-size: .68rem; opacity: .75; text-transform: uppercase; letter-spacing: .04em; }
+    .prof-dash-body { padding: 1.2rem 1.6rem 1.4rem; }
+    .prof-dash-bio { font-size: .9rem; color: var(--muted); line-height: 1.65; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .prof-dash-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.2rem; }
+    .prof-dash-chip { background: rgba(21,115,71,.1); color: var(--accent); border-radius: 20px; padding: .25rem .75rem; font-size: .78rem; font-weight: 600; }
+    .prof-dash-footer { display: flex; gap: .7rem; flex-wrap: wrap; }
   </style>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -627,6 +690,30 @@
     </div>
   </main>
 
+  <!-- PHOTO CROP MODAL -->
+  <div class="crop-modal-overlay" id="cropOverlay">
+    <div class="crop-modal">
+      <h3>Ajustar foto de perfil</h3>
+      <div class="crop-stage" id="cropStage">
+        <img class="crop-img" id="cropImg" draggable="false">
+        <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;" xmlns="http://www.w3.org/2000/svg">
+          <defs><mask id="circleMask"><rect width="100%" height="100%" fill="white"/><circle cx="50%" cy="50%" r="42%" fill="black"/></mask></defs>
+          <rect width="100%" height="100%" fill="rgba(0,0,0,0.55)" mask="url(#circleMask)"/>
+        </svg>
+        <div class="crop-circle-outline"></div>
+      </div>
+      <div class="crop-controls">
+        <label>Zoom</label>
+        <input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1">
+        <span class="crop-zoom-val" id="cropZoomVal">1x</span>
+      </div>
+      <div class="crop-actions">
+        <button class="crop-btn-apply" onclick="applyCrop()">Aplicar</button>
+        <button class="crop-btn-cancel" onclick="closeCrop()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <div id="settingsPanel" class="settings-panel">
     <div class="settings-header">
       <h3>Configurações</h3>
@@ -647,6 +734,8 @@
     <p>AI Store — protótipo • © 2025</p>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <script src="app.js"></script>
   <script>
     // ===== FUNÇÕES ESPECÍFICAS DO DASHBOARD =====
@@ -697,44 +786,135 @@
     window.handleProfileUpload = function(event) {
       const file = event.target.files[0];
       if (!file) return;
-      
-      if (!file.type.startsWith('image/')) {
-        alert('Por favor, selecione uma imagem válida');
-        return;
-      }
-      
-      if (file.size > 2 * 1024 * 1024) {
-        alert('A imagem deve ter no máximo 2MB');
-        return;
-      }
-      
+      if (!file.type.startsWith('image/')) { alert('Selecione uma imagem válida.'); return; }
       const reader = new FileReader();
-      reader.onload = function(e) {
-        const imageData = e.target.result;
-        const user = getCurrentUser();
-        
-        // Salvar no localStorage separado para avatar
-        localStorage.setItem(`avatar_${user.id}`, imageData);
-        
-        // TAMBÉM SALVAR NO OBJETO DO USUÁRIO
-        const users = JSON.parse(localStorage.getItem('ai_store_users') || '[]');
-        const userIndex = users.findIndex(u => u.id === user.id);
-        if (userIndex >= 0) {
-          users[userIndex].avatar = imageData;
-          localStorage.setItem('ai_store_users', JSON.stringify(users));
-        }
-        
-        // Atualizar exibição
-        const avatarContent = document.getElementById('avatarContent');
-        avatarContent.innerHTML = `<img src="${imageData}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">`;
-        
-        event.target.value = '';
-      };
-      
+      reader.onload = e => openCrop(e.target.result);
       reader.readAsDataURL(file);
+      event.target.value = '';
     };
-    
-    window.removerFoto = function() {
+
+    // ===== CROP ENGINE =====
+    let _cropRaw = null, _cropScale = 1, _cropX = 0, _cropY = 0;
+    let _dragStart = null, _imgNatW = 0, _imgNatH = 0, _stageSize = 0;
+
+    function openCrop(src) {
+      _cropRaw = src; _cropScale = 1; _cropX = 0; _cropY = 0;
+      const zoom = document.getElementById('cropZoom');
+      zoom.value = 1;
+      document.getElementById('cropZoomVal').textContent = '1x';
+      const img = document.getElementById('cropImg');
+      img.src = src;
+      img.onload = () => {
+        _imgNatW = img.naturalWidth; _imgNatH = img.naturalHeight;
+        const stage = document.getElementById('cropStage');
+        _stageSize = stage.offsetWidth;
+        const minFit = _stageSize / Math.min(_imgNatW, _imgNatH);
+        _cropScale = minFit;
+        zoom.min = minFit; zoom.max = minFit * 4; zoom.step = minFit * 0.01; zoom.value = minFit;
+        document.getElementById('cropZoomVal').textContent = '1x';
+        _cropX = (_stageSize - _imgNatW * _cropScale) / 2;
+        _cropY = (_stageSize - _imgNatH * _cropScale) / 2;
+        updateCropTransform();
+      };
+      document.getElementById('cropOverlay').classList.add('open');
+      initCropDrag();
+    }
+
+    function closeCrop() { document.getElementById('cropOverlay').classList.remove('open'); }
+
+    function updateCropTransform() {
+      const img = document.getElementById('cropImg');
+      img.style.width = (_imgNatW * _cropScale) + 'px';
+      img.style.height = (_imgNatH * _cropScale) + 'px';
+      img.style.left = _cropX + 'px';
+      img.style.top = _cropY + 'px';
+    }
+
+    function clampCrop() {
+      const r = _stageSize * 0.42, cx = _stageSize / 2, cy = _stageSize / 2;
+      _cropX = Math.min(cx - r, Math.max(cx + r - _imgNatW * _cropScale, _cropX));
+      _cropY = Math.min(cy - r, Math.max(cy + r - _imgNatH * _cropScale, _cropY));
+    }
+
+    function initCropDrag() {
+      const old = document.getElementById('cropStage');
+      const fresh = old.cloneNode(true);
+      old.parentNode.replaceChild(fresh, old);
+      fresh.appendChild(document.getElementById('cropImg'));
+      const svgEl = document.querySelector('#cropOverlay svg');
+      if (svgEl) fresh.appendChild(svgEl);
+      const outline = document.querySelector('.crop-circle-outline');
+      if (outline) fresh.appendChild(outline);
+      fresh.addEventListener('pointerdown', e => {
+        _dragStart = { px: e.clientX, py: e.clientY, ix: _cropX, iy: _cropY };
+        fresh.setPointerCapture(e.pointerId);
+      });
+      fresh.addEventListener('pointermove', e => {
+        if (!_dragStart) return;
+        _cropX = _dragStart.ix + (e.clientX - _dragStart.px);
+        _cropY = _dragStart.iy + (e.clientY - _dragStart.py);
+        clampCrop(); updateCropTransform();
+      });
+      fresh.addEventListener('pointerup', () => { _dragStart = null; });
+      fresh.addEventListener('wheel', e => {
+        e.preventDefault();
+        const zoom = document.getElementById('cropZoom');
+        const ns = Math.min(parseFloat(zoom.max), Math.max(parseFloat(zoom.min), _cropScale * (e.deltaY < 0 ? 1.05 : 0.95)));
+        const cx = _stageSize / 2, cy = _stageSize / 2;
+        _cropX = cx - (cx - _cropX) * (ns / _cropScale);
+        _cropY = cy - (cy - _cropY) * (ns / _cropScale);
+        _cropScale = ns; zoom.value = ns;
+        document.getElementById('cropZoomVal').textContent = (ns / parseFloat(zoom.min)).toFixed(1) + 'x';
+        clampCrop(); updateCropTransform();
+      }, { passive: false });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const zoomEl = document.getElementById('cropZoom');
+      if (zoomEl) zoomEl.addEventListener('input', function() {
+        const ns = parseFloat(this.value), cx = _stageSize/2, cy = _stageSize/2;
+        _cropX = cx - (cx - _cropX) * (ns / _cropScale);
+        _cropY = cy - (cy - _cropY) * (ns / _cropScale);
+        _cropScale = ns;
+        document.getElementById('cropZoomVal').textContent = (ns / parseFloat(this.min)).toFixed(1) + 'x';
+        clampCrop(); updateCropTransform();
+      });
+    });
+
+    window.applyCrop = function() {
+      const size = 300;
+      const canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.beginPath(); ctx.arc(size/2, size/2, size/2, 0, Math.PI*2); ctx.clip();
+      const stageR = _stageSize * 0.42;
+      const scale  = (size / 2) / stageR;
+      const imgX = (_cropX - (_stageSize/2 - stageR)) * scale;
+      const imgY = (_cropY - (_stageSize/2 - stageR)) * scale;
+      const tmp = new Image(); tmp.src = _cropRaw;
+      tmp.onload = async () => {
+        ctx.drawImage(tmp, imgX, imgY, _imgNatW * _cropScale * scale, _imgNatH * _cropScale * scale);
+        const result = canvas.toDataURL('image/jpeg', 0.88);
+        // Try Supabase Storage first, fall back to localStorage
+        try {
+          const user = getCurrentUser();
+          if (user && window.SupaDB) {
+            canvas.toBlob(async blob => {
+              const url = await SupaDB.Profiles.uploadAvatar(user.id, new File([blob], 'avatar.jpg', {type:'image/jpeg'}));
+              document.getElementById('avatarContent').innerHTML = '<img src="' + url + '" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">';
+            }, 'image/jpeg', 0.88);
+          } else { throw new Error('no supabase'); }
+        } catch {
+          // fallback localStorage
+          const user = getCurrentUser();
+          if (user) localStorage.setItem('avatar_' + user.id, result);
+          document.getElementById('avatarContent').innerHTML = '<img src="' + result + '" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">';
+        }
+        closeCrop();
+      };
+    };
+
+        window.removerFoto = function() {
       if (currentUser && confirm('Remover foto de perfil?')) {
         localStorage.removeItem(`avatar_${currentUser.id}`);
         const initial = currentUser.name.charAt(0).toUpperCase();
@@ -933,7 +1113,7 @@
           </div>`;
         return;
       }
-      const CAT_SVC = {atendimento:'💬 Atendimento',analise:'📊 Análise',automacao:'⚙️ Automação',marketing:'📣 Marketing',rh:'🧑‍💼 RH',seguranca:'🛡️ Segurança',personalizado:'🛠️ Personalizado',outro:'✨ Outro'};
+      const CAT_SVC = {atendimento:'<i data-lucide="message-circle" style="width:16px;height:16px;vertical-align:middle;"></i> Atendimento',analise:'<i data-lucide="bar-chart-2" style="width:16px;height:16px;vertical-align:middle;"></i> Análise',automacao:'<i data-lucide="settings" style="width:16px;height:16px;vertical-align:middle;"></i> Automação',marketing:'<i data-lucide="megaphone" style="width:16px;height:16px;vertical-align:middle;"></i> Marketing',rh:'<i data-lucide="briefcase" style="width:16px;height:16px;vertical-align:middle;"></i> RH',seguranca:'<i data-lucide="shield" style="width:16px;height:16px;vertical-align:middle;"></i> Segurança',personalizado:'<i data-lucide="wrench" style="width:16px;height:16px;vertical-align:middle;"></i> Personalizado',outro:'<i data-lucide="sparkles" style="width:16px;height:16px;vertical-align:middle;"></i> Outro'};
       services.forEach(svc => {
         const card = document.createElement('div');
         card.className = 'small-card';
@@ -970,75 +1150,45 @@
     function carregarPerfilProfissional() {
       const container = document.getElementById('profissionalContainer');
       if (!container) return;
-      
-      // Busca profissionais do localStorage
       const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
-      
       if (professionals.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <p>Você ainda não tem um perfil profissional.</p>
-            <a href="inscricao-professionals.html" class="cta">Criar perfil</a>
-          </div>
-        `;
+        container.innerHTML = '<div class="empty-state"><p>Você ainda não tem um perfil profissional.</p><a href="inscricao-professionals.html" class="cta">Criar perfil</a></div>';
         document.getElementById('profissionalBadge').style.display = 'none';
         return;
       }
-      
       document.getElementById('profissionalBadge').style.display = 'inline-block';
-      
-      // Listar todos os profissionais
-      let html = '<div style="margin-bottom: 2rem;">';
-      
-      professionals.forEach(prof => {
-        const servicos = prof.services || ['Instalação', 'Treinamento', 'Customização'];
-        
-        html += `
-          <div class="professional-card" style="margin-bottom: 2rem;">
-            <div class="professional-card-content">
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                <h3>${prof.name}</h3>
-                <div>
-                  <button class="small-btn" onclick="editarProfissional(${prof.id})"><i data-lucide="search"></i> Editar</button>
-                  <button class="small-btn" onclick="excluirProfissional(${prof.id})" style="border-color: #dc3545; color: #dc3545;"> Excluir</button>
-                </div>
-              </div>
-              <p class="specialty">${prof.specialty}</p>
-              
-              <div class="professional-stats">
-                <div class="stat">
-                  <span class="value">⭐ ${prof.rating}</span>
-                  <span class="label">Avaliação</span>
-                </div>
-                <div class="stat">
-                  <span class="value">${prof.projects || 0}</span>
-                  <span class="label">Projetos</span>
-                </div>
-                <div class="stat">
-                  <span class="value">${prof.hourlyRate ? `R$ ${prof.hourlyRate}` : 'Consultar'}</span>
-                  <span class="label">Hora</span>
-                </div>
-              </div>
-              
-              <p style="margin-bottom: 1.5rem;">${prof.bio || prof.description || 'Profissional disponível para serviços.'}</p>
-              
-              <div style="margin-bottom: 1.5rem;">
-                <strong>Serviços oferecidos:</strong>
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
-                  ${servicos.map(s => `<span style="background: rgba(255,255,255,0.2); padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.9rem;">${s}</span>`).join('')}
-                </div>
-              </div>
-              
-              <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <button class="cta" onclick="window.location.href='professional.html?id=${prof.id}'">Ver perfil público</button>
-              </div>
-            </div>
-          </div>
-        `;
-        lucide.createIcons();
-      });
-      
-      container.innerHTML = html;
+      container.innerHTML = professionals.map(prof => {
+        const avatar = prof.profile?.avatar || prof.profile?.avatar_url || prof.avatar || null;
+        const avHtml = avatar ? '<img src="' + avatar + '" alt="">' : (prof.name?.charAt(0) || '?').toUpperCase();
+        const chips  = prof.services?.length ? prof.services.map(s => '<span class="prof-dash-chip">' + s + '</span>').join('') : '';
+        const rate   = prof.hourlyRate ? 'R$ ' + prof.hourlyRate + '/h' : 'Consultar';
+        return '<div class="prof-dash-card">' +
+          '<div class="prof-dash-top">' +
+            '<div class="prof-dash-identity">' +
+              '<div class="prof-dash-av">' + avHtml + '</div>' +
+              '<div class="prof-dash-name"><h3>' + prof.name + '</h3><span>' + (prof.specialty||'') + '</span></div>' +
+            '</div>' +
+            '<div class="prof-dash-actions">' +
+              '<button class="prof-dash-btn" onclick="editarProfissional(' + prof.id + ')"><i data-lucide="pencil" style="width:13px;height:13px;"></i> Editar</button>' +
+              '<button class="prof-dash-btn danger" onclick="excluirProfissional(' + prof.id + ')"><i data-lucide="trash-2" style="width:13px;height:13px;"></i></button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="prof-dash-stats">' +
+            '<div class="prof-dash-stat"><span class="sv"><i data-lucide="star" style="width:13px;height:13px;fill:#f59e0b;color:#f59e0b;vertical-align:middle;"></i> ' + (typeof prof.rating==='number'?prof.rating.toFixed(1):'5.0') + '</span><span class="sl">Avaliação</span></div>' +
+            '<div class="prof-dash-stat"><span class="sv">' + (prof.projects||0) + '</span><span class="sl">Projetos</span></div>' +
+            '<div class="prof-dash-stat"><span class="sv">' + rate + '</span><span class="sl">Por hora</span></div>' +
+          '</div>' +
+          '<div class="prof-dash-body">' +
+            (prof.bio||prof.description ? '<p class="prof-dash-bio">' + (prof.bio||prof.description) + '</p>' : '') +
+            (chips ? '<div class="prof-dash-chips">' + chips + '</div>' : '') +
+            '<div class="prof-dash-footer">' +
+              '<button class="small-btn" onclick="window.location.href=\'professional.html?id=' + prof.id + '\'">Ver perfil público</button>' +
+              (prof.portfolioLink ? '<a href="' + prof.portfolioLink + '" target="_blank" class="small-btn"><i data-lucide="external-link" style="width:13px;height:13px;"></i> Portfólio</a>' : '') +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+      if (window.lucide) lucide.createIcons();
     }
     
     // Editar profissional
@@ -1058,6 +1208,7 @@
       alert('Perfil excluído com sucesso!');
       carregarPerfilProfissional();
     };
+    
     // Carregar vendas realizadas (= compras reais, pois buyer=seller no protótipo)
     function carregarVendas() {
       const container = document.getElementById('vendasContainer');
