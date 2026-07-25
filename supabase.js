@@ -5,7 +5,7 @@
 // ── CONFIGURAÇÃO ──────────────────────────────────────────────────────────────
 // Preencha estas variáveis com os valores do seu projeto Supabase.
 // Elas ficam expostas no browser — isso é seguro para a chave "anon".
-const SUPABASE_URL  = window.__SUPABASE_URL__  || 'https://ylyixbvlofluhgpcouil.supabase.co/rest/v1/';
+const SUPABASE_URL  = window.__SUPABASE_URL__  || 'https://ylyixbvlofluhgpcouil.supabase.co';
 const SUPABASE_ANON = window.__SUPABASE_ANON__ || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlseWl4YnZsb2ZsdWhncGNvdWlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MDIxMjYsImV4cCI6MjA5MDM3ODEyNn0.AXjRGcntgezjFgNv4lzr84Z6RcuAf_szsFckWrTMFcg';
 
 const { createClient } = supabase;   // from CDN <script>
