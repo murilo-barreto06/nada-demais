@@ -800,78 +800,6 @@ function goHome() {
   location.href = 'index.html'; 
 }
 
-// Mock data for store
-const PRODUCTS = [
-  { id:1, title:'IA Atendimento para WhatsApp', price:'R$ 199,00', seller:'BotLabs', short:'Atendente automático para mensagens', img: '' },
-  { id:2, title:'Analisador de Documentos', price:'R$ 299,00', seller:'DocAI', short:'Extrai e classifica documentos', img: '' },
-  { id:3, title:'Recomendador de Produtos', price:'R$ 149,00', seller:'RecoSys', short:'Sistema de recomendações para e‑commerce', img: '' },
-  { id:4, title:'Detector de Qualidade (Visão)', price:'R$ 349,00', seller:'VisionWorks', short:'Detecta defeitos em produção', img: '' }
-];
-
-// Populate store carousel on store.html
-function renderStore() {
-  const el = document.getElementById('storeCarousel');
-  if(!el) return;
-  el.innerHTML = '';
-  PRODUCTS.forEach(p => {
-    const d = document.createElement('div');
-    d.className = 'card';
-    d.innerHTML = `<div class="img"></div><p>${p.title}</p>`;
-    d.onclick = () => openProduct(p.id);
-    el.appendChild(d);
-  });
-}
-
-// Open product details
-function openProduct(id) {
-  const prod = PRODUCTS.find(p => p.id === id);
-  if(prod) {
-    sessionStorage.setItem('selectedProduct', JSON.stringify(prod));
-    location.href = 'model.html';
-  }
-}
-
-// Open product sample
-function openProductSample(i) {
-  const p = PRODUCTS[i] || PRODUCTS[0];
-  openProduct(p.id);
-}
-
-// Populate model page from sessionStorage
-function renderModel() {
-  const data = sessionStorage.getItem('selectedProduct');
-  if(!data) return;
-  const p = JSON.parse(data);
-  const title = document.getElementById('productTitle');
-  const short = document.getElementById('productShort');
-  const price = document.getElementById('productPrice');
-  const seller = document.getElementById('productSeller');
-  const img = document.getElementById('productImage');
-  const docs = document.getElementById('productDocs');
-  if(title) title.textContent = p.title;
-  if(short) short.textContent = p.short;
-  if(price) price.textContent = p.price;
-  if(seller) seller.textContent = p.seller;
-  if(img) img.style.background = 'linear-gradient(180deg,#cfeeff,#9fd8ff,#7bc35b)';
-  if(docs) docs.innerHTML = '<li>Instalação via Docker</li><li>API REST - Exemplo</li><li>Exemplos de integração</li>';
-  
-  const rel = document.getElementById('relatedGrid');
-  if(rel) {
-    rel.innerHTML = '';
-    PRODUCTS.filter(x => x.id !== p.id).slice(0,3).forEach(r => {
-      const c = document.createElement('div');
-      c.className = 'small-card';
-      c.innerHTML = `<h4>${r.title}</h4><p>${r.seller}</p>`;
-      rel.appendChild(c);
-    });
-  }
-}
-
-// Mock login
-function mockLogin() {
-  alert('Login mock — aqui você integraria com backend');
-  location.href = 'buyer-dashboard.html';
-}
 
 // Carousel functions
 function moveCarousel(dir) {
@@ -894,9 +822,17 @@ function toggleSearch(){
 
 async function loadFeatured() {
   try {
-    // Carrega APENAS modelos criados pelo usuário (sem pré-definidos)
-    const userModels = JSON.parse(localStorage.getItem('models') || '[]');
-    
+    // Carrega modelos do Supabase (compartilhado entre dispositivos)
+    let userModels = [];
+    if (window.SupaDB) {
+      userModels = await SupaDB.Models.list();
+      userModels = userModels.map(m => ({
+        ...m,
+        image: m.media?.[0]?.url || '',
+        description: m.description || ''
+      }));
+    }
+
     const carousel = document.getElementById("carouselContainer");
     if (!carousel) return;
     
@@ -928,8 +864,16 @@ async function loadFeatured() {
 }
 
 // Função para carregar profissionais na home
-function loadHomeProfessionals() {
-  const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+async function loadHomeProfessionals() {
+  let professionals = [];
+  if (window.SupaDB) {
+    professionals = await SupaDB.Professionals.list();
+    professionals = professionals.map(p => ({
+      ...p,
+      hourlyRate: p.hourly_rate,
+      avatar: p.media?.[0]?.url || p.profiles?.avatar_url || ''
+    }));
+  }
   const carousel = document.getElementById('professionalsCarouselHome');
   if (!carousel) return;
   
@@ -947,13 +891,13 @@ function loadHomeProfessionals() {
     
     const avatarHTML = prof.avatar
       ? `<div class="avatar" style="background-image: url('${prof.avatar}')"></div>`
-      : `<div class="avatar-placeholder">${prof.name.charAt(0)}</div>`;
+      : `<div class="avatar-placeholder">${(prof.name||'?').charAt(0)}</div>`;
     
     card.innerHTML = `
       ${avatarHTML}
       <h3>${prof.name}</h3>
-      <p class="specialty">${prof.specialty}</p>
-      <div class="rating">⭐ ${prof.rating.toFixed(1)}</div>
+      <p class="specialty">${prof.specialty||''}</p>
+      <div class="rating">⭐ ${(prof.rating||0).toFixed(1)}</div>
     `;
     
     carousel.appendChild(card);
@@ -1005,8 +949,6 @@ function loadProfessional() {
   renderProfessional(professional);
 }
 
-// ===== CARROSSEL DE PROFISSIONAIS =====
-let professionals = [];
 
 // Carregar profissionais na página store.html (APENAS criados)
 function loadStoreProfessionals() {
@@ -1287,7 +1229,6 @@ function viewPortfolio() {
 // ===== GERENCIAMENTO DE PROFISSIONAIS (CRUD) =====
 
 // Chave para localStorage
-const PROFESSIONALS_STORAGE_KEY = 'ai_store_professionals';
 
 // Mostra mensagem de sucesso após cadastro
 function showSuccessMessage() {
@@ -1456,8 +1397,11 @@ function prevSlideServices() {
 }
 
 // Load services on home page
-function loadHomeServices() {
-  const services = JSON.parse(localStorage.getItem('services') || '[]');
+async function loadHomeServices() {
+  let services = [];
+  if (window.SupaDB) {
+    services = await SupaDB.Services.list();
+  }
   const carousel = document.getElementById('servicesCarouselHome');
   if (!carousel) return;
   carousel.innerHTML = '';
@@ -1471,7 +1415,7 @@ function loadHomeServices() {
     card.href = `service.html?id=${svc.id}`;
     card.className = 'carousel-item';
     const icon = CAT_SVC[svc.category] || '🤖';
-    const imageUrl = svc.media?.[0]?.data || svc.image || '';
+    const imageUrl = svc.media?.[0]?.url || svc.image || '';
     card.innerHTML = `
       <div class="carousel-thumb" style="${imageUrl?`background-image:url('${imageUrl}');`:`background:linear-gradient(135deg,#312e81,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:2.5rem;`}">
         ${imageUrl?'':icon}

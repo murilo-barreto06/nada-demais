@@ -905,7 +905,7 @@
     };
     
     // Função para excluir modelo
-    window.excluirModelo = function(id) {
+    window.excluirModelo = async function(id) {
       if (!confirm('Tem certeza que deseja excluir este modelo?')) return;
       
       await SupaDB.Models.remove(id);
@@ -961,17 +961,21 @@
       window.location.href = 'publicar-servico.html';
     };
 
-    window.excluirServico = function(id) {
+    window.excluirServico = async function(id) {
       if (!confirm('Excluir este serviço?')) return;
       await SupaDB.Services.remove(id);
       carregarServicos();
     };
-    function carregarPerfilProfissional() {
+    async function carregarPerfilProfissional() {
       const container = document.getElementById('profissionalContainer');
       if (!container) return;
       
-      // Busca profissionais do localStorage
-      const professionals = JSON.parse(localStorage.getItem('professionals') || '[]');
+      // Busca os perfis profissionais do usuário atual no Supabase
+      let professionals = [];
+      if (window.SupaDB && currentUser) {
+        const all = await SupaDB.Professionals.list();
+        professionals = all.filter(p => p.user_id === currentUser.id);
+      }
       
       if (professionals.length === 0) {
         container.innerHTML = `
@@ -1047,7 +1051,7 @@
     };
     
     // Excluir profissional
-    window.excluirProfissional = function(id) {
+    window.excluirProfissional = async function(id) {
       if (!confirm('Tem certeza que deseja excluir este perfil profissional?')) return;
       
       await SupaDB.Professionals.remove(id);

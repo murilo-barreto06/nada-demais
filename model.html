@@ -285,15 +285,14 @@
     };
 
     // ===== BUY =====
-    window.buyModel = function(id) {
-      const models = JSON.parse(localStorage.getItem('models')||'[]');
-      const model = models.find(m=>m.id==id);
-      if (!model) return;
-      const purchases = JSON.parse(localStorage.getItem('purchases')||'[]');
-      if (purchases.find(p=>p.modelId==id && p.type==='model')) {
+    window.buyModel = async function(id) {
+      const alreadyBought = await SupaDB.Purchases.exists(id, 'model');
+      if (alreadyBought) {
         alert('Você já adquiriu este modelo!');
         return;
       }
+      const model = await SupaDB.Models.get(id);
+      if (!model) return;
       await SupaDB.Purchases.create({
         item_id: model.id,
         title:   model.title,
@@ -308,7 +307,7 @@
     };
 
     // ===== LOAD PAGE =====
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       const id = new URLSearchParams(window.location.search).get('id');
       if (!id) { window.location.href='store.html'; return; }
 

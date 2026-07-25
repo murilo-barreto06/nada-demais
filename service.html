@@ -250,14 +250,13 @@
     }
 
     // ===== BUY =====
-    window.buyService = function(id) {
-      const services = JSON.parse(localStorage.getItem('services')||'[]');
-      const svc = services.find(s=>s.id==id);
-      if (!svc) return;
-      const purchases = JSON.parse(localStorage.getItem('purchases')||'[]');
-      if (purchases.find(p=>p.modelId==id && p.type==='service')) {
+    window.buyService = async function(id) {
+      const alreadyBought = await SupaDB.Purchases.exists(id, 'service');
+      if (alreadyBought) {
         alert('Você já adquiriu este serviço!'); return;
       }
+      const svc = await SupaDB.Services.get(id);
+      if (!svc) return;
       await SupaDB.Purchases.create({ item_id: svc.id, title: svc.title, price: svc.price, seller: svc.seller, type: 'service' });
       const fb = document.getElementById('buyFeedback');
       const btn = document.getElementById('buyBtn');
@@ -266,7 +265,7 @@
     };
 
     // ===== LOAD PAGE =====
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       const id = new URLSearchParams(window.location.search).get('id');
       if (!id) { window.location.href='store.html'; return; }
 
