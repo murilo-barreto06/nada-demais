@@ -113,6 +113,14 @@ nav a.active {
   border-radius: 50%;
   transition: background-color var(--transition);
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn svg {
+  width: 1.4rem;
+  height: 1.4rem;
 }
 
 .icon-btn:hover {
