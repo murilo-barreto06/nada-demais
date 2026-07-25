@@ -1105,6 +1105,7 @@
     
     // ===== INIT =====
     document.addEventListener('DOMContentLoaded', async function() {
+      await _loadUser();
       carregarDadosUsuario();
       await carregarAdquiridos();
       await carregarPublicados();
