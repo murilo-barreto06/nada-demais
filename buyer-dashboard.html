@@ -758,34 +758,29 @@
       document.getElementById('nameEditor').classList.remove('show');
     };
     
-    window.salvarNomeInline = function() {
+    window.salvarNomeInline = async function() {
       const novoNome = document.getElementById('editNameInput').value.trim();
       if (!novoNome) {
         alert('O nome não pode estar vazio');
         return;
       }
-      
-      // Atualizar no localStorage
-      const users = JSON.parse(localStorage.getItem('ai_store_users') || '[]');
-      const userIndex = users.findIndex(u => u.id === currentUser.id);
-      
-      if (userIndex >= 0) {
-        users[userIndex].name = novoNome;
-        localStorage.setItem('ai_store_users', JSON.stringify(users));
-        
-        // Atualizar currentUser
+
+      try {
+        await SupaDB.Profiles.upsert(currentUser.id, { name: novoNome });
+
         currentUser.name = novoNome;
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        
         document.getElementById('profileName').textContent = novoNome;
-        
+
         // Se não tiver foto, atualizar inicial
         if (!localStorage.getItem(`avatar_${currentUser.id}`)) {
           const initial = novoNome.charAt(0).toUpperCase();
           document.getElementById('avatarContent').innerHTML = `<span style="font-size: 3rem; line-height: 100px;">${initial}</span>`;
         }
-        
+
         esconderEditorNome();
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao salvar o nome. Tente novamente.');
       }
     };
     
